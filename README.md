@@ -12,6 +12,7 @@
 - develop : 개발 브랜치(브랜치 중앙 저장소, 테스트 용도)
 - feature :
   - #n issue name : issue에 포함된 기능별 브랜치(ex. #1 로그인 기능 구현)
+  - feature 브랜치를 나눌 때 develop 브랜치으로부터 나눌 것
 
 **커밋 규칙**
 
