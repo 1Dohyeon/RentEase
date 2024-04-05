@@ -36,4 +36,5 @@ body
 - 부연 설명이 필요할 때 작성
 
 **Pull Request**
+
 feature 브랜치에서 기능 개발이 완료되었다면 바로 merge 하는 것이 아니라 develop 브랜치로 pull request한다. 그 후 검토를 하고 merge를 하며 feature 브랜치는 삭제한다.
