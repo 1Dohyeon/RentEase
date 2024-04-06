@@ -1,4 +1,4 @@
-### Rules
+### 1. Rules
 
 **.eslintrc.js/prettier rule**
 
@@ -11,7 +11,7 @@
 ],
 ```
 
-### 라이브러리
+### 2. 라이브러리
 
 **1. mysql2**
 
