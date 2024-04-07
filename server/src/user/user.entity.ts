@@ -1,13 +1,10 @@
-import {
-  IsBoolean,
-  IsEmail,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-} from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { CommonEntity } from 'src/common/entity/common.entity';
-import { Column } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 
+@Entity({
+  name: 'user',
+})
 export class UserEntity extends CommonEntity {
   @IsEmail({}, { message: '올바른 형태의 이메일을 작성해주세요.' })
   @IsNotEmpty({ message: '이메일을 작성해주세요.' })
@@ -33,7 +30,7 @@ export class UserEntity extends CommonEntity {
   @Column({ type: 'boolean', default: false })
   isAdmin: boolean;
 
-  @IsNumber()
-  @Column({ type: 'number', default: 30 })
-  manners_point: number;
+  // @IsNumber()
+  // @Column()
+  // manners_point: number;
 }
