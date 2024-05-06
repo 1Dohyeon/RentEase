@@ -22,7 +22,7 @@ export class AuthService {
 
   /**
    * 회원가입
-   * to AuthController register
+   * to AuthController.register
    */
   async register(userRegisterDto: UserRegisterDto) {
     const { email, password, username, nickname } = userRegisterDto;
@@ -56,7 +56,7 @@ export class AuthService {
 
   /**
    * 로그인
-   * to AuthController login
+   * to AuthController.login
    */
   async jwtLogIn(userLoginDto: UserLoginDto, response: Response) {
     const { user, jwt } = await this.verifyUserAndSignJwt(
@@ -66,17 +66,14 @@ export class AuthService {
 
     response.cookie('jwt', jwt, { httpOnly: true });
 
-    const loginUser = await this.userRepository.getReadOnlyUserDataById(
-      user.id,
-    );
+    const loginUser = await this.userRepository.getUserById(user.id);
 
     return { loginUser, jwt };
   }
 
   /**
    * id, password 확인 + jwt 확인
-   * to here jwtLogIn
-   * UserService로 옮길 수도..
+   * to this.jwtLogIn
    */
   async verifyUserAndSignJwt(
     email: UserLoginDto['email'],

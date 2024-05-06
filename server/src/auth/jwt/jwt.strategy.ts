@@ -17,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   // 보안을 위해 jwt 정보에 password는 제외
   async validate(payload: Payload) {
-    const user = await this.usersRepository.findUserByIdWithoutPassword(
+    const user = await this.usersRepository.getUserBySubForValidate(
       payload.sub,
     );
 
