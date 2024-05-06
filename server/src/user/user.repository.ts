@@ -17,58 +17,29 @@ export class UserRepository extends Repository<UserEntity> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  /** ---------- CREATE ---------- */
-
   /**
-   * to AuthService register
+   * user 객체 생성
+   * to AuthService.register
    */
   async createUser(userRegisterDto: UserRegisterDto): Promise<UserEntity> {
     const user = this.repository.create(userRegisterDto);
     await this.repository.save(user);
 
-    return this.getCreatedUserById(user.id);
+    return this.getUserById(user.id);
   }
 
   /** ---------- READ ---------- */
 
   /**
-   * user의 프로필 setting 에서 조회되는 데이터 :
-   * id, email, username, nickname,
-   * createdAt, updatedAt, deletedAt,
-   * articles, teams 반환
-   */
-  async getReadOnlyUserDataById(
-    userId: number,
-  ): Promise<UserEntity | undefined> {
-    try {
-      const user = await this.repository
-        .createQueryBuilder('user')
-        .where('user.id = :id', { id: userId })
-        // =:id는 SQL에서 값이 특정한 값과 동일한지 확인하는 연산자
-        .select([
-          'user.id',
-          'user.email',
-          'user.username',
-          'user.nickname',
-          'user.createdAt',
-        ])
-        .getOne();
-
-      if (!user) throw new Error();
-      return user;
-    } catch (error) {
-      throw new BadRequestException('해당하는 사용자를 찾을 수 없습니다.');
-    }
-  }
-
-  /**
-   * user login시 사용
+   * id를 통해 user 기본 정보만 불러옴
+   * to AuthService.register
    */
   async getUserById(userId: number): Promise<UserEntity | undefined> {
     try {
       const user = await this.repository
         .createQueryBuilder('user')
         .where('user.id = :id', { id: userId })
+        // where(=:id)는 SQL에서 값이 특정한 값과 동일한지 확인하는 연산자
         .select([
           'user.id',
           'user.email',
@@ -85,13 +56,11 @@ export class UserRepository extends Repository<UserEntity> {
     }
   }
 
-  /** 로그인할 때 정보 반환.
+  /** 로그인할 때 리턴 정보.
    * payload의 sub 데이터로 jwt 인증할 때 사용됨.
-   * password 없이 userdata 반환
+   * to JwtStrategy.validate
    */
-  async findUserByIdWithoutPassword(
-    sub: string,
-  ): Promise<UserEntity | undefined> {
+  async getUserBySubForValidate(sub: string): Promise<UserEntity | undefined> {
     try {
       return this.createQueryBuilder('user')
         .addSelect(['user.id', 'user.email', 'user.username', 'user.nickname'])
@@ -105,32 +74,8 @@ export class UserRepository extends Repository<UserEntity> {
   }
 
   /**
-   * user를 생성할 때 user의 기본 정보만 반환 :
-   * id, email, username, nickname, updatedAt 반환
-   */
-  async getCreatedUserById(userId: number): Promise<UserEntity | undefined> {
-    try {
-      const user = await this.repository
-        .createQueryBuilder('user')
-        .where('user.id = :id', { id: userId })
-        .select([
-          'user.id',
-          'user.email',
-          'user.username',
-          'user.nickname',
-          'user.createdAt',
-        ])
-        .getOne();
-
-      if (!user) throw new Error();
-      return user;
-    } catch (error) {
-      throw new BadRequestException('해당하는 사용자를 찾을 수 없습니다.');
-    }
-  }
-
-  /**
-   * to AuthService login
+   * email로 user 불러옴
+   * to AuthService.verifyUserAndSignJwt
    */
   async getUserByEmail(email: string): Promise<any | null> {
     const user = await this.repository.findOne({ where: { email } });
@@ -227,7 +172,7 @@ export class UserRepository extends Repository<UserEntity> {
     return await this.repository.find();
   }
 
-  async getUserArticles(userId: number): Promise<UserEntity | undefined> {
+  async getArticlesByUserId(userId: number): Promise<UserEntity | undefined> {
     return this.createQueryBuilder('user')
       .leftJoinAndSelect('user.articles', 'articles')
       .where('user.id = :userId', { userId })
@@ -239,7 +184,7 @@ export class UserRepository extends Repository<UserEntity> {
   /**
    * to settingController deleteUser
    */
-  async deleteUser(user: UserEntity): Promise<UserEntity> {
+  async deleteUserById(user: UserEntity): Promise<UserEntity> {
     const deletedUser = await this.getDeletedUserById(user.id);
     await this.repository.delete(user.id);
     return deletedUser;

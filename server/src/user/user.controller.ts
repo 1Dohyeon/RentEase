@@ -7,12 +7,32 @@ export class UserController {
   constructor(private readonly userRepository: UserRepository) {}
 
   /**
-   * 특정 User 인스턴스 불러옴
+   * user 정보 불러옴
    */
   @Get(':userId')
   async getUserById(
     @Param('userId') userId: number,
   ): Promise<UserEntity | undefined> {
-    return this.userRepository.getReadOnlyUserDataById(userId);
+    return this.userRepository.getUserById(userId);
+  }
+
+  /**
+   * user의 게시글들 불러옴
+   */
+  @Get(':userId')
+  async getArticlesByUserId(
+    @Param('userId') userId: number,
+  ): Promise<UserEntity | undefined> {
+    return this.userRepository.getArticlesByUserId(userId);
+  }
+
+  /**
+   * user가 review를 남긴 게시글들 불러옴
+   */
+  @Get(':userId')
+  async getReviewsByUserId(
+    @Param('userId') userId: number,
+  ): Promise<UserEntity | undefined> {
+    return this.userRepository.getUserById(userId);
   }
 }
