@@ -27,7 +27,7 @@ export class SettingController {
   @Get('/account')
   async getUserAccount(@Request() req) {
     const userId = req.user.id;
-    return this.accountRepository.getProfile(userId);
+    return await this.accountRepository.getProfile(userId);
   }
 
   @Patch('/account/email')
