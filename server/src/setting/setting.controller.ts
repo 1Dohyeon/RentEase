@@ -1,9 +1,19 @@
-import { Controller, Get, Patch, Redirect, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Redirect,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import { AccountRepository } from 'src/account/account.repository';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 
 @Controller('settings')
 @UseGuards(JwtAuthGuard)
 export class SettingController {
+  constructor(private readonly accountRepository: AccountRepository) {}
+
   @Get('/')
   @Redirect('/settings/profile')
   async redirectToProfile() {}
@@ -15,7 +25,10 @@ export class SettingController {
   async updateProfile() {}
 
   @Get('/account')
-  async getUserAccount() {}
+  async getUserAccount(@Request() req) {
+    const userId = req.user.id;
+    return this.accountRepository.getProfile(userId);
+  }
 
   @Patch('/account/email')
   async updateEmail() {}
