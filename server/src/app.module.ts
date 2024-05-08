@@ -3,7 +3,11 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './common/logger/logger.middleware';
+import { UserEntity } from './user/user.entity';
+import { UserModule } from './user/user.module';
+import { SettingModule } from './setting/setting.module';
 
 @Module({
   imports: [
@@ -19,9 +23,12 @@ import { LoggerMiddleware } from './common/logger/logger.middleware';
       database: process.env.DB_NAME,
       synchronize: true, // 배포환경에서는 false
       logging: true,
-      entities: [],
+      entities: [UserEntity],
       autoLoadEntities: true,
     }),
+    UserModule,
+    AuthModule,
+    SettingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
