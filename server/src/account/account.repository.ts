@@ -17,6 +17,4 @@ export class AccountRepository extends UserRepository {
       name: user.username,
     };
   }
-
-  // async updatePassword(userId: number) {}
 }

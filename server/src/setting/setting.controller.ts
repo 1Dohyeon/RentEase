@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -8,12 +9,16 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AccountRepository } from 'src/account/account.repository';
+import { AccountService } from 'src/account/account.service';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 
 @Controller('settings')
 @UseGuards(JwtAuthGuard)
 export class SettingController {
-  constructor(private readonly accountRepository: AccountRepository) {}
+  constructor(
+    private readonly accountRepository: AccountRepository,
+    private readonly accountService: AccountService,
+  ) {}
 
   @Get('/')
   @Redirect('/settings/profile')
@@ -35,15 +40,15 @@ export class SettingController {
    * 계정 삭제
    */
   @Delete('/account/delete-user')
-  @UseGuards(JwtAuthGuard)
   async deleteAccount(@Request() req) {
     const userId = req.user.id;
     return await this.accountRepository.deleteUserById(userId);
   }
 
-  // @Patch('/account/password')
-  // async updatePassword(@Request() req) {
-  //   const userId = req.user.id;
-  //   return await this.accountRepository.updatePassword(userId);
-  // }
+  @Patch('/account/password')
+  async updatePassword(@Request() req, @Body() body) {
+    const userId = req.user.id;
+    const newPassword = body.newPassword;
+    return await this.accountService.updatePassword(userId, newPassword);
+  }
 }

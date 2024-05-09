@@ -132,39 +132,6 @@ export class UserRepository extends Repository<UserEntity> {
     }
   }
 
-  /** user의 프로필 정보만 반환 :
-   * user의 id, username, nickname 반환 */
-  async getUserProfile(userId: number): Promise<UserEntity | undefined> {
-    try {
-      const user = await this.repository.findOne({
-        where: { id: userId },
-        select: ['id', 'username', 'nickname'],
-      });
-
-      if (!user) throw new Error();
-      return user;
-    } catch (error) {
-      throw new BadRequestException('로그인 세션이 만료되었습니다.');
-    }
-  }
-
-  /**
-   * email만 불러옴
-   * to settingController getUserEmail */
-  async getUserEmail(userId: number): Promise<UserEntity | undefined> {
-    try {
-      const user = await this.repository.findOne({
-        where: { id: userId },
-        select: ['email'],
-      });
-
-      if (!user) throw new Error();
-      return user;
-    } catch (error) {
-      throw new BadRequestException('로그인 세션이 만료되었습니다.');
-    }
-  }
-
   /**
    * to userController getAllUsers
    */
@@ -177,6 +144,16 @@ export class UserRepository extends Repository<UserEntity> {
       .leftJoinAndSelect('user.articles', 'articles')
       .where('user.id = :userId', { userId })
       .getOne();
+  }
+
+  /** ---------- UPDATE ---------- */
+
+  async updatePassword(userId: number, hashedPassword: string) {
+    const user = await this.getUpdatedUserById(userId);
+    user.password = hashedPassword;
+    await this.repository.save(user);
+
+    return user;
   }
 
   /** ---------- DELETE ---------- */
