@@ -96,6 +96,6 @@ export class AuthService {
   }
 
   async deleteUser(userId: number) {
-    return this.userRepository.deleteUserById(userId);
+    return await this.userRepository.deleteUserById(userId);
   }
 }
