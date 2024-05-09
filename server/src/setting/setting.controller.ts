@@ -42,7 +42,10 @@ export class SettingController {
    * 프로필 업데이트
    */
   @Patch('/profile')
-  async updateProfile() {}
+  async updateProfile(@Request() req, @Body() body) {
+    const userId = req.user.id;
+    return await this.profileRepository.updateProfile(userId, body);
+  }
 
   /**
    *  계정 정보 조회(email, username)
