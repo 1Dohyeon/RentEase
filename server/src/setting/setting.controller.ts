@@ -31,7 +31,7 @@ export class SettingController {
   async updateProfile() {}
 
   @Get('/account')
-  async getAccount(@Request() req) {
+  async getAccountById(@Request() req) {
     const userId = req.user.id;
     return await this.accountRepository.getAccountById(userId);
   }
