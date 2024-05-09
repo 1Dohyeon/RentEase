@@ -105,62 +105,6 @@ export class UserRepository extends Repository<UserEntity> {
       .getOne();
   }
 
-  /** ---------- UPDATE ---------- */
-
-  /**
-   * password 업데이트
-   * to AccountService.updatePassword
-   */
-  async updatePassword(userId: number, hashedPassword: string) {
-    const user = await this.getUserById(userId);
-    user.password = hashedPassword;
-    await this.repository.save(user);
-
-    return {
-      id: user.id,
-      updatedAt: user.updatedAt,
-    };
-  }
-
-  /**
-   * profile 업데이트
-   * to SettingAccount.updateProfile
-   */
-  async updateProfile(userId: number, updateStatus: Partial<UserEntity>) {
-    const user = await this.getUserById(userId);
-
-    // 사용자가 변경한 값만 업데이트
-    // Object.assign(user, updateStatus); // 이렇게 해도 아래랑 같은 결과
-    if (updateStatus.username) {
-      user.username = updateStatus.username;
-    }
-    if (updateStatus.nickname) {
-      user.nickname = updateStatus.nickname;
-    }
-    await this.repository.save(user);
-
-    return {
-      id: user.id,
-      username: user.username,
-      nickname: user.nickname,
-      updatedAt: user.updatedAt,
-    };
-  }
-
-  /** ---------- DELETE ---------- */
-
-  /**
-   * to settingController.deleteUser
-   */
-  async deleteUserById(userId: number) {
-    const deletedUser = await this.getUserById(userId);
-    await this.repository.delete(userId);
-    return {
-      id: deletedUser.id,
-      deletedAt: deletedUser.deletedAt,
-    };
-  }
-
   /** ---------- db 확인 ---------- */
 
   /**

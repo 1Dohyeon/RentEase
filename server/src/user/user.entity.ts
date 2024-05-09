@@ -34,3 +34,17 @@ export class UserEntity extends CommonEntity {
   // @Column()
   // manners_point: number;
 }
+
+export interface UserProfile {
+  id: number;
+  username: string;
+  nickname: string;
+  updatedAt: Date;
+}
+
+export interface UserAccount {
+  id: number;
+  username: string;
+  email: string;
+  updatedAt: Date;
+}
