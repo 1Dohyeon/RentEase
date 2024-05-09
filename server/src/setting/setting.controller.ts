@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   Patch,
   Redirect,
@@ -28,6 +29,16 @@ export class SettingController {
   async getAccount(@Request() req) {
     const userId = req.user.id;
     return await this.accountRepository.getAccount(userId);
+  }
+
+  /**
+   * 계정 삭제
+   */
+  @Delete('/account/delete-user')
+  @UseGuards(JwtAuthGuard)
+  async deleteAccount(@Request() req) {
+    const userId = req.user.id;
+    return await this.accountRepository.deleteUserById(userId);
   }
 
   // @Patch('/account/password')
