@@ -30,7 +30,6 @@ export class UserRepository extends Repository<UserEntity> {
 
   /**
    * id를 통해 user 기본 정보만 불러옴
-   * to AuthService.register
    */
   async getUserById(userId: number): Promise<UserEntity | undefined> {
     try {
