@@ -11,6 +11,7 @@ import {
 import { AccountRepository } from 'src/account/account.repository';
 import { AccountService } from 'src/account/account.service';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
+import { ProfileRepository } from 'src/profile/profile.repository';
 
 @Controller('settings')
 @UseGuards(JwtAuthGuard)
@@ -18,6 +19,7 @@ export class SettingController {
   constructor(
     private readonly accountRepository: AccountRepository,
     private readonly accountService: AccountService,
+    private readonly profileRepository: ProfileRepository,
   ) {}
 
   /**
@@ -31,7 +33,10 @@ export class SettingController {
    * 프로필 정보 조회
    */
   @Get('/profile')
-  async getProfile() {}
+  async getProfileById(@Request() req) {
+    const userId = req.user.id;
+    return await this.profileRepository.getProfileById(userId);
+  }
 
   /**
    * 프로필 업데이트

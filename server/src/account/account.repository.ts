@@ -16,8 +16,8 @@ export class AccountRepository extends UserRepository {
     }
 
     return {
-      nickname: user.email,
-      name: user.username,
+      email: user.email,
+      username: user.username,
     };
   }
 }
