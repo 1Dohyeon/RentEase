@@ -11,9 +11,9 @@ export class AccountRepository extends UserRepository {
       throw new BadRequestException('해당하는 사용자를 찾을 수 없습니다.');
     }
 
-    // 사용자 정보 중에서 nickname과 name 속성만 반환
+    // 사용자 정보 중에서 email과 name 속성만 반환
     return {
-      nickname: user.nickname,
+      nickname: user.email,
       name: user.username,
     };
   }
