@@ -25,14 +25,14 @@ export class SettingController {
   async updateProfile() {}
 
   @Get('/account')
-  async getUserAccount(@Request() req) {
+  async getAccount(@Request() req) {
     const userId = req.user.id;
-    return await this.accountRepository.getProfile(userId);
+    return await this.accountRepository.getAccount(userId);
   }
 
-  @Patch('/account/email')
-  async updateEmail() {}
-
-  @Patch('/account/password')
-  async updatePassword() {}
+  // @Patch('/account/password')
+  // async updatePassword(@Request() req) {
+  //   const userId = req.user.id;
+  //   return await this.accountRepository.updatePassword(userId);
+  // }
 }

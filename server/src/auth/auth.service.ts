@@ -94,4 +94,8 @@ export class AuthService {
       throw new BadRequestException(error.message);
     }
   }
+
+  async deleteUser(userId: number) {
+    return this.userRepository.deleteUserById(userId);
+  }
 }

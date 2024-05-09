@@ -184,9 +184,9 @@ export class UserRepository extends Repository<UserEntity> {
   /**
    * to settingController deleteUser
    */
-  async deleteUserById(user: UserEntity): Promise<UserEntity> {
-    const deletedUser = await this.getDeletedUserById(user.id);
-    await this.repository.delete(user.id);
+  async deleteUserById(userId: number): Promise<UserEntity> {
+    const deletedUser = await this.getDeletedUserById(userId);
+    await this.repository.delete(userId);
     return deletedUser;
   }
 
