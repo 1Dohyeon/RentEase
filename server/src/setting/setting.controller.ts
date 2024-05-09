@@ -33,7 +33,7 @@ export class SettingController {
   @Get('/account')
   async getAccount(@Request() req) {
     const userId = req.user.id;
-    return await this.accountRepository.getAccount(userId);
+    return await this.accountRepository.getAccountById(userId);
   }
 
   /**

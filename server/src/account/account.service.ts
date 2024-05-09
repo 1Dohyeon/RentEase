@@ -6,6 +6,10 @@ import { AccountRepository } from './account.repository';
 export class AccountService {
   constructor(private readonly accountRepository: AccountRepository) {}
 
+  /**
+   * password 해시화
+   * to SettingController.updatePassword
+   */
   async updatePassword(userId: number, newPassword: string) {
     try {
       console.log(userId, newPassword);

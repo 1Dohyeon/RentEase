@@ -3,7 +3,7 @@ import { UserRepository } from 'src/user/user.repository';
 
 @Injectable()
 export class AccountRepository extends UserRepository {
-  async getAccount(userId: number) {
+  async getAccountById(userId: number) {
     const user = await this.getUserById(userId);
 
     // 사용자 정보가 없으면 예외 처리
