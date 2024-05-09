@@ -20,16 +20,28 @@ export class SettingController {
     private readonly accountService: AccountService,
   ) {}
 
+  /**
+   * settings/ 로 접근시 /settings/profile 로 리다이렉트
+   */
   @Get('/')
   @Redirect('/settings/profile')
   async redirectToProfile() {}
 
+  /**
+   * 프로필 정보 조회
+   */
   @Get('/profile')
   async getProfile() {}
 
+  /**
+   * 프로필 업데이트
+   */
   @Patch('/profile')
   async updateProfile() {}
 
+  /**
+   *  계정 정보 조회(email, username)
+   */
   @Get('/account')
   async getAccountById(@Request() req) {
     const userId = req.user.id;
@@ -45,6 +57,9 @@ export class SettingController {
     return await this.accountRepository.deleteUserById(userId);
   }
 
+  /**
+   * password 업데이트
+   */
   @Patch('/account/password')
   async updatePassword(@Request() req, @Body() body) {
     const userId = req.user.id;
