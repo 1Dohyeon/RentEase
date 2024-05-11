@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Patch,
+  Post,
   Redirect,
   Request,
   UseGuards,
@@ -43,6 +44,24 @@ export class SettingController {
    */
   @Patch('/profile')
   async updateProfile(@Request() req, @Body() body) {
+    const userId = req.user.id;
+    return await this.profileRepository.updateProfile(userId, body);
+  }
+
+  /**
+   * 주소 생성
+   */
+  @Post('/profile/address')
+  async createAdress(@Request() req, @Body() body) {
+    const userId = req.user.id;
+    return await this.profileRepository.updateProfile(userId, body);
+  }
+
+  /**
+   * 주소 수정
+   */
+  @Patch('/profile/address/:id')
+  async updateAddress(@Request() req, @Body() body) {
     const userId = req.user.id;
     return await this.profileRepository.updateProfile(userId, body);
   }
