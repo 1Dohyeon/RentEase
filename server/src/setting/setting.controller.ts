@@ -12,7 +12,7 @@ import {
 import { AccountRepository } from 'src/account/account.repository';
 import { AccountService } from 'src/account/account.service';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
-import { ProfileRepository } from 'src/profile/profile.repository';
+import { ProfileService } from 'src/profile/profile.service';
 
 @Controller('settings')
 @UseGuards(JwtAuthGuard)
@@ -20,7 +20,7 @@ export class SettingController {
   constructor(
     private readonly accountRepository: AccountRepository,
     private readonly accountService: AccountService,
-    private readonly profileRepository: ProfileRepository,
+    private readonly profileService: ProfileService,
   ) {}
 
   /**
@@ -36,7 +36,7 @@ export class SettingController {
   @Get('/profile')
   async getProfileById(@Request() req) {
     const userId = req.user.id;
-    return await this.profileRepository.getProfileById(userId);
+    return await this.profileService.getProfileById(userId);
   }
 
   /**
@@ -45,7 +45,7 @@ export class SettingController {
   @Patch('/profile')
   async updateProfile(@Request() req, @Body() body) {
     const userId = req.user.id;
-    return await this.profileRepository.updateProfile(userId, body);
+    return await this.profileService.updateProfile(userId, body);
   }
 
   /**
@@ -54,7 +54,7 @@ export class SettingController {
   @Post('/profile/address')
   async createAdress(@Request() req, @Body() body) {
     const userId = req.user.id;
-    return await this.profileRepository.updateProfile(userId, body);
+    return await this.profileService.updateProfile(userId, body);
   }
 
   /**
@@ -63,7 +63,7 @@ export class SettingController {
   @Patch('/profile/address/:id')
   async updateAddress(@Request() req, @Body() body) {
     const userId = req.user.id;
-    return await this.profileRepository.updateProfile(userId, body);
+    return await this.profileService.updateProfile(userId, body);
   }
 
   /**
