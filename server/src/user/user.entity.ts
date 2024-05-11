@@ -1,7 +1,6 @@
 import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { AddressEntity } from 'src/address/address.entity';
 import { CommonEntity } from 'src/common/entity/common.entity';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 
 @Entity({
   name: 'user',
@@ -31,12 +30,12 @@ export class UserEntity extends CommonEntity {
   @Column({ type: 'boolean', default: false })
   isAdmin: boolean;
 
-  @OneToMany(() => AddressEntity, (address) => address.user)
-  addresses: AddressEntity[];
-
   // @IsNumber()
   // @Column()
   // manners_point: number;
+
+  // @OneToMany(() => AddressEntity, (address) => address.user)
+  // addresses: AddressEntity[];
 }
 
 export interface UserProfile {

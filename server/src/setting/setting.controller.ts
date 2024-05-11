@@ -9,7 +9,6 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AccountRepository } from 'src/account/account.repository';
 import { AccountService } from 'src/account/account.service';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { ProfileService } from 'src/profile/profile.service';
@@ -18,7 +17,6 @@ import { ProfileService } from 'src/profile/profile.service';
 @UseGuards(JwtAuthGuard)
 export class SettingController {
   constructor(
-    private readonly accountRepository: AccountRepository,
     private readonly accountService: AccountService,
     private readonly profileService: ProfileService,
   ) {}
@@ -72,7 +70,7 @@ export class SettingController {
   @Get('/account')
   async getAccountById(@Request() req) {
     const userId = req.user.id;
-    return await this.accountRepository.getAccountById(userId);
+    return await this.accountService.getAccountById(userId);
   }
 
   /**
@@ -81,7 +79,7 @@ export class SettingController {
   @Delete('/account/delete-user')
   async deleteAccount(@Request() req) {
     const userId = req.user.id;
-    return await this.accountRepository.deleteUserById(userId);
+    return await this.accountService.deleteUserById(userId);
   }
 
   /**
