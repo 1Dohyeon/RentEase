@@ -10,6 +10,7 @@ import { UserModule } from './user/user.module';
 import { SettingModule } from './setting/setting.module';
 import { AccountModule } from './account/account.module';
 import { ProfileModule } from './profile/profile.module';
+import { AddressModule } from './address/address.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ProfileModule } from './profile/profile.module';
     SettingModule,
     AccountModule,
     ProfileModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService],
