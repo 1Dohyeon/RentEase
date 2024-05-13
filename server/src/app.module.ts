@@ -11,6 +11,7 @@ import { SettingModule } from './setting/setting.module';
 import { AccountModule } from './account/account.module';
 import { ProfileModule } from './profile/profile.module';
 import { AddressModule } from './address/address.module';
+import { ArticleModule } from './article/article.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { AddressModule } from './address/address.module';
     AccountModule,
     ProfileModule,
     AddressModule,
+    ArticleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
