@@ -33,4 +33,21 @@ export class UserEntity extends CommonEntity {
   // @IsNumber()
   // @Column()
   // manners_point: number;
+
+  // @OneToMany(() => AddressEntity, (address) => address.user)
+  // addresses: AddressEntity[];
+}
+
+export interface UserProfile {
+  id: number;
+  username: string;
+  nickname: string;
+  updatedAt: Date;
+}
+
+export interface UserAccount {
+  id: number;
+  username: string;
+  email: string;
+  updatedAt: Date;
 }

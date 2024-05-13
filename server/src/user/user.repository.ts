@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserRegisterDto } from './dtos/user.register.req';
@@ -16,6 +12,8 @@ export class UserRepository extends Repository<UserEntity> {
   ) {
     super(repository.target, repository.manager, repository.queryRunner);
   }
+
+  /** ---------- CREATE ---------- */
 
   /**
    * user 객체 생성
@@ -32,20 +30,21 @@ export class UserRepository extends Repository<UserEntity> {
 
   /**
    * id를 통해 user 기본 정보만 불러옴
-   * to AuthService.register
    */
   async getUserById(userId: number): Promise<UserEntity | undefined> {
     try {
       const user = await this.repository
         .createQueryBuilder('user')
         .where('user.id = :id', { id: userId })
-        // where(=:id)는 SQL에서 값이 특정한 값과 동일한지 확인하는 연산자
+        // password 제외하고 불러옴
         .select([
           'user.id',
           'user.email',
           'user.username',
           'user.nickname',
           'user.createdAt',
+          'user.updatedAt',
+          'user.deletedAt',
         ])
         .getOne();
 
@@ -56,7 +55,8 @@ export class UserRepository extends Repository<UserEntity> {
     }
   }
 
-  /** 로그인할 때 리턴 정보.
+  /**
+   * 로그인할 때 리턴 정보.
    * payload의 sub 데이터로 jwt 인증할 때 사용됨.
    * to JwtStrategy.validate
    */
@@ -89,89 +89,15 @@ export class UserRepository extends Repository<UserEntity> {
   }
 
   /**
-   * user를 업데이트할 때 반환 :
-   * id, email, username, nickname, updatedAt 반환
-   */
-  async getUpdatedUserById(userId: number): Promise<UserEntity | undefined> {
-    try {
-      const user = await this.repository
-        .createQueryBuilder('user')
-        .where('user.id = :id', { id: userId })
-        .select([
-          'user.id',
-          'user.email',
-          'user.username',
-          'user.nickname',
-          'user.updatedAt',
-        ])
-        .getOne();
-
-      if (!user) throw new Error();
-      return user;
-    } catch (error) {
-      throw new BadRequestException('해당하는 사용자를 찾을 수 없습니다.');
-    }
-  }
-
-  /**
-   * user를 삭제할 때 반환 :
-   * id, email, username, nickname, deletedAt 반환
-   */
-  async getDeletedUserById(userId: number): Promise<UserEntity | undefined> {
-    try {
-      const user = await this.repository
-        .createQueryBuilder('user')
-        .where('user.id = :id', { id: userId })
-        .select(['user.id', 'user.email', 'user.username', 'user.nickname'])
-        .getOne();
-
-      if (!user) throw new Error();
-      return user;
-    } catch (error) {
-      throw new BadRequestException('해당하는 사용자를 찾을 수 없습니다.');
-    }
-  }
-
-  /** user의 프로필 정보만 반환 :
-   * user의 id, username, nickname 반환 */
-  async getUserProfile(userId: number): Promise<UserEntity | undefined> {
-    try {
-      const user = await this.repository.findOne({
-        where: { id: userId },
-        select: ['id', 'username', 'nickname'],
-      });
-
-      if (!user) throw new Error();
-      return user;
-    } catch (error) {
-      throw new BadRequestException('로그인 세션이 만료되었습니다.');
-    }
-  }
-
-  /**
-   * email만 불러옴
-   * to settingController getUserEmail */
-  async getUserEmail(userId: number): Promise<UserEntity | undefined> {
-    try {
-      const user = await this.repository.findOne({
-        where: { id: userId },
-        select: ['email'],
-      });
-
-      if (!user) throw new Error();
-      return user;
-    } catch (error) {
-      throw new BadRequestException('로그인 세션이 만료되었습니다.');
-    }
-  }
-
-  /**
-   * to userController getAllUsers
+   * to userController.getAllUsers
    */
   async getAllUsers(): Promise<UserEntity[]> {
     return await this.repository.find();
   }
 
+  /**
+   * to userController.getArticlesByUserId
+   */
   async getArticlesByUserId(userId: number): Promise<UserEntity | undefined> {
     return this.createQueryBuilder('user')
       .leftJoinAndSelect('user.articles', 'articles')
@@ -179,44 +105,23 @@ export class UserRepository extends Repository<UserEntity> {
       .getOne();
   }
 
-  /** ---------- DELETE ---------- */
+  /** ---------- db 확인 ---------- */
 
   /**
-   * to settingController deleteUser
-   */
-  async deleteUserById(user: UserEntity): Promise<UserEntity> {
-    const deletedUser = await this.getDeletedUserById(user.id);
-    await this.repository.delete(user.id);
-    return deletedUser;
-  }
-
-  /** ---------- ETC ---------- */
-
-  /** db안 email 여부 확인 */
+   * db안 email 존재 여부 확인
+   * to AuthService.register
+   * */
   async existsByEmail(email: string): Promise<boolean> {
     const user = await this.repository.findOne({ where: { email } });
     return !!user; // 이메일이 존재하면 true, 존재하지 않으면 false를 반환
   }
 
-  /** db안 nickname 여부 확인 */
+  /**
+   * db 안에 nickname 존재 여부 확인
+   * to AuthService.register
+   */
   async existsByNickname(nickname: string): Promise<boolean> {
     const user = await this.repository.findOne({ where: { nickname } });
     return !!user; // 닉네임 존재하면 true, 존재하지 않으면 false를 반환
-  }
-
-  /** email 중복 체크, 중복이면 에러 처리 */
-  async checkEmail(user: UserEntity, email: string) {
-    const isNicknameExist = await this.existsByEmail(email);
-    if (user.email != email && isNicknameExist) {
-      throw new UnauthorizedException('이미 존재하는 이메일입니다.');
-    }
-  }
-
-  /** nickname 중복 체크, 중복이면 에러 처리 */
-  async checkNickname(user: UserEntity, nickname: string) {
-    const isNicknameExist = await this.existsByNickname(nickname);
-    if (user.nickname != nickname && isNicknameExist) {
-      throw new UnauthorizedException('이미 존재하는 닉네임입니다.');
-    }
   }
 }

@@ -8,6 +8,9 @@ import { LoggerMiddleware } from './common/logger/logger.middleware';
 import { UserEntity } from './user/user.entity';
 import { UserModule } from './user/user.module';
 import { SettingModule } from './setting/setting.module';
+import { AccountModule } from './account/account.module';
+import { ProfileModule } from './profile/profile.module';
+import { AddressModule } from './address/address.module';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { SettingModule } from './setting/setting.module';
     UserModule,
     AuthModule,
     SettingModule,
+    AccountModule,
+    ProfileModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService],
