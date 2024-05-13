@@ -88,16 +88,10 @@ export class UserRepository extends Repository<UserEntity> {
     return user;
   }
 
-  /**
-   * to userController.getAllUsers
-   */
   async getAllUsers(): Promise<UserEntity[]> {
     return await this.repository.find();
   }
 
-  /**
-   * to userController.getArticlesByUserId
-   */
   async getArticlesByUserId(userId: number): Promise<UserEntity | undefined> {
     return this.createQueryBuilder('user')
       .leftJoinAndSelect('user.articles', 'articles')

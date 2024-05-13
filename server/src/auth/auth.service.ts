@@ -10,13 +10,13 @@ import { Response } from 'express';
 import { UserDto } from 'src/user/dtos/user.dto';
 import { UserLoginDto } from 'src/user/dtos/user.login.req';
 import { UserRegisterDto } from 'src/user/dtos/user.register.req';
-import { UserRepository } from 'src/user/user.repository';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    private readonly userRepository: UserRepository,
+    private readonly userService: UserService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -28,15 +28,14 @@ export class AuthService {
     const { email, password, username, nickname } = userRegisterDto;
 
     // email 중복 확인
-    const isEmailExist = await this.userRepository.existsByEmail(email);
+    const isEmailExist = await this.userService.existsByEmail(email);
 
     if (isEmailExist) {
       throw new UnauthorizedException('이미 존재하는 이메일입니다.');
     }
 
     // 닉네임 중복 확인
-    const isNicknameExist =
-      await this.userRepository.existsByNickname(nickname);
+    const isNicknameExist = await this.userService.existsByNickname(nickname);
     if (isNicknameExist) {
       throw new UnauthorizedException('이미 존재하는 닉네임입니다.');
     }
@@ -44,7 +43,7 @@ export class AuthService {
     // user 데이터 생성
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await this.userRepository.createUser({
+    const user = await this.userService.createUser({
       email,
       password: hashedPassword,
       username,
@@ -66,7 +65,7 @@ export class AuthService {
 
     response.cookie('jwt', jwt, { httpOnly: true });
 
-    const loginUser = await this.userRepository.getUserById(user.id);
+    const loginUser = await this.userService.getUserById(user.id);
 
     return { loginUser, jwt };
   }
@@ -79,7 +78,7 @@ export class AuthService {
     email: UserLoginDto['email'],
     password: UserLoginDto['password'],
   ): Promise<{ jwt: string; user: UserDto }> {
-    const user = await this.userRepository.getUserByEmail(email);
+    const user = await this.userService.getUserByEmail(email);
     if (!user)
       throw new UnauthorizedException('해당 이메일 계정은 존재하지 않습니다.');
     if (!(await bcrypt.compare(password, user.password)))
