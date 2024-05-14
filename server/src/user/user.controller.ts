@@ -1,10 +1,10 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { UserEntity } from './user.entity';
-import { UserRepository } from './user.repository';
+import { UserService } from './user.service';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly userService: UserService) {}
 
   /**
    * user 정보 불러옴
@@ -13,7 +13,7 @@ export class UserController {
   async getUserById(
     @Param('userId') userId: number,
   ): Promise<UserEntity | undefined> {
-    return this.userRepository.getUserById(userId);
+    return this.userService.getUserById(userId);
   }
 
   /**
@@ -23,7 +23,7 @@ export class UserController {
   async getArticlesByUserId(
     @Param('userId') userId: number,
   ): Promise<UserEntity | undefined> {
-    return this.userRepository.getArticlesByUserId(userId);
+    return this.userService.getArticlesByUserId(userId);
   }
 
   /**
@@ -33,6 +33,6 @@ export class UserController {
   async getReviewsByUserId(
     @Param('userId') userId: number,
   ): Promise<UserEntity | undefined> {
-    return this.userRepository.getUserById(userId);
+    return this.userService.getUserById(userId);
   }
 }

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserAccount, UserEntity } from 'src/user/user.entity';
-import { UserService } from 'src/user/user.service';
+import { UserRepository } from 'src/user/user.repository';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -9,7 +9,7 @@ export class AccountRepository extends Repository<UserEntity> {
   constructor(
     @InjectRepository(UserEntity)
     private readonly repository: Repository<UserEntity>,
-    private readonly userService: UserService,
+    private readonly userRepository: UserRepository,
   ) {
     super(repository.target, repository.manager, repository.queryRunner);
   }
@@ -18,7 +18,7 @@ export class AccountRepository extends Repository<UserEntity> {
    * 계정 정보만 불러옴(email, username)
    */
   async getAccountById(userId: number): Promise<UserAccount> {
-    const user = await this.userService.getUserById(userId);
+    const user = await this.userRepository.getUserById(userId);
 
     // 사용자 정보가 없으면 예외 처리
     if (!user) {
@@ -41,7 +41,7 @@ export class AccountRepository extends Repository<UserEntity> {
     userId: number,
     hashedPassword: string,
   ): Promise<UserAccount> {
-    const updatedUser = await this.userService.getUserById(userId);
+    const updatedUser = await this.userRepository.getUserById(userId);
     updatedUser.password = hashedPassword;
     await this.repository.save(updatedUser);
 
@@ -52,7 +52,7 @@ export class AccountRepository extends Repository<UserEntity> {
    * to settingController.deleteUser
    */
   async deleteUserById(userId: number) {
-    const deletedUser = await this.userService.getUserById(userId);
+    const deletedUser = await this.userRepository.getUserById(userId);
     await this.repository.delete(userId);
     return {
       id: deletedUser.id,
