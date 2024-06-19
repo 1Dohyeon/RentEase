@@ -18,7 +18,7 @@ export class AccountRepository extends Repository<UserEntity> {
    * 계정 정보만 불러옴(email, username)
    */
   async getAccountById(userId: number): Promise<UserAccount> {
-    const user = await this.userRepository.getUserById(userId);
+    const user = await this.userRepository.getUserInfoById(userId);
 
     // 사용자 정보가 없으면 예외 처리
     if (!user) {
