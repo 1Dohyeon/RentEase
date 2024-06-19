@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AddressEntity } from 'src/address/address.entity';
 import { UserEntity, UserProfile } from 'src/user/user.entity';
 import { UserRepository } from 'src/user/user.repository';
 import { Repository } from 'typeorm';
@@ -31,6 +32,7 @@ export class ProfileRepository extends Repository<UserEntity> {
       nickname: user.nickname,
       username: user.username,
       updatedAt: user.updatedAt,
+      addresses: user.addresses,
     };
   }
 
@@ -55,5 +57,13 @@ export class ProfileRepository extends Repository<UserEntity> {
     await this.repository.save(user);
 
     return await this.getProfileById(userId);
+  }
+
+  async getAddressByUserId(
+    userId: number,
+  ): Promise<AddressEntity[] | undefined> {
+    const user = await this.userRepository.getUserInfoById(userId);
+
+    return user.addresses;
   }
 }

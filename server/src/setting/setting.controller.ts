@@ -47,6 +47,15 @@ export class SettingController {
   }
 
   /**
+   * 주소 정보 가져옴
+   */
+  @Get()
+  async getAddress(@Request() req) {
+    const userId = req.user.id;
+    return this.profileService.getAddresses(userId);
+  }
+
+  /**
    * 주소 생성
    */
   @Post('/profile/address')

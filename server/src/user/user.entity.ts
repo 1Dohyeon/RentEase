@@ -45,6 +45,7 @@ export interface UserProfile {
   username: string;
   nickname: string;
   updatedAt: Date;
+  addresses: AddressEntity[];
 }
 
 export interface UserAccount {

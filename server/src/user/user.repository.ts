@@ -35,6 +35,7 @@ export class UserRepository extends Repository<UserEntity> {
     try {
       const user = await this.repository
         .createQueryBuilder('user')
+        .leftJoinAndSelect('user.addresses', 'address')
         .where('user.id = :id', { id: userId })
         // 실명과 password 제외하고 불러옴
         .select([
@@ -43,6 +44,9 @@ export class UserRepository extends Repository<UserEntity> {
           'user.createdAt',
           'user.updatedAt',
           'user.deletedAt',
+          'address.id',
+          'address.country',
+          'address.district',
         ])
         .getOne();
 
@@ -60,6 +64,7 @@ export class UserRepository extends Repository<UserEntity> {
     try {
       const user = await this.repository
         .createQueryBuilder('user')
+        .leftJoinAndSelect('user.addresses', 'address')
         .where('user.id = :id', { id: userId })
         // password 제외하고 불러옴
         .select([
@@ -70,6 +75,9 @@ export class UserRepository extends Repository<UserEntity> {
           'user.createdAt',
           'user.updatedAt',
           'user.deletedAt',
+          'address.id',
+          'address.country',
+          'address.district',
         ])
         .getOne();
 
