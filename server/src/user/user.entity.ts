@@ -1,9 +1,10 @@
 import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { AddressEntity } from 'src/address/address.entity';
 import { CommonEntity } from 'src/common/entity/common.entity';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity({
-  name: 'user',
+  name: 'users',
 })
 export class UserEntity extends CommonEntity {
   @IsEmail({}, { message: '올바른 형태의 이메일을 작성해주세요.' })
@@ -34,8 +35,8 @@ export class UserEntity extends CommonEntity {
   // @Column()
   // manners_point: number;
 
-  // @OneToMany(() => AddressEntity, (address) => address.user)
-  // addresses: AddressEntity[];
+  @OneToMany(() => AddressEntity, (address) => address.user)
+  addresses: AddressEntity[];
 }
 
 export interface UserProfile {

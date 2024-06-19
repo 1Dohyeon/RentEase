@@ -19,7 +19,7 @@ export class ProfileRepository extends Repository<UserEntity> {
    * to SettingController.getProfileById
    */
   async getProfileById(userId: number): Promise<UserProfile> {
-    const user = await this.userRepository.getUserById(userId);
+    const user = await this.userRepository.getUserInfoById(userId);
 
     // 사용자 정보가 없으면 예외 처리
     if (!user) {
@@ -42,7 +42,7 @@ export class ProfileRepository extends Repository<UserEntity> {
     userId: number,
     updateStatus: Partial<UserEntity>,
   ): Promise<UserProfile> {
-    const user = await this.userRepository.getUserById(userId);
+    const user = await this.userRepository.getUserInfoById(userId);
 
     // 사용자가 변경한 값만 업데이트
     // Object.assign(user, updateStatus); // 이렇게 해도 아래랑 같은 결과
