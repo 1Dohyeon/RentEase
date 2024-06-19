@@ -1,6 +1,6 @@
 import { CommonEntity } from 'src/common/entity/common.entity';
 import { UserEntity } from 'src/user/user.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToMany } from 'typeorm';
 
 @Entity('address')
 export class AddressEntity extends CommonEntity {
@@ -10,6 +10,6 @@ export class AddressEntity extends CommonEntity {
   @Column({ type: 'varchar', nullable: false })
   district: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.addresses)
-  user: UserEntity;
+  @ManyToMany(() => UserEntity, (user) => user.addresses)
+  users: UserEntity[];
 }
