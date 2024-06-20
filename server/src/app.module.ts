@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountModule } from './account/account.module';
+import { AddressEntity } from './address/address.entity';
 import { AddressModule } from './address/address.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -27,7 +28,7 @@ import { UserModule } from './user/user.module';
       database: process.env.DB_NAME,
       synchronize: true, // 배포환경에서는 false
       logging: true,
-      entities: [UserEntity],
+      entities: [UserEntity, AddressEntity],
       autoLoadEntities: true,
     }),
     UserModule,
