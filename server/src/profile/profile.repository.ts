@@ -71,12 +71,7 @@ export class ProfileRepository extends Repository<UserEntity> {
     user: UserProfile,
     addressEntities: AddressEntity[],
   ): Promise<AddressEntity[]> {
-    const newAddresses = addressEntities.filter(
-      (newAddr) =>
-        !user.addresses.some((existingAddr) => existingAddr.id === newAddr.id),
-    );
-
-    user.addresses = [...user.addresses, ...newAddresses];
+    user.addresses = [...addressEntities];
     await this.userRepository.save(user);
     return user.addresses;
   }
