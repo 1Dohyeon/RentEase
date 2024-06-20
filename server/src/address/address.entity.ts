@@ -1,13 +1,13 @@
 import { CommonEntity } from 'src/common/entity/common.entity';
 import { UserEntity } from 'src/user/user.entity';
-import { Column, Entity, ManyToMany } from 'typeorm';
+import { Entity, ManyToMany, PrimaryColumn } from 'typeorm';
 
 @Entity('address')
 export class AddressEntity extends CommonEntity {
-  @Column({ type: 'varchar', nullable: false })
-  country: string;
+  @PrimaryColumn({ type: 'varchar', nullable: false })
+  city: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @PrimaryColumn({ type: 'varchar', nullable: false })
   district: string;
 
   @ManyToMany(() => UserEntity, (user) => user.addresses)

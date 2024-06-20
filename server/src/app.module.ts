@@ -5,13 +5,13 @@ import { AccountModule } from './account/account.module';
 import { AddressModule } from './address/address.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ArticleModule } from './article/article.module';
 import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './common/logger/logger.middleware';
 import { ProfileModule } from './profile/profile.module';
 import { SettingModule } from './setting/setting.module';
 import { UserEntity } from './user/user.entity';
 import { UserModule } from './user/user.module';
-import { ArticleModule } from './article/article.module';
 
 @Module({
   imports: [
