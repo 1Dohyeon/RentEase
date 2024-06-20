@@ -10,7 +10,14 @@ export class AddressRepository implements OnModuleInit {
     private readonly repository: Repository<AddressEntity>,
   ) {}
 
+  async findAddress(city: string, district: string) {
+    return await this.repository.findOne({
+      where: { city, district },
+    });
+  }
+
   async onModuleInit() {
+    // 데이터 중복 삽입 방지 로직 추가
     const addresses = [
       { city: '서울특별시', district: '강남구' },
       { city: '서울특별시', district: '강동구' },

@@ -49,7 +49,7 @@ export class SettingController {
   /**
    * 주소 정보 가져옴
    */
-  @Get()
+  @Get('/profile/address')
   async getAddress(@Request() req) {
     const userId = req.user.id;
     return this.profileService.getAddresses(userId);
@@ -59,9 +59,9 @@ export class SettingController {
    * 주소 생성
    */
   @Post('/profile/address')
-  async createAdress(@Request() req, @Body() body) {
+  async createAdress(@Request() req, @Body('addresses') addresses: string[]) {
     const userId = req.user.id;
-    return await this.profileService.updateProfile(userId, body);
+    return await this.profileService.addAddress(userId, addresses);
   }
 
   /**

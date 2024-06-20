@@ -45,7 +45,7 @@ export class UserRepository extends Repository<UserEntity> {
           'user.updatedAt',
           'user.deletedAt',
           'address.id',
-          'address.country',
+          'address.city',
           'address.district',
         ])
         .getOne();
@@ -76,7 +76,7 @@ export class UserRepository extends Repository<UserEntity> {
           'user.updatedAt',
           'user.deletedAt',
           'address.id',
-          'address.country',
+          'address.city',
           'address.district',
         ])
         .getOne();
