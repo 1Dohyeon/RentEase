@@ -35,11 +35,10 @@ export class ProfileService {
     const existingAddresses = user.addresses.map(
       (addr) => `${addr.city} ${addr.district}`,
     );
-    console.log(`사용자의 기존 주소 : ${existingAddresses}`);
+
     const newAddresses = addresses.filter(
       (address) => !existingAddresses.includes(address),
     );
-    console.log(`추가할 주소 : ${newAddresses}`);
 
     if (user.addresses.length + newAddresses.length > 3) {
       throw new BadRequestException('최대 3개의 주소만 추가할 수 있습니다.');
@@ -60,8 +59,15 @@ export class ProfileService {
         return foundAddress;
       }),
     );
-    console.log(addressEntities);
 
     return await this.profileRepository.addAddress(user, addressEntities);
+  }
+
+  async removeAddressByIndex(
+    userId: number,
+    index: number,
+  ): Promise<AddressEntity[]> {
+    const user = await this.profileRepository.getProfileById(userId);
+    return await this.profileRepository.removeAddressByIndex(user, index);
   }
 }

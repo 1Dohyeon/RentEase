@@ -5,11 +5,13 @@ import {
   Get,
   Patch,
   Post,
+  Query,
   Redirect,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { AccountService } from 'src/account/account.service';
+import { AddressEntity } from 'src/address/address.entity';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { ProfileService } from 'src/profile/profile.service';
 
@@ -50,7 +52,7 @@ export class SettingController {
    * 주소 정보 가져옴
    */
   @Get('/profile/address')
-  async getAddress(@Request() req) {
+  async getAddress(@Request() req): Promise<AddressEntity[]> {
     const userId = req.user.id;
     return this.profileService.getAddresses(userId);
   }
@@ -59,7 +61,10 @@ export class SettingController {
    * 주소 생성
    */
   @Post('/profile/address')
-  async createAdress(@Request() req, @Body('addresses') addresses: string[]) {
+  async createAdress(
+    @Request() req,
+    @Body('addresses') addresses: string[],
+  ): Promise<AddressEntity[]> {
     const userId = req.user.id;
     return await this.profileService.addAddress(userId, addresses);
   }
@@ -71,6 +76,17 @@ export class SettingController {
   async updateAddress(@Request() req, @Body() body) {
     const userId = req.user.id;
     return await this.profileService.updateProfile(userId, body);
+  }
+
+  /**
+   * 주소 삭제 ex) DELETE /profile/address?userId=1&idx=1
+   */
+  @Delete('/profile/address')
+  async removeAddressByIndex(
+    @Query('userId') userId: number,
+    @Query('idx') index: number,
+  ): Promise<AddressEntity[]> {
+    return this.profileService.removeAddressByIndex(userId, index);
   }
 
   /**
