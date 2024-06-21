@@ -76,26 +76,6 @@ export class ProfileRepository extends Repository<UserEntity> {
     return user.addresses;
   }
 
-  // async removeAddressByIndex(
-  //   user: UserProfile,
-  //   index: number,
-  // ): Promise<AddressEntity[] | undefined> {
-  //   // index는 0,1,2만 가능
-  //   if (index < 0 || index >= user.addresses.length || index > 2) {
-  //     throw new BadRequestException('유효하지 않은 주소 인덱스입니다.');
-  //   }
-  //   console.log(`전체 주소 정보 : ${JSON.stringify(user.addresses)}`);
-  //   console.log(`삭제할 주소 정보 : ${JSON.stringify(user.addresses[index])}`);
-  //   user.addresses.splice(index, 1);
-  //   console.log(`삭제 후 주소 정보 : ${JSON.stringify(user.addresses)}`);
-  //   try {
-  //     await this.userRepository.save(user);
-  //     return user.addresses;
-  //   } catch (err) {
-  //     throw new Error(`저장 중 에러 발생: ${err.message}`);
-  //   }
-  // }
-
   async removeAddress(
     user: UserProfile,
     addressId: number,
