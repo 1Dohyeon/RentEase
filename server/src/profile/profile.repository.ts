@@ -69,11 +69,37 @@ export class ProfileRepository extends Repository<UserEntity> {
 
   async addAddress(
     user: UserProfile,
-    addressEntities: AddressEntity[],
+    address: AddressEntity,
   ): Promise<AddressEntity[]> {
-    user.addresses = [...addressEntities];
-    await this.userRepository.save(user);
-    return user.addresses;
+    console.log(`profile.repository: ${JSON.stringify(address)}`);
+
+    try {
+      await this.repository
+        .createQueryBuilder()
+        .relation(UserEntity, 'addresses')
+        .of(user.id)
+        .add(address.id);
+
+      /**
+       * 아래 쿼리문은 usersaddress과 users, address 테이블의 ManyToMany의 관계형 테이블임을 알고 있어야함
+       * 위 쿼리문은 relation을 통해서 어떤 테이블들의 관계를 나타내는지 알 수 있음
+       * 따라서 취향 차이임
+       * 둘 다 쿼리문으로 변형하면 아래와 같음 :
+       * INSERT INTO usersaddress (userId, addressId) VALUES (user.id, address.id); */
+
+      // await this.repository
+      //   .createQueryBuilder()
+      //   .insert()
+      //   .into('usersaddress')
+      //   .values({ userid: user.id, addressid: address.id })
+      //   .execute();
+
+      // 사용자 주소 목록 갱신
+      const updatedUser = await this.getProfileById(user.id);
+      return updatedUser.addresses;
+    } catch (err) {
+      throw new Error(`주소 추가 중 에러 발생: ${err.message}`);
+    }
   }
 
   async removeAddress(
@@ -102,6 +128,24 @@ export class ProfileRepository extends Repository<UserEntity> {
       return addressToRemove;
     } catch (err) {
       throw new Error(`저장 중 에러 발생: ${err.message}`);
+    }
+  }
+
+  async updateAddress(
+    user: UserProfile,
+    oldAddressId: number,
+    newAddressEntity: AddressEntity,
+  ): Promise<AddressEntity[]> {
+    try {
+      // 관계형 db 중복 이슈로 삭제 후 추가로 변경
+      await this.removeAddress(user, oldAddressId);
+      await this.addAddress(user, newAddressEntity);
+
+      // 사용자 주소 목록 갱신
+      const updatedUser = await this.getProfileById(user.id);
+      return updatedUser.addresses;
+    } catch (err) {
+      throw new Error(`주소 업데이트 중 에러 발생: ${err.message}`);
     }
   }
 }

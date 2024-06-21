@@ -49,7 +49,7 @@ export class SettingController {
   }
 
   /**
-   * 주소 정보 가져옴
+   * 주소 정보만 가져옴
    */
   @Get('/profile/address')
   async getAddress(@Request() req): Promise<AddressEntity[]> {
@@ -63,23 +63,14 @@ export class SettingController {
   @Post('/profile/address')
   async createAdress(
     @Request() req,
-    @Body('addresses') addresses: string[],
+    @Body('address') addresses: string,
   ): Promise<AddressEntity[]> {
     const userId = req.user.id;
     return await this.profileService.addAddress(userId, addresses);
   }
 
   /**
-   * 주소 수정
-   */
-  @Patch('/profile/address/:id')
-  async updateAddress(@Request() req, @Body() body) {
-    const userId = req.user.id;
-    return await this.profileService.updateProfile(userId, body);
-  }
-
-  /**
-   * 주소 삭제 ex) DELETE /profile/address?userId=1&addressId=8
+   * 주소 삭제 ex) Delete /profile/address?userId=1&addressId=8
    */
   @Delete('/profile/address')
   async removeAddress(
@@ -87,6 +78,22 @@ export class SettingController {
     @Query('addressId') addressId: number,
   ): Promise<AddressEntity> {
     return this.profileService.removeAddress(userId, addressId);
+  }
+
+  /**
+   * 주소 수정 ex) Patch /profile/address?userId=1&addressId=8
+   */
+  @Patch('/profile/address')
+  async updateAddress(
+    @Query('userId') userId: number,
+    @Query('addressId') oldAddressId: number,
+    @Body('newAddress') newAddress: string,
+  ): Promise<AddressEntity[]> {
+    return await this.profileService.updateAddress(
+      userId,
+      oldAddressId,
+      newAddress,
+    );
   }
 
   /**
