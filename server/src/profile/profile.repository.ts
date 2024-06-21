@@ -96,31 +96,30 @@ export class ProfileRepository extends Repository<UserEntity> {
   //   }
   // }
 
-  async removeAddressByIndex(
+  async removeAddress(
     user: UserProfile,
-    index: number,
-  ): Promise<AddressEntity[]> {
-    // index는 0,1,2만 가능
-    if (index < 0 || index >= user.addresses.length || index > 2) {
-      throw new BadRequestException('유효하지 않은 주소 인덱스입니다.');
+    addressId: number,
+  ): Promise<AddressEntity> {
+    // addressId가 숫자인지 확인
+    const addressIdToNumber = Number(addressId);
+    console.log(addressIdToNumber);
+    console.log(user.addresses);
+
+    const addressToRemove = user.addresses.find(
+      (address) => address.id === addressIdToNumber,
+    );
+    if (!addressToRemove) {
+      throw new Error('주소가 없습니다.');
     }
-
-    console.log(`전체 주소 정보 : ${JSON.stringify(user.addresses)}`);
-    console.log(`삭제할 주소 정보 : ${JSON.stringify(user.addresses[index])}`);
-
-    const addressToRemove = user.addresses[index];
-    user.addresses.splice(index, 1); // 배열에서 주소 제거
-
-    console.log(`삭제 후 주소 정보 : ${JSON.stringify(user.addresses)}`);
 
     try {
       await this.repository
         .createQueryBuilder()
         .relation(UserEntity, 'addresses')
         .of(user.id)
-        .remove(addressToRemove.id);
+        .remove(addressId);
 
-      return user.addresses;
+      return addressToRemove;
     } catch (err) {
       throw new Error(`저장 중 에러 발생: ${err.message}`);
     }

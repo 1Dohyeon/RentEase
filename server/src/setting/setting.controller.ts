@@ -79,14 +79,14 @@ export class SettingController {
   }
 
   /**
-   * 주소 삭제 ex) DELETE /profile/address?userId=1&idx=1
+   * 주소 삭제 ex) DELETE /profile/address?userId=1&addressId=8
    */
   @Delete('/profile/address')
-  async removeAddressByIndex(
+  async removeAddress(
     @Query('userId') userId: number,
-    @Query('idx') index: number,
-  ): Promise<AddressEntity[]> {
-    return this.profileService.removeAddressByIndex(userId, index);
+    @Query('addressId') addressId: number,
+  ): Promise<AddressEntity> {
+    return this.profileService.removeAddress(userId, addressId);
   }
 
   /**

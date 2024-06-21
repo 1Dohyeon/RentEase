@@ -63,11 +63,19 @@ export class ProfileService {
     return await this.profileRepository.addAddress(user, addressEntities);
   }
 
-  async removeAddressByIndex(
+  async removeAddress(
     userId: number,
-    index: number,
-  ): Promise<AddressEntity[]> {
+    addressId: number,
+  ): Promise<AddressEntity> {
     const user = await this.profileRepository.getProfileById(userId);
-    return await this.profileRepository.removeAddressByIndex(user, index);
+
+    if (!user) {
+      throw new Error('존재하지 않는 사용자입니다.');
+    }
+    if (!addressId) {
+      throw new Error('존재하지 않는 주소입니다.');
+    }
+
+    return await this.profileRepository.removeAddress(user, addressId);
   }
 }
