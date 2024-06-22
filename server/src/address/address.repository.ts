@@ -10,12 +10,14 @@ export class AddressRepository implements OnModuleInit {
     private readonly repository: Repository<AddressEntity>,
   ) {}
 
+  // city, district 정보로 db에서 주소 객체를 가져옴
   async findAddress(city: string, district: string) {
     return await this.repository.findOne({
       where: { city, district },
     });
   }
 
+  // db에 주소 저장이 안되어있다면 서버 시작시 주소 정보를 추가함
   async onModuleInit() {
     // 데이터 중복 삽입 방지 로직 추가
     const addresses = [

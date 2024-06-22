@@ -29,6 +29,7 @@ export class AccountService {
     }
   }
 
+  /** 계정 삭제 */
   async deleteUserById(userId: number) {
     return await this.accountRepository.deleteUserById(userId);
   }

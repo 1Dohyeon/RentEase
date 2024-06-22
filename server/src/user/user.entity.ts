@@ -40,6 +40,7 @@ export class UserEntity extends CommonEntity {
   addresses: AddressEntity[];
 }
 
+/** 사용자 프로필(실명x, 이메일x) */
 export interface UserProfile {
   id: number;
   username: string;
@@ -48,9 +49,12 @@ export interface UserProfile {
   addresses: AddressEntity[];
 }
 
+/** 사용자 계정(실명, 이메일 포함) */
 export interface UserAccount {
   id: number;
   username: string;
   email: string;
+  nickname: string;
   updatedAt: Date;
+  addresses: AddressEntity[];
 }

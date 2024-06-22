@@ -11,10 +11,12 @@ export class ProfileService {
     private readonly addressRepository: AddressRepository,
   ) {}
 
+  /** 사용자 프로필 정보 가져옴 */
   async getProfileById(userId: number): Promise<UserProfile> {
     return await this.profileRepository.getProfileById(userId);
   }
 
+  /** 사용자 프로필 업데이트(실명, 닉네임) */
   async updateProfile(
     userId: number,
     updateStatus: Partial<UserEntity>,
@@ -22,15 +24,18 @@ export class ProfileService {
     return await this.profileRepository.updateProfile(userId, updateStatus);
   }
 
+  /** 사용자 주소만 가져옴 */
   async getAddresses(userId: number): Promise<AddressEntity[]> {
     return await this.profileRepository.getAddressByUserId(userId);
   }
 
+  /** front에서 string으로 입력 받은 주소 정보 split */
   private parseAddress(address: string): { city: string; district: string } {
     const [city, district] = address.split(' ');
     return { city, district };
   }
 
+  /** 사용자가 이미 등록한 주소인지 체크 */
   private checkAddress(user: UserProfile, address: AddressEntity) {
     const existingAddress = user.addresses.find(
       (addr) => addr.id === address.id,
@@ -40,6 +45,7 @@ export class ProfileService {
     }
   }
 
+  /** 사용자 주소 정보 추가(최대 3개) */
   async addAddress(userId: number, address: string): Promise<AddressEntity[]> {
     const user = await this.profileRepository.getProfileById(userId);
 
@@ -67,6 +73,7 @@ export class ProfileService {
     return await this.profileRepository.addAddress(user, addressEntity);
   }
 
+  /** 사용자 주소 정보 삭제(1개씩) */
   async removeAddress(
     userId: number,
     addressId: number,
@@ -83,6 +90,7 @@ export class ProfileService {
     return await this.profileRepository.removeAddress(user, addressId);
   }
 
+  /** 사용자 주소 정보 업데이트 */
   async updateAddress(
     userId: number,
     oldAddressId: number,

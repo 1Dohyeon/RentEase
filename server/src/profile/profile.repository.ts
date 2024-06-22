@@ -16,7 +16,7 @@ export class ProfileRepository extends Repository<UserEntity> {
   }
 
   /**
-   * 프로필 정보만 불러옴(nickname, username)
+   * 프로필 정보만 불러옴(nickname, username, addresses)
    * to SettingController.getProfileById
    */
   async getProfileById(userId: number): Promise<UserProfile> {
@@ -67,6 +67,7 @@ export class ProfileRepository extends Repository<UserEntity> {
     return user.addresses;
   }
 
+  /** 사용자 주소 정보 추가(최대 3개) */
   async addAddress(
     user: UserProfile,
     address: AddressEntity,
@@ -102,6 +103,7 @@ export class ProfileRepository extends Repository<UserEntity> {
     }
   }
 
+  /** 사용자 주소 정보 삭제(1개씩) */
   async removeAddress(
     user: UserProfile,
     addressId: number,
@@ -131,6 +133,7 @@ export class ProfileRepository extends Repository<UserEntity> {
     }
   }
 
+  /** 사용자 주소 정보 업데이트 */
   async updateAddress(
     user: UserProfile,
     oldAddressId: number,
