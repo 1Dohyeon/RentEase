@@ -1,7 +1,7 @@
 import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { AddressEntity } from 'src/address/address.entity';
 import { CommonEntity } from 'src/common/entity/common.entity';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 
 @Entity({
   name: 'users',
@@ -31,24 +31,30 @@ export class UserEntity extends CommonEntity {
   @Column({ type: 'boolean', default: false })
   isAdmin: boolean;
 
-  // @IsNumber()
-  // @Column()
-  // manners_point: number;
-
-  @OneToMany(() => AddressEntity, (address) => address.user)
+  @ManyToMany(() => AddressEntity, (address) => address.users)
+  @JoinTable({
+    name: 'usersaddress',
+    joinColumn: { name: 'userid', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'addressid', referencedColumnName: 'id' },
+  })
   addresses: AddressEntity[];
 }
 
+/** 사용자 프로필(실명x, 이메일x) */
 export interface UserProfile {
   id: number;
   username: string;
   nickname: string;
   updatedAt: Date;
+  addresses: AddressEntity[];
 }
 
+/** 사용자 계정(실명, 이메일 포함) */
 export interface UserAccount {
   id: number;
   username: string;
   email: string;
+  nickname: string;
   updatedAt: Date;
+  addresses: AddressEntity[];
 }

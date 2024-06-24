@@ -2,16 +2,17 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountModule } from './account/account.module';
+import { AddressEntity } from './address/address.entity';
 import { AddressModule } from './address/address.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ArticleModule } from './article/article.module';
 import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './common/logger/logger.middleware';
 import { ProfileModule } from './profile/profile.module';
 import { SettingModule } from './setting/setting.module';
 import { UserEntity } from './user/user.entity';
 import { UserModule } from './user/user.module';
-import { ArticleModule } from './article/article.module';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { ArticleModule } from './article/article.module';
       database: process.env.DB_NAME,
       synchronize: true, // 배포환경에서는 false
       logging: true,
-      entities: [UserEntity],
+      entities: [UserEntity, AddressEntity],
       autoLoadEntities: true,
     }),
     UserModule,
@@ -35,8 +36,8 @@ import { ArticleModule } from './article/article.module';
     SettingModule,
     AccountModule,
     ProfileModule,
-    AddressModule,
     ArticleModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService],

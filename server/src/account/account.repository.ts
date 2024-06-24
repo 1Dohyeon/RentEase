@@ -15,7 +15,7 @@ export class AccountRepository extends Repository<UserEntity> {
   }
 
   /**
-   * 계정 정보만 불러옴(email, username)
+   * 사용자 계정 정보 불러옴
    */
   async getAccountById(userId: number): Promise<UserAccount> {
     const user = await this.userRepository.getUserInfoById(userId);
@@ -29,13 +29,14 @@ export class AccountRepository extends Repository<UserEntity> {
       id: user.id,
       email: user.email,
       username: user.username,
+      nickname: user.nickname,
       updatedAt: user.updatedAt,
+      addresses: user.addresses,
     };
   }
 
   /**
    * password 업데이트
-   * to AccountService.updatePassword
    */
   async updatePassword(
     userId: number,
@@ -49,7 +50,7 @@ export class AccountRepository extends Repository<UserEntity> {
   }
 
   /**
-   * to settingController.deleteUser
+   * 계정 삭제
    */
   async deleteUserById(userId: number) {
     const deletedUser = await this.userRepository.getUserById(userId);
