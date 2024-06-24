@@ -12,6 +12,7 @@ import { UserEntity } from './models/user.entity';
 import { ProfileModule } from './profile/profile.module';
 import { SettingModule } from './setting/setting.module';
 import { UserModule } from './user/user.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { UserModule } from './user/user.module';
     ProfileModule,
     ArticleModule,
     AddressModule,
+    ReviewModule,
   ],
   controllers: [AppController],
 })

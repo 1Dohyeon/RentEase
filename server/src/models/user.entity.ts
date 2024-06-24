@@ -1,7 +1,9 @@
 import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { CommonEntity } from 'src/common/entity/common.entity';
 import { AddressEntity } from 'src/models/address.entity';
-import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
+import { ArticleEntity } from './article.entity';
+import { ReviewEntity } from './review.entity';
 
 @Entity({
   name: 'users',
@@ -38,6 +40,12 @@ export class UserEntity extends CommonEntity {
     inverseJoinColumn: { name: 'addressid', referencedColumnName: 'id' },
   })
   addresses: AddressEntity[];
+
+  @OneToMany(() => ArticleEntity, (article) => article.author)
+  articles: ArticleEntity[];
+
+  @OneToMany(() => ReviewEntity, (review) => review.writer)
+  reviews: ReviewEntity[];
 }
 
 /** 사용자 프로필(실명x, 이메일x) */
