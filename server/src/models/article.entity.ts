@@ -42,17 +42,20 @@ export class ArticleEntity extends CommonEntity {
   @IsNumber()
   @IsNotEmpty()
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
-  dailyPrice: number;
+  @JoinColumn({ name: 'dailyprice' })
+  dailyprice: number;
 
   @IsNumber()
   @IsOptional()
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  weeklyPrice?: number;
+  @JoinColumn({ name: 'weeklyprice' })
+  weeklyprice?: number;
 
   @IsNumber()
   @IsOptional()
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  monthlyPrice?: number;
+  @JoinColumn({ name: 'monthlyprice' })
+  monthlyprice?: number;
 
   @IsEnum(Currency)
   @IsNotEmpty()
