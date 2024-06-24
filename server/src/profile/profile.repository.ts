@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AddressEntity } from 'src/address/address.entity';
-import { UserEntity, UserProfile } from 'src/user/user.entity';
+import { AddressEntity } from 'src/models/address.entity';
+import { UserEntity, UserProfile } from 'src/models/user.entity';
 import { UserRepository } from 'src/user/user.repository';
 import { Repository } from 'typeorm';
 

@@ -11,8 +11,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AccountService } from 'src/account/account.service';
-import { AddressEntity } from 'src/address/address.entity';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
+import { AddressEntity } from 'src/models/address.entity';
 import { ProfileService } from 'src/profile/profile.service';
 
 @Controller('settings')

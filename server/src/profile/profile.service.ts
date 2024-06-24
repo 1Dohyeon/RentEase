@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { AddressEntity } from 'src/address/address.entity';
 import { AddressRepository } from 'src/address/address.repository';
-import { UserEntity, UserProfile } from 'src/user/user.entity';
+import { AddressEntity } from 'src/models/address.entity';
+import { UserEntity, UserProfile } from 'src/models/user.entity';
 import { ProfileRepository } from './profile.repository';
 
 @Injectable()

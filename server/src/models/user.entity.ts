@@ -1,6 +1,6 @@
 import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { AddressEntity } from 'src/address/address.entity';
 import { CommonEntity } from 'src/common/entity/common.entity';
+import { AddressEntity } from 'src/models/address.entity';
 import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 
 @Entity({

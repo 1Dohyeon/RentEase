@@ -1,5 +1,5 @@
 import { CommonEntity } from 'src/common/entity/common.entity';
-import { UserEntity } from 'src/user/user.entity';
+import { UserEntity } from 'src/models/user.entity';
 import { Entity, ManyToMany, PrimaryColumn } from 'typeorm';
 
 @Entity('address')

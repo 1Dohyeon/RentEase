@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AddressEntity } from './address.entity';
+import { AddressEntity } from '../models/address.entity';
 
 @Injectable()
 export class AddressRepository implements OnModuleInit {
