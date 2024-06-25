@@ -16,6 +16,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
+import { CategoryEntity } from './category.entity';
 import { ReviewEntity } from './review.entity';
 import { UserEntity } from './user.entity';
 
@@ -76,4 +77,12 @@ export class ArticleEntity extends CommonEntity {
     inverseJoinColumn: { name: 'addressid', referencedColumnName: 'id' },
   })
   addresses: AddressEntity[];
+
+  @ManyToMany(() => CategoryEntity, (category) => category.articles)
+  @JoinTable({
+    name: 'articlescategory',
+    joinColumn: { name: 'articleid', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'categoryid', referencedColumnName: 'id' },
+  })
+  categories: CategoryEntity[];
 }

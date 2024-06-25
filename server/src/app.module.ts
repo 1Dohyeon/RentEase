@@ -6,13 +6,17 @@ import { AddressModule } from './address/address.module';
 import { AppController } from './app.controller';
 import { ArticleModule } from './article/article.module';
 import { AuthModule } from './auth/auth.module';
+import { CategoryModule } from './category/category.module';
 import { LoggerMiddleware } from './common/logger/logger.middleware';
 import { AddressEntity } from './models/address.entity';
+import { ArticleEntity } from './models/article.entity';
+import { CategoryEntity } from './models/category.entity';
+import { ReviewEntity } from './models/review.entity';
 import { UserEntity } from './models/user.entity';
 import { ProfileModule } from './profile/profile.module';
+import { ReviewModule } from './review/review.module';
 import { SettingModule } from './setting/setting.module';
 import { UserModule } from './user/user.module';
-import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -28,7 +32,13 @@ import { ReviewModule } from './review/review.module';
       database: process.env.DB_NAME,
       synchronize: true, // 배포환경에서는 false
       logging: true,
-      entities: [UserEntity, AddressEntity],
+      entities: [
+        UserEntity,
+        AddressEntity,
+        ArticleEntity,
+        ReviewEntity,
+        CategoryEntity,
+      ],
       autoLoadEntities: true,
     }),
     UserModule,
@@ -39,6 +49,7 @@ import { ReviewModule } from './review/review.module';
     ArticleModule,
     AddressModule,
     ReviewModule,
+    CategoryModule,
   ],
   controllers: [AppController],
 })
