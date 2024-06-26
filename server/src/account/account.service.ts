@@ -15,9 +15,21 @@ export class AccountService {
    * password 해시화
    * to SettingController.updatePassword
    */
-  async updatePassword(userId: number, newPassword: string) {
+  async updatePassword(
+    userId: number,
+    oldPassword: string,
+    newPassword: string,
+  ) {
+    const checkOldPassword = await this.accountRepository.checkPassword(
+      userId,
+      oldPassword,
+    );
+
+    if (!checkOldPassword) {
+      throw new BadRequestException('기존 비밀번호를 잘못 입력하였습니다.');
+    }
+
     try {
-      console.log(userId, newPassword);
       const hashedPassword = await bcrypt.hash(newPassword, 10);
 
       return await this.accountRepository.updatePassword(

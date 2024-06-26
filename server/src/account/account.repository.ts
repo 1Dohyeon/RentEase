@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 import { UserAccount, UserEntity } from 'src/models/user.entity';
 import { UserRepository } from 'src/user/user.repository';
 import { Repository } from 'typeorm';
@@ -36,15 +37,27 @@ export class AccountRepository extends Repository<UserEntity> {
   }
 
   /**
+   * password 체크
+   */
+  async checkPassword(userId, password): Promise<boolean> {
+    const user = await this.getAccountById(userId);
+    const userAllInfo = await this.userRepository.getUserByEmail(user.email);
+    const check = await bcrypt.compare(password, userAllInfo.password);
+
+    return check;
+  }
+
+  /**
    * password 업데이트
    */
   async updatePassword(
     userId: number,
     hashedPassword: string,
   ): Promise<UserAccount> {
-    const updatedUser = await this.userRepository.getUserById(userId);
-    updatedUser.password = hashedPassword;
-    await this.repository.save(updatedUser);
+    const user = await this.getAccountById(userId);
+    const userAllInfo = await this.userRepository.getUserByEmail(user.email);
+    userAllInfo.password = hashedPassword;
+    await this.repository.save(userAllInfo);
 
     return await this.getAccountById(userId);
   }

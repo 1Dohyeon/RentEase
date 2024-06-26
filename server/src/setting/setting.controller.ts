@@ -120,7 +120,12 @@ export class SettingController {
   @Patch('/account/password')
   async updatePassword(@Request() req, @Body() body) {
     const userId = req.user.id;
+    const oldPassword = body.oldPassword;
     const newPassword = body.newPassword;
-    return await this.accountService.updatePassword(userId, newPassword);
+    return await this.accountService.updatePassword(
+      userId,
+      oldPassword,
+      newPassword,
+    );
   }
 }
