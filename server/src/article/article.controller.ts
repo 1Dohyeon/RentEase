@@ -11,6 +11,7 @@ import {
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { AddressEntity } from 'src/models/address.entity';
 import { ArticleEntity, Currency } from 'src/models/article.entity';
+import { CategoryEntity } from 'src/models/category.entity';
 import { ArticleService } from './article.service';
 
 @Controller('articles')
@@ -29,6 +30,7 @@ export class ArticleController {
     @Body('dailyprice') dailyprice: number,
     @Body('currency') currency: Currency,
     @Body('addresses') addresses: AddressEntity[],
+    @Body('categories') categories: CategoryEntity[],
     @Body('weeklyprice') weeklyprice?: number,
     @Body('monthlyprice') monthlyprice?: number,
   ) {
@@ -41,6 +43,7 @@ export class ArticleController {
       dailyprice,
       currency,
       addresses,
+      categories,
       weeklyprice,
       monthlyprice,
     );
@@ -60,9 +63,10 @@ export class ArticleController {
    * 특정 article 삭제
    */
   @Delete(':articleId')
+  @UseGuards(JwtAuthGuard)
   async deleteArticleById(
     @Param('articleId') articleId: number,
   ): Promise<ArticleEntity | undefined> {
-    return this.articleService.getArticleById(articleId);
+    return this.articleService.deleteArticleById(articleId);
   }
 }

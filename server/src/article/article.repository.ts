@@ -1,7 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AddressEntity } from 'src/models/address.entity';
 import { ArticleEntity, Currency } from 'src/models/article.entity';
+import { CategoryEntity } from 'src/models/category.entity';
 import { UserEntity } from 'src/models/user.entity';
 import { Repository } from 'typeorm';
 
@@ -23,6 +28,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
     currency: Currency,
     addresses: AddressEntity[],
     author: UserEntity,
+    categories: CategoryEntity[],
     weeklyprice?: number,
     monthlyprice?: number,
   ): Promise<ArticleEntity> {
@@ -33,6 +39,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
       currency,
       addresses,
       author,
+      categories,
       weeklyprice,
       monthlyprice,
     });
@@ -50,6 +57,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
       const article = await this.repository
         .createQueryBuilder('article')
         .leftJoinAndSelect('article.addresses', 'address')
+        .leftJoinAndSelect('article.categories', 'category')
         .leftJoinAndSelect('article.author', 'author')
         .where('article.id = :id', { id: articleId })
         .select([
@@ -62,6 +70,8 @@ export class ArticleRepository extends Repository<ArticleEntity> {
           'article.currency',
           'address.city',
           'address.district',
+          'category.id',
+          'category.title',
           'author.id',
           'author.nickname',
         ])
@@ -72,5 +82,21 @@ export class ArticleRepository extends Repository<ArticleEntity> {
     } catch (error) {
       throw new BadRequestException('해당하는 게시글을 찾을 수 없습니다.');
     }
+  }
+
+  async deleteArticleById(
+    articleId: number,
+  ): Promise<ArticleEntity | undefined> {
+    const article = await this.getArticleById(articleId);
+
+    // 게시글이 존재하지 않으면 예외를 던집니다.
+    if (!article) {
+      throw new NotFoundException('해당하는 게시글을 찾을 수 없습니다.');
+    }
+
+    // 게시글을 삭제합니다.
+    await this.repository.remove(article);
+
+    return article;
   }
 }
