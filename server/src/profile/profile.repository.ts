@@ -72,8 +72,6 @@ export class ProfileRepository extends Repository<UserEntity> {
     user: UserProfile,
     address: AddressEntity,
   ): Promise<AddressEntity[]> {
-    console.log(`profile.repository: ${JSON.stringify(address)}`);
-
     try {
       await this.repository
         .createQueryBuilder()
@@ -110,12 +108,10 @@ export class ProfileRepository extends Repository<UserEntity> {
   ): Promise<AddressEntity> {
     // addressId가 숫자인지 확인
     const addressIdToNumber = Number(addressId);
-    console.log(addressIdToNumber);
-    console.log(user.addresses);
-
     const addressToRemove = user.addresses.find(
       (address) => address.id === addressIdToNumber,
     );
+
     if (!addressToRemove) {
       throw new Error('주소가 없습니다.');
     }

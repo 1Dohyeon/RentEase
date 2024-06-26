@@ -43,7 +43,6 @@ export class ArticleRepository extends Repository<ArticleEntity> {
       weeklyprice,
       monthlyprice,
     });
-    console.log(article);
     await this.repository.save(article);
 
     return this.getArticleById(article.id);
