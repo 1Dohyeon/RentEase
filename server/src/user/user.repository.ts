@@ -95,7 +95,8 @@ export class UserRepository extends Repository<UserEntity> {
    */
   async getUserBySubForValidate(sub: string): Promise<UserEntity | undefined> {
     try {
-      return this.createQueryBuilder('user')
+      return this.repository
+        .createQueryBuilder('user')
         .addSelect(['user.id', 'user.email', 'user.username', 'user.nickname'])
         .where('user.id = :sub', { sub })
         .getOne();

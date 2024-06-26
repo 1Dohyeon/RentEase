@@ -19,7 +19,6 @@ export class AddressRepository implements OnModuleInit {
 
   // db에 주소 저장이 안되어있다면 서버 시작시 주소 정보를 추가함
   async onModuleInit() {
-    // 데이터 중복 삽입 방지 로직 추가
     const addresses = [
       { city: '서울특별시', district: '강남구' },
       { city: '서울특별시', district: '강동구' },
