@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Request,
   UseGuards,
@@ -68,5 +69,14 @@ export class ArticleController {
     @Param('articleId') articleId: number,
   ): Promise<ArticleEntity | undefined> {
     return this.articleService.deleteArticleById(articleId);
+  }
+
+  /**
+   * 프로필 업데이트
+   */
+  @Patch('edit/:articleId')
+  @UseGuards(JwtAuthGuard)
+  async updateArticle(@Param('articleId') articleId: number, @Body() body) {
+    return await this.articleService.updateArticle(articleId, body);
   }
 }

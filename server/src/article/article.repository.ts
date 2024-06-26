@@ -98,4 +98,26 @@ export class ArticleRepository extends Repository<ArticleEntity> {
 
     return article;
   }
+
+  /**
+   * article 업데이트
+   * to SettingAccount.updateProfile
+   */
+  async updateArticle(
+    articleId: number,
+    updateStatus: Partial<ArticleEntity>,
+  ): Promise<ArticleEntity> {
+    const article = await this.getArticleById(articleId);
+
+    // 사용자가 변경한 값만 업데이트
+    // Object.assign(article, updateStatus); // 이렇게 해도 아래랑 같은 결과
+    article.title = updateStatus.title;
+    article.content = updateStatus.content;
+    article.dailyprice = updateStatus.dailyprice;
+    article.weeklyprice = updateStatus.weeklyprice;
+    article.monthlyprice = updateStatus.monthlyprice;
+    await this.repository.save(article);
+
+    return await this.getArticleById(articleId);
+  }
 }

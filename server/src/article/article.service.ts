@@ -54,4 +54,8 @@ export class ArticleService {
   ): Promise<ArticleEntity | undefined> {
     return this.articleRepository.deleteArticleById(articleId);
   }
+
+  async updateArticle(articleId: number, updateStatus: Partial<ArticleEntity>) {
+    return await this.articleRepository.updateArticle(articleId, updateStatus);
+  }
 }
