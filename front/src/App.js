@@ -1,17 +1,17 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './pages/Home';
-import Login from './pages/Login'; // Login 페이지 추가
-import Signup from './pages/Signup'; // Signup 페이지 추가
-import About from './pages/About'; // About 페이지 추가
+import React from "react";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import About from "./pages/About"; // About 페이지 추가
+import Home from "./pages/Home";
+import Login from "./pages/Login"; // Login 페이지 추가
+import Register from "./pages/register";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="auth/login" element={<Login />} />
+        <Route path="auth/register" element={<Register />} />
         <Route path="/about" element={<About />} />
       </Routes>
     </Router>

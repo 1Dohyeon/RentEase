@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Link 추가
+import React, { useState } from "react";
+import { Link } from "react-router-dom"; // Link 추가
 
-function Signup() {
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [nickname, setNickname] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+function Register() {
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -15,15 +15,15 @@ function Signup() {
       return;
     }
     // 회원가입 로직 추가
-    console.log('Email:', email);
-    console.log('Name:', name);
-    console.log('Nickname:', nickname);
-    console.log('Password:', password);
+    console.log("Email:", email);
+    console.log("Name:", name);
+    console.log("Nickname:", nickname);
+    console.log("Password:", password);
   };
 
   const handleKakaoLogin = () => {
     // 카카오 로그인 로직 추가
-    console.log('Kakao login clicked');
+    console.log("Kakao login clicked");
   };
 
   return (
@@ -85,13 +85,23 @@ function Signup() {
             required
           />
         </div>
-        <button type="submit" style={styles.button}>Sign Up</button>
-        <button type="button" onClick={handleKakaoLogin} style={{ ...styles.button, ...styles.kakaoButton }}>Sign Up with Kakao</button>
+        <button type="submit" style={styles.button}>
+          Sign Up
+        </button>
+        <button
+          type="button"
+          onClick={handleKakaoLogin}
+          style={{ ...styles.button, ...styles.kakaoButton }}
+        >
+          Sign Up with Kakao
+        </button>
       </form>
-      
+
       {/* 로그인 페이지로 이동하는 버튼 */}
-      <Link to="/login" style={{ textDecoration: 'none' }}>
-        <button style={{ ...styles.button, backgroundColor: '#28a745' }}>Go to Login</button>
+      <Link to="auth/login" style={{ textDecoration: "none" }}>
+        <button style={{ ...styles.button, backgroundColor: "#28a745" }}>
+          Go to Login
+        </button>
       </Link>
     </div>
   );
@@ -99,45 +109,45 @@ function Signup() {
 
 const styles = {
   container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100vh',
-    backgroundColor: '#f0f0f0',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100vh",
+    backgroundColor: "#f0f0f0",
   },
   form: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '300px',
-    padding: '20px',
-    border: '1px solid #ccc',
-    borderRadius: '10px',
-    backgroundColor: '#fff',
+    display: "flex",
+    flexDirection: "column",
+    width: "300px",
+    padding: "20px",
+    border: "1px solid #ccc",
+    borderRadius: "10px",
+    backgroundColor: "#fff",
   },
   formGroup: {
-    marginBottom: '15px',
+    marginBottom: "15px",
   },
   input: {
-    width: '100%',
-    padding: '8px',
-    marginTop: '5px',
-    border: '1px solid #ccc',
-    borderRadius: '5px',
+    width: "100%",
+    padding: "8px",
+    marginTop: "5px",
+    border: "1px solid #ccc",
+    borderRadius: "5px",
   },
   button: {
-    padding: '10px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    marginBottom: '10px',
+    padding: "10px",
+    backgroundColor: "#007bff",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    marginBottom: "10px",
   },
   kakaoButton: {
-    backgroundColor: '#FEE500',
-    color: '#000',
+    backgroundColor: "#FEE500",
+    color: "#000",
   },
 };
 
-export default Signup;
+export default Register;

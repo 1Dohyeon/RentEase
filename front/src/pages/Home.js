@@ -1,15 +1,15 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
   const navigate = useNavigate();
 
   const handleLoginClick = () => {
-    navigate('/login');
+    navigate("auth/login");
   };
 
   const handleSignupClick = () => {
-    navigate('/signup');
+    navigate("auth/signup");
   };
 
   return (
@@ -18,8 +18,12 @@ function Home() {
       <header style={styles.header}>
         <h1>RentEase</h1>
         <nav>
-          <button onClick={handleLoginClick} style={styles.button}>Login</button>
-          <button onClick={handleSignupClick} style={styles.button}>Sign Up</button>
+          <button onClick={handleLoginClick} style={styles.button}>
+            Login
+          </button>
+          <button onClick={handleSignupClick} style={styles.button}>
+            Sign Up
+          </button>
         </nav>
       </header>
 
@@ -27,7 +31,10 @@ function Home() {
       <section style={styles.section}>
         <h2>Welcome to RentEase</h2>
         <p>This application helps you manage your rentals with ease.</p>
-        <p>Explore our features and find out how we can assist you in managing your properties.</p>
+        <p>
+          Explore our features and find out how we can assist you in managing
+          your properties.
+        </p>
       </section>
 
       {/* 푸터 */}
@@ -40,33 +47,33 @@ function Home() {
 
 const styles = {
   header: {
-    padding: '10px',
-    backgroundColor: '#282c34',
-    color: 'white',
-    display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    padding: "10px",
+    backgroundColor: "#282c34",
+    color: "white",
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
   },
   section: {
-    padding: '20px',
+    padding: "20px",
   },
   button: {
-    padding: '10px 20px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    margin: '5px',
+    padding: "10px 20px",
+    backgroundColor: "#007bff",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    margin: "5px",
   },
   footer: {
-    padding: '10px',
-    backgroundColor: '#282c34',
-    color: 'white',
-    textAlign: 'center',
-    position: 'fixed',
-    bottom: '0',
-    width: '100%',
+    padding: "10px",
+    backgroundColor: "#282c34",
+    color: "white",
+    textAlign: "center",
+    position: "fixed",
+    bottom: "0",
+    width: "100%",
   },
 };
 
