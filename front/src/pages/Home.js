@@ -9,7 +9,7 @@ function Home() {
   };
 
   const handleSignupClick = () => {
-    navigate("auth/signup");
+    navigate("auth/register");
   };
 
   return (
