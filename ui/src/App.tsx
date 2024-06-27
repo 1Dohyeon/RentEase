@@ -2,9 +2,9 @@ import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Articles from "./pages/Articles";
 import MyPage from "./pages/MyPage";
-import Settings from "./pages/Settings";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import Settings from "./pages/settings/Settings";
 
 const App: React.FC = () => {
   return (

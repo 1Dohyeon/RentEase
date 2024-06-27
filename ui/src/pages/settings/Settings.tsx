@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Header from "../components/Header";
-import { AuthContext } from "../contexts/AuthContext";
+import Header from "../../components/Header";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const Settings: React.FC = () => {
   const { logout } = useContext(AuthContext);
