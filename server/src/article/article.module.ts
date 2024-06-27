@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AddressModule } from 'src/address/address.module';
 import { ArticleEntity } from 'src/models/article.entity';
 import { UserModule } from 'src/user/user.module';
 import { ArticleController } from './article.controller';
@@ -10,6 +11,7 @@ import { ArticleService } from './article.service';
   imports: [
     TypeOrmModule.forFeature([ArticleEntity, ArticleRepository]),
     UserModule,
+    AddressModule,
   ],
   controllers: [ArticleController],
   providers: [ArticleService, ArticleRepository],

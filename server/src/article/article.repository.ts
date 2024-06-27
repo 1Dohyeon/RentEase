@@ -67,6 +67,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
           'article.weeklyprice',
           'article.monthlyprice',
           'article.currency',
+          'address.id',
           'address.city',
           'address.district',
           'category.id',
@@ -101,7 +102,6 @@ export class ArticleRepository extends Repository<ArticleEntity> {
 
   /**
    * article 업데이트
-   * to SettingAccount.updateProfile
    */
   async updateArticle(
     articleId: number,
@@ -110,12 +110,56 @@ export class ArticleRepository extends Repository<ArticleEntity> {
     const article = await this.getArticleById(articleId);
 
     // 사용자가 변경한 값만 업데이트
-    // Object.assign(article, updateStatus); // 이렇게 해도 아래랑 같은 결과
-    article.title = updateStatus.title;
-    article.content = updateStatus.content;
-    article.dailyprice = updateStatus.dailyprice;
-    article.weeklyprice = updateStatus.weeklyprice;
-    article.monthlyprice = updateStatus.monthlyprice;
+
+    article.title = updateStatus.title ?? article.title;
+    article.content = updateStatus.content ?? article.content;
+    article.dailyprice = updateStatus.dailyprice ?? article.dailyprice;
+    article.weeklyprice = updateStatus.weeklyprice ?? article.weeklyprice;
+    article.monthlyprice = updateStatus.monthlyprice ?? article.monthlyprice;
+    article.currency = updateStatus.currency ?? article.currency;
+
+    // addresses 업데이트
+    if (updateStatus.addresses) {
+      try {
+        // 기존 관계 삭제
+        await this.repository
+          .createQueryBuilder()
+          .relation(ArticleEntity, 'addresses')
+          .of(article)
+          .remove(article.addresses);
+
+        // 새로운 관계 추가
+        await this.repository
+          .createQueryBuilder()
+          .relation(ArticleEntity, 'addresses')
+          .of(article)
+          .add(updateStatus.addresses);
+      } catch (err) {
+        return await this.getArticleById(articleId);
+      }
+    }
+
+    // categories 업데이트
+    if (updateStatus.categories) {
+      try {
+        // 기존 관계 삭제
+        await this.repository
+          .createQueryBuilder()
+          .relation(ArticleEntity, 'categories')
+          .of(article)
+          .remove(article.categories);
+
+        // 새로운 관계 추가
+        await this.repository
+          .createQueryBuilder()
+          .relation(ArticleEntity, 'categories')
+          .of(article)
+          .add(updateStatus.categories);
+      } catch (err) {
+        return await this.getArticleById(articleId);
+      }
+    }
+
     await this.repository.save(article);
 
     return await this.getArticleById(articleId);
