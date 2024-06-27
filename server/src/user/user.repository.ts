@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UserEntity } from '../models/user.entity';
 import { UserRegisterDto } from './dtos/user.register.req';
-import { UserEntity } from './user.entity';
 
 @Injectable()
 export class UserRepository extends Repository<UserEntity> {
@@ -35,6 +35,7 @@ export class UserRepository extends Repository<UserEntity> {
     try {
       const user = await this.repository
         .createQueryBuilder('user')
+        .leftJoinAndSelect('user.addresses', 'address')
         .where('user.id = :id', { id: userId })
         // 실명과 password 제외하고 불러옴
         .select([
@@ -43,6 +44,9 @@ export class UserRepository extends Repository<UserEntity> {
           'user.createdAt',
           'user.updatedAt',
           'user.deletedAt',
+          'address.id',
+          'address.city',
+          'address.district',
         ])
         .getOne();
 
@@ -60,6 +64,7 @@ export class UserRepository extends Repository<UserEntity> {
     try {
       const user = await this.repository
         .createQueryBuilder('user')
+        .leftJoinAndSelect('user.addresses', 'address')
         .where('user.id = :id', { id: userId })
         // password 제외하고 불러옴
         .select([
@@ -70,6 +75,9 @@ export class UserRepository extends Repository<UserEntity> {
           'user.createdAt',
           'user.updatedAt',
           'user.deletedAt',
+          'address.id',
+          'address.city',
+          'address.district',
         ])
         .getOne();
 
@@ -87,7 +95,8 @@ export class UserRepository extends Repository<UserEntity> {
    */
   async getUserBySubForValidate(sub: string): Promise<UserEntity | undefined> {
     try {
-      return this.createQueryBuilder('user')
+      return this.repository
+        .createQueryBuilder('user')
         .addSelect(['user.id', 'user.email', 'user.username', 'user.nickname'])
         .where('user.id = :sub', { sub })
         .getOne();
