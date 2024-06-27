@@ -73,65 +73,140 @@ const Register: React.FC = () => {
   return (
     <div>
       <Header />
-      <div>
-        <h2>회원가입</h2>
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="email">Email:</label>
+      <div
+        style={{
+          width: "480px",
+          margin: "0 auto",
+          marginTop: "10px",
+        }}
+      >
+        <h2
+          style={{
+            textAlign: "center",
+            padding: "10px",
+            color: "#3A3A3A",
+          }}
+        >
+          회원가입
+        </h2>
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            width: "353px",
+            margin: "0 auto",
+          }}
+        >
+          <div style={{ padding: "5px 0px" }}>
+            <label htmlFor="email" style={{ display: "block" }}>
+              이메일
+            </label>
             <input
               type="email"
               id="email"
               value={email}
               onChange={handleEmailChange}
               required
+              style={{
+                width: "353px",
+                height: "40px",
+                borderRadius: "10px",
+                border: "1px solid",
+              }}
             />
           </div>
-          <div>
-            <label htmlFor="username">Username:</label>
+          <div style={{ padding: "5px 0px" }}>
+            <label htmlFor="username" style={{ display: "block" }}>
+              이름
+            </label>
             <input
               type="text"
               id="username"
               value={username}
               onChange={handleUsernameChange}
               required
+              style={{
+                width: "353px",
+                height: "40px",
+                borderRadius: "10px",
+                border: "1px solid",
+              }}
             />
           </div>
-          <div>
-            <label htmlFor="nickname">Nickname:</label>
+          <div style={{ padding: "5px 0px" }}>
+            <label htmlFor="nickname" style={{ display: "block" }}>
+              닉네임
+            </label>
             <input
               type="text"
               id="nickname"
               value={nickname}
               onChange={handleNicknameChange}
               required
+              style={{
+                width: "353px",
+                height: "40px",
+                borderRadius: "10px",
+                border: "1px solid",
+              }}
             />
           </div>
-          <div>
-            <label htmlFor="password">Password:</label>
+          <div style={{ padding: "5px 0px" }}>
+            <label htmlFor="password" style={{ display: "block" }}>
+              비밀번호
+            </label>
             <input
               type="password"
               id="password"
               value={password}
               onChange={handlePasswordChange}
               required
+              style={{
+                width: "353px",
+                height: "40px",
+                borderRadius: "10px",
+                border: "1px solid",
+              }}
             />
           </div>
-          <div>
-            <label htmlFor="passwordConfirm">Confirm Password:</label>
+          <div style={{ padding: "5px 0px" }}>
+            <label htmlFor="passwordConfirm" style={{ display: "block" }}>
+              비밀번호 확인
+            </label>
             <input
               type="password"
               id="passwordConfirm"
               value={passwordConfirm}
               onChange={handlePasswordConfirmChange}
               required
+              style={{
+                width: "353px",
+                height: "40px",
+                borderRadius: "10px",
+                border: "1px solid",
+              }}
             />
           </div>
           {!isPasswordMatch && (
             <p style={{ color: "red" }}>Passwords do not match</p>
           )}
           {error && <p style={{ color: "red" }}>{error}</p>}
-          <button type="submit" disabled={!isPasswordMatch}>
-            Register
+          <button
+            type="submit"
+            disabled={!isPasswordMatch}
+            style={{
+              cursor: "pointer",
+              margin: "10px 0px",
+              backgroundColor: "#7DB26B",
+              width: "360px",
+              height: "40px",
+              borderRadius: "20px",
+              border: "none",
+              color: "#fdfdfd",
+              fontSize: "16px",
+              fontWeight: "600",
+            }}
+          >
+            회원가입
           </button>
         </form>
       </div>
