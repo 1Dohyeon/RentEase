@@ -2,6 +2,7 @@ import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Articles from "./pages/Articles";
 import MyPage from "./pages/MyPage";
+import Settings from "./pages/Settings";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 
@@ -13,6 +14,7 @@ const App: React.FC = () => {
       <Route path="/auth/login" element={<Login />} />
       <Route path="/auth/register" element={<Register />} />
       <Route path="/users/:userId" element={<MyPage />} />
+      <Route path="/settings" element={<Settings />} />
     </Routes>
   );
 };

@@ -1,29 +1,22 @@
 import React, { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 
 const Header: React.FC = () => {
-  const { userId, isLoggedIn, logout } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/articles");
-  };
+  const { userId, isLoggedIn } = useContext(AuthContext);
 
   return (
     <header
       style={{
         maxWidth: "100%",
         height: "70px",
-        backgroundColor: "#ffffff",
         boxShadow: "0 1px 4px rgba(0, 0, 0, 0.1)",
       }}
     >
       <div
         style={{
           maxWidth: "840px",
-          height: "100%", // 헤더의 높이와 맞춤
+          height: "100%",
           margin: "0 auto",
           display: "flex",
           alignItems: "center",
@@ -33,7 +26,6 @@ const Header: React.FC = () => {
       >
         <h2 style={{ margin: 0 }}>
           {" "}
-          {/* h2 태그의 margin을 0으로 설정 */}
           <Link
             to="/articles"
             style={{ textDecoration: "none", color: "#7DB26B" }}
@@ -50,10 +42,11 @@ const Header: React.FC = () => {
                   textDecoration: "none",
                   color: "#7DB26B",
                   display: "inline-block",
-                  width: "100px",
                   height: "30px",
                   textAlign: "center",
-                  marginRight: "10px",
+                  marginRight: "30px",
+                  fontWeight: "600",
+                  marginTop: "10px",
                 }}
               >
                 마이페이지
@@ -64,31 +57,14 @@ const Header: React.FC = () => {
                   textDecoration: "none",
                   color: "#7DB26B",
                   display: "inline-block",
-                  width: "100px",
+
                   height: "30px",
                   textAlign: "center",
-                  marginRight: "10px",
+                  fontWeight: "600",
                 }}
               >
                 설정
               </Link>
-              <button
-                onClick={handleLogout}
-                style={{
-                  textDecoration: "none",
-                  color: "#7DB26B",
-                  display: "inline-block",
-                  width: "80px",
-                  height: "30px",
-                  textAlign: "center",
-                  border: "none",
-                  background: "none",
-                  cursor: "pointer",
-                  fontSize: "16px",
-                }}
-              >
-                로그아웃
-              </button>
             </>
           ) : (
             <>
@@ -102,6 +78,8 @@ const Header: React.FC = () => {
                   height: "30px",
                   textAlign: "center",
                   marginRight: "10px",
+                  fontWeight: "600",
+                  marginTop: "10px",
                 }}
               >
                 회원가입

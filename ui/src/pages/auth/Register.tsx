@@ -73,66 +73,68 @@ const Register: React.FC = () => {
   return (
     <div>
       <Header />
-      <h1>Register</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={handleEmailChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="username">Username:</label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={handleUsernameChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="nickname">Nickname:</label>
-          <input
-            type="text"
-            id="nickname"
-            value={nickname}
-            onChange={handleNicknameChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={handlePasswordChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="passwordConfirm">Confirm Password:</label>
-          <input
-            type="password"
-            id="passwordConfirm"
-            value={passwordConfirm}
-            onChange={handlePasswordConfirmChange}
-            required
-          />
-        </div>
-        {!isPasswordMatch && (
-          <p style={{ color: "red" }}>Passwords do not match</p>
-        )}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <button type="submit" disabled={!isPasswordMatch}>
-          Register
-        </button>
-      </form>
+      <div>
+        <h2>회원가입</h2>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="email">Email:</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={handleEmailChange}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="username">Username:</label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={handleUsernameChange}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="nickname">Nickname:</label>
+            <input
+              type="text"
+              id="nickname"
+              value={nickname}
+              onChange={handleNicknameChange}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="password">Password:</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={handlePasswordChange}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="passwordConfirm">Confirm Password:</label>
+            <input
+              type="password"
+              id="passwordConfirm"
+              value={passwordConfirm}
+              onChange={handlePasswordConfirmChange}
+              required
+            />
+          </div>
+          {!isPasswordMatch && (
+            <p style={{ color: "red" }}>Passwords do not match</p>
+          )}
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          <button type="submit" disabled={!isPasswordMatch}>
+            Register
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
