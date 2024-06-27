@@ -55,31 +55,85 @@ const Login: React.FC = () => {
   return (
     <div>
       <Header />
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={handleEmailChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={handlePasswordChange}
-            required
-          />
-        </div>
-        {error && <div style={{ color: "red" }}>{error}</div>}
-        <button type="submit">Login</button>
-      </form>
+      <div
+        style={{
+          width: "480px",
+          margin: "0 auto",
+          marginTop: "10px",
+        }}
+      >
+        <h2
+          style={{
+            textAlign: "center",
+            padding: "10px",
+            color: "#3A3A3A",
+          }}
+        >
+          로그인
+        </h2>
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            width: "353px",
+            margin: "0 auto",
+          }}
+        >
+          <div style={{ padding: "5px 0px" }}>
+            <label htmlFor="email" style={{ display: "block" }}>
+              이메일
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={handleEmailChange}
+              required
+              style={{
+                width: "353px",
+                height: "40px",
+                borderRadius: "10px",
+                border: "1px solid",
+              }}
+            />
+          </div>
+          <div style={{ padding: "5px 0px" }}>
+            <label htmlFor="password" style={{ display: "block" }}>
+              비밀번호
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={handlePasswordChange}
+              required
+              style={{
+                width: "353px",
+                height: "40px",
+                borderRadius: "10px",
+                border: "1px solid",
+              }}
+            />
+          </div>
+          {error && <div style={{ color: "red" }}>{error}</div>}
+          <button
+            type="submit"
+            style={{
+              cursor: "pointer",
+              margin: "10px 0px",
+              backgroundColor: "#7DB26B",
+              width: "360px",
+              height: "40px",
+              borderRadius: "20px",
+              border: "none",
+              color: "#fdfdfd",
+              fontSize: "16px",
+              fontWeight: "600",
+            }}
+          >
+            로그인
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
