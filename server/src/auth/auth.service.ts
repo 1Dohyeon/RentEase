@@ -63,7 +63,11 @@ export class AuthService {
       userLoginDto.password,
     );
 
-    response.cookie('jwt', jwt, { httpOnly: true });
+    response.cookie('jwt', jwt, {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
 
     const loginUser = await this.userService.getUserById(user.id);
 
