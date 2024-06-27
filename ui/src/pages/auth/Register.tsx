@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header";
 
 const Register: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -71,6 +72,7 @@ const Register: React.FC = () => {
 
   return (
     <div>
+      <Header />
       <h1>Register</h1>
       <form onSubmit={handleSubmit}>
         <div>

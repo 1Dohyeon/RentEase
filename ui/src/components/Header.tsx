@@ -23,6 +23,7 @@ const Header: React.FC = () => {
       <div
         style={{
           maxWidth: "840px",
+          height: "100%", // 헤더의 높이와 맞춤
           margin: "0 auto",
           display: "flex",
           alignItems: "center",
@@ -30,7 +31,9 @@ const Header: React.FC = () => {
           justifyContent: "space-between",
         }}
       >
-        <h2>
+        <h2 style={{ margin: 0 }}>
+          {" "}
+          {/* h2 태그의 margin을 0으로 설정 */}
           <Link
             to="/articles"
             style={{ textDecoration: "none", color: "#7DB26B" }}

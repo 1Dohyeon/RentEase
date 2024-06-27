@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header";
 import { AuthContext } from "../../contexts/AuthContext";
 
 const Login: React.FC = () => {
@@ -53,6 +54,7 @@ const Login: React.FC = () => {
 
   return (
     <div>
+      <Header />
       <h1>Login</h1>
       <form onSubmit={handleSubmit}>
         <div>
