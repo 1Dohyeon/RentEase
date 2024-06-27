@@ -1,12 +1,13 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/exception/httpException.filter';
 import { QueryFailedFilter } from './common/exception/queryFailedFilter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const PORT = process.env.PORT;
 
   // 예외 처리 글로벌 설정
@@ -27,9 +28,13 @@ async function bootstrap() {
 
   // CORS
   app.enableCors({
-    origin: true, // 배포할 때는 특정 url로 수정
+    origin: 'http://localhost:3000', // 프론트엔드 주소
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
+
+  // app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  // app.setViewEngine('hbs');
 
   await app.listen(PORT);
 }

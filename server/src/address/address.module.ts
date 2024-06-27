@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from 'src/user/user.entity';
-import { UserRepository } from 'src/user/user.repository';
+import { AddressEntity } from '../models/address.entity';
+import { AddressRepository } from './address.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, UserRepository])],
+  imports: [TypeOrmModule.forFeature([AddressEntity])],
+  providers: [AddressRepository],
+  exports: [AddressRepository],
 })
 export class AddressModule {}

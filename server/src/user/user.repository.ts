@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UserEntity } from '../models/user.entity';
 import { UserRegisterDto } from './dtos/user.register.req';
-import { UserEntity } from './user.entity';
 
 @Injectable()
 export class UserRepository extends Repository<UserEntity> {
@@ -35,16 +35,49 @@ export class UserRepository extends Repository<UserEntity> {
     try {
       const user = await this.repository
         .createQueryBuilder('user')
+        .leftJoinAndSelect('user.addresses', 'address')
         .where('user.id = :id', { id: userId })
-        // password 제외하고 불러옴
+        // 실명과 password 제외하고 불러옴
         .select([
           'user.id',
-          'user.email',
-          'user.username',
           'user.nickname',
           'user.createdAt',
           'user.updatedAt',
           'user.deletedAt',
+          'address.id',
+          'address.city',
+          'address.district',
+        ])
+        .getOne();
+
+      if (!user) throw new Error();
+      return user;
+    } catch (error) {
+      throw new BadRequestException('해당하는 사용자를 찾을 수 없습니다.');
+    }
+  }
+
+  /**
+   * id를 통해 user 모든 정보 불러옴
+   */
+  async getUserInfoById(userId: number): Promise<UserEntity | undefined> {
+    try {
+      const user = await this.repository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.addresses', 'address')
+        .where('user.id = :id', { id: userId })
+        // password 제외하고 불러옴
+        .select([
+          'user.id',
+          'user.username',
+          'user.email',
+          'user.nickname',
+          'user.createdAt',
+          'user.updatedAt',
+          'user.deletedAt',
+          'address.id',
+          'address.city',
+          'address.district',
         ])
         .getOne();
 
@@ -62,7 +95,8 @@ export class UserRepository extends Repository<UserEntity> {
    */
   async getUserBySubForValidate(sub: string): Promise<UserEntity | undefined> {
     try {
-      return this.createQueryBuilder('user')
+      return this.repository
+        .createQueryBuilder('user')
         .addSelect(['user.id', 'user.email', 'user.username', 'user.nickname'])
         .where('user.id = :sub', { sub })
         .getOne();
@@ -88,16 +122,10 @@ export class UserRepository extends Repository<UserEntity> {
     return user;
   }
 
-  /**
-   * to userController.getAllUsers
-   */
   async getAllUsers(): Promise<UserEntity[]> {
     return await this.repository.find();
   }
 
-  /**
-   * to userController.getArticlesByUserId
-   */
   async getArticlesByUserId(userId: number): Promise<UserEntity | undefined> {
     return this.createQueryBuilder('user')
       .leftJoinAndSelect('user.articles', 'articles')

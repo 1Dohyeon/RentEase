@@ -1,9 +1,12 @@
 import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { CommonEntity } from 'src/common/entity/common.entity';
-import { Column, Entity } from 'typeorm';
+import { AddressEntity } from 'src/models/address.entity';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
+import { ArticleEntity } from './article.entity';
+import { ReviewEntity } from './review.entity';
 
 @Entity({
-  name: 'user',
+  name: 'users',
 })
 export class UserEntity extends CommonEntity {
   @IsEmail({}, { message: '올바른 형태의 이메일을 작성해주세요.' })
@@ -30,24 +33,36 @@ export class UserEntity extends CommonEntity {
   @Column({ type: 'boolean', default: false })
   isAdmin: boolean;
 
-  // @IsNumber()
-  // @Column()
-  // manners_point: number;
+  @ManyToMany(() => AddressEntity, (address) => address.users)
+  @JoinTable({
+    name: 'usersaddress',
+    joinColumn: { name: 'userid', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'addressid', referencedColumnName: 'id' },
+  })
+  addresses: AddressEntity[];
 
-  // @OneToMany(() => AddressEntity, (address) => address.user)
-  // addresses: AddressEntity[];
+  @OneToMany(() => ArticleEntity, (article) => article.author)
+  articles: ArticleEntity[];
+
+  @OneToMany(() => ReviewEntity, (review) => review.writer)
+  reviews: ReviewEntity[];
 }
 
+/** 사용자 프로필(실명x, 이메일x) */
 export interface UserProfile {
   id: number;
   username: string;
   nickname: string;
   updatedAt: Date;
+  addresses: AddressEntity[];
 }
 
+/** 사용자 계정(실명, 이메일 포함) */
 export interface UserAccount {
   id: number;
   username: string;
   email: string;
+  nickname: string;
   updatedAt: Date;
+  addresses: AddressEntity[];
 }

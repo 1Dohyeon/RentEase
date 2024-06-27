@@ -5,12 +5,14 @@ import {
   Get,
   Patch,
   Post,
+  Query,
   Redirect,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { AccountService } from 'src/account/account.service';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
+import { AddressEntity } from 'src/models/address.entity';
 import { ProfileService } from 'src/profile/profile.service';
 
 @Controller('settings')
@@ -47,21 +49,51 @@ export class SettingController {
   }
 
   /**
-   * 주소 생성
+   * 주소 정보만 가져옴
    */
-  @Post('/profile/address')
-  async createAdress(@Request() req, @Body() body) {
+  @Get('/profile/address')
+  async getAddress(@Request() req): Promise<AddressEntity[]> {
     const userId = req.user.id;
-    return await this.profileService.updateProfile(userId, body);
+    return this.profileService.getAddresses(userId);
   }
 
   /**
-   * 주소 수정
+   * 주소 생성
    */
-  @Patch('/profile/address/:id')
-  async updateAddress(@Request() req, @Body() body) {
+  @Post('/profile/address')
+  async createAdress(
+    @Request() req,
+    @Body('address') addresses: string,
+  ): Promise<AddressEntity[]> {
     const userId = req.user.id;
-    return await this.profileService.updateProfile(userId, body);
+    return await this.profileService.addAddress(userId, addresses);
+  }
+
+  /**
+   * 주소 삭제 ex) Delete /profile/address?userId=1&addressId=8
+   */
+  @Delete('/profile/address')
+  async removeAddress(
+    @Query('userId') userId: number,
+    @Query('addressId') addressId: number,
+  ): Promise<AddressEntity> {
+    return this.profileService.removeAddress(userId, addressId);
+  }
+
+  /**
+   * 주소 수정 ex) Patch /profile/address?userId=1&addressId=8
+   */
+  @Patch('/profile/address')
+  async updateAddress(
+    @Query('userId') userId: number,
+    @Query('addressId') oldAddressId: number,
+    @Body('newAddress') newAddress: string,
+  ): Promise<AddressEntity[]> {
+    return await this.profileService.updateAddress(
+      userId,
+      oldAddressId,
+      newAddress,
+    );
   }
 
   /**
@@ -88,7 +120,12 @@ export class SettingController {
   @Patch('/account/password')
   async updatePassword(@Request() req, @Body() body) {
     const userId = req.user.id;
+    const oldPassword = body.oldPassword;
     const newPassword = body.newPassword;
-    return await this.accountService.updatePassword(userId, newPassword);
+    return await this.accountService.updatePassword(
+      userId,
+      oldPassword,
+      newPassword,
+    );
   }
 }
