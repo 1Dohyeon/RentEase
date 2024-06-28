@@ -18,6 +18,24 @@ export class ArticleRepository extends Repository<ArticleEntity> {
   ) {
     super(repository.target, repository.manager, repository.queryRunner);
   }
+
+  async getAllArticles() {
+    return await this.repository
+      .createQueryBuilder('article')
+      .select([
+        'article.id',
+        'article.title',
+        'article.dailyprice',
+        'article.createdAt',
+        'author.nickname',
+        'address.city',
+        'address.district',
+      ])
+      .leftJoin('article.author', 'author')
+      .leftJoin('article.addresses', 'address')
+      .getMany();
+  }
+
   /**
    * article 생성
    */

@@ -19,6 +19,11 @@ import { ArticleService } from './article.service';
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
+  @Get()
+  async getAllArticles() {
+    return await this.articleService.getAllArticles();
+  }
+
   /**
    * 게시글 작성
    */
@@ -36,7 +41,6 @@ export class ArticleController {
     @Body('monthlyprice') monthlyprice?: number,
   ) {
     const userId = req.user.id;
-    console.log(userId);
     return await this.articleService.createArticle(
       userId,
       title,

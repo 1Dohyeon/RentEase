@@ -12,6 +12,10 @@ export class ArticleService {
     private readonly userService: UserService,
   ) {}
 
+  async getAllArticles() {
+    return await this.articleRepository.getAllArticles();
+  }
+
   async createArticle(
     userId: number,
     title: string,
