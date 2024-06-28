@@ -315,14 +315,26 @@ export class ArticleRepository extends Repository<ArticleEntity> {
   ): Promise<ArticleEntity> {
     const article = await this.getArticleById(articleId);
 
-    // 사용자가 변경한 값만 업데이트
+    // 변경할 필드와 값 준비
+    const updateFields: { [key: string]: any } = {};
+    if (updateStatus.title) updateFields.title = updateStatus.title;
+    if (updateStatus.content) updateFields.content = updateStatus.content;
+    if (updateStatus.dailyprice)
+      updateFields.dailyprice = updateStatus.dailyprice;
+    if (updateStatus.weeklyprice)
+      updateFields.weeklyprice = updateStatus.weeklyprice;
+    if (updateStatus.monthlyprice)
+      updateFields.monthlyprice = updateStatus.monthlyprice;
+    if (updateStatus.currency) updateFields.currency = updateStatus.currency;
+    console.log(updateFields);
 
-    article.title = updateStatus.title ?? article.title;
-    article.content = updateStatus.content ?? article.content;
-    article.dailyprice = updateStatus.dailyprice ?? article.dailyprice;
-    article.weeklyprice = updateStatus.weeklyprice ?? article.weeklyprice;
-    article.monthlyprice = updateStatus.monthlyprice ?? article.monthlyprice;
-    article.currency = updateStatus.currency ?? article.currency;
+    // 필드 업데이트 쿼리
+    await this.repository
+      .createQueryBuilder()
+      .update(ArticleEntity)
+      .set(updateFields)
+      .where('id = :id', { id: articleId })
+      .execute();
 
     // addresses 업데이트
     if (updateStatus.addresses) {
@@ -341,7 +353,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
           .of(article)
           .add(updateStatus.addresses);
       } catch (err) {
-        return await this.getArticleById(articleId);
+        throw new NotFoundException('AS: 주소 업데이트에 실패하였습니다.');
       }
     }
 
@@ -362,12 +374,16 @@ export class ArticleRepository extends Repository<ArticleEntity> {
           .of(article)
           .add(updateStatus.categories);
       } catch (err) {
-        return await this.getArticleById(articleId);
+        throw new NotFoundException('AS: 카테고리 업데이트에 실패하였습니다.');
       }
     }
 
+    console.log(article);
     await this.repository.save(article);
 
-    return await this.getArticleById(articleId);
+    const updatedArticle = await this.getArticleById(articleId);
+    console.log(updatedArticle);
+
+    return updatedArticle;
   }
 }
