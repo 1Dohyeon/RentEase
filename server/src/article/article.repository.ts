@@ -144,7 +144,6 @@ export class ArticleRepository extends Repository<ArticleEntity> {
     addressIds: number[],
   ): Promise<ArticleBanner[] | undefined> {
     try {
-      console.log(`addressIds: ${addressIds}`);
       const articles = await this.repository
         .createQueryBuilder('article')
         .select([
@@ -167,7 +166,6 @@ export class ArticleRepository extends Repository<ArticleEntity> {
         .andWhere('address.id IN (:...addressIds)', { addressIds })
         .getMany();
 
-      console.log(articles);
       return articles.map((article) => ({
         ...article,
         createdAt: timeSince(article.createdAt),
