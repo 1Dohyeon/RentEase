@@ -86,3 +86,27 @@ export class ArticleEntity extends CommonEntity {
   })
   categories: CategoryEntity[];
 }
+
+export interface ArticleBanner {
+  id: number;
+  title: string;
+  dailyprice: number;
+  currency: Currency;
+  createdAt: string;
+  author: UserEntity;
+  addresses: AddressEntity[];
+  categories: CategoryEntity[];
+}
+
+export interface ArticleDetail {
+  id: number;
+  title: string;
+  dailyprice: number;
+  currency: Currency;
+  createdAt: string;
+  author: UserEntity;
+  addresses: AddressEntity[];
+  categories: CategoryEntity[];
+  weeklyprice?: number;
+  monthlyprice?: number;
+}
