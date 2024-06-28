@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CategoryRepository } from 'src/category/category.repository';
 import { AddressEntity } from 'src/models/address.entity';
 import {
@@ -41,16 +37,13 @@ export class ArticleService {
     categoryId: number,
   ): Promise<ArticleBanner[] | undefined> {
     try {
+      // 카테고리 id 존재 여부 예외 처리(적용 안됨...)
       const category =
         await this.categoryRepository.findCategoryById(categoryId);
 
-      if (category === null) {
-        throw new NotFoundException(
-          'AS: 해당하는 카테고리는 존재하지 않습니다.',
-        );
+      if (category) {
+        return await this.articleRepository.getArticlesByCategory(categoryId);
       }
-
-      return await this.articleRepository.getArticlesByCategory(categoryId);
     } catch (err) {
       throw new BadRequestException('AS: 알 수 없는 에러가 발생하였습니다.');
     }
@@ -61,55 +54,85 @@ export class ArticleService {
    */
   async getArticlesByLocation(
     userId: number,
-    location: boolean,
+    isLocation: boolean,
   ): Promise<ArticleBanner[] | undefined> {
-    try {
-      // userId 존재 여부 예외 처리
-      if (userId) {
-        const author = await this.userService.getUserById(userId);
+    // userId 존재 여부 예외 처리
+    if (userId) {
+      // location이 false이면 모든 게시글을 반환
+      // 분명 false인데 예외처리가 제대로 작동 안함...
+      console.log(isLocation);
+      if (!isLocation) {
+        console.log('isLocation 예외처리');
+        return await this.articleRepository.getAllArticles();
+      }
 
-        // location이 false이면 모든 게시글을 반환
-        if (!location) {
-          return await this.articleRepository.getAllArticles();
-        }
+      const author = await this.userService.getUserById(userId);
 
-        // author 조회 여부 예외 처리
-        if (!author) {
-          throw new BadRequestException(
-            'AS: 사용자를 찾을 수 없습니다. 다시 로그인 해주세요.',
-          );
-        }
-
-        // 사용자 주소 존재 여부 예외 처리
-        if (!author.addresses || author.addresses.length === 0) {
-          throw new BadRequestException('AS: 사용자 주소를 설정해주세요.');
-        }
-
-        const addressIds = author.addresses.map((address) => address.id);
-
-        return await this.articleRepository.getArticlesByLocation(addressIds);
-      } else {
+      // author 조회 여부 예외 처리
+      if (!author) {
         throw new BadRequestException(
           'AS: 사용자를 찾을 수 없습니다. 다시 로그인 해주세요.',
         );
       }
-    } catch (err) {
-      throw new BadRequestException('AS: 알 수 없는 에러가 발생하였습니다.');
+
+      // 사용자 주소 존재 여부 예외 처리
+      if (!author.addresses || author.addresses.length === 0) {
+        throw new BadRequestException('AS: 사용자 주소를 설정해주세요.');
+      }
+
+      // address id 배열로 저장
+      const addressIds = author.addresses.map((address) => address.id);
+
+      return await this.articleRepository.getArticlesByLocation(addressIds);
+    } else {
+      throw new BadRequestException(
+        'AS: 사용자를 찾을 수 없습니다. 다시 로그인 해주세요.',
+      );
     }
   }
 
   /**
    * 특정 카테고리에서 사용자 주소 정보와 동일한 게시글 조회
    */
-  // async getArticlesByCategoryAndLocation(
-  //   categoryId: number,
-  //   location: boolean,
-  // ): Promise<ArticleBanner[] | undefined> {
-  //   return await this.articleRepository.getArticlesByCategoryAndLocation(
-  //     categoryId,
-  //     location,
-  //   );
-  // }
+  async getArticlesByCategoryAndLocation(
+    userId: number,
+    categoryId: number,
+    isLocation: boolean,
+  ): Promise<ArticleBanner[] | undefined> {
+    // userId 존재 여부 예외 처리
+    if (userId) {
+      // location이 false이면 모든 게시글을 반환
+      // 분명 false인데 예외처리가 제대로 작동 안함...
+      console.log(`isLocation: ${isLocation}`);
+      if (!isLocation) {
+        console.log('isLocation 예외처리');
+        return await this.articleRepository.getAllArticles();
+      }
+
+      const author = await this.userService.getUserById(userId);
+
+      // 사용자 주소 존재 여부 예외 처리
+      if (
+        !author.addresses ||
+        author.addresses.length === 0 ||
+        author.addresses === null
+      ) {
+        throw new BadRequestException('AS: 사용자 주소를 설정해주세요.');
+      }
+
+      // address id 배열로 저장
+      const addressIds = author.addresses.map((address) => address.id);
+
+      return await this.articleRepository.getArticlesByCategoryAndLocation(
+        categoryId,
+        addressIds,
+      );
+    } else {
+      throw new BadRequestException(
+        'AS: 사용자를 찾을 수 없습니다. 다시 로그인 해주세요.',
+      );
+    }
+  }
 
   async createArticle(
     userId: number,
@@ -122,41 +145,62 @@ export class ArticleService {
     weeklyprice?: number,
     monthlyprice?: number,
   ): Promise<ArticleEntity> {
-    const author = await this.userService.getUserById(userId);
-    // 사용자의 주소 중 선택된 주소만 필터링하여 추가
-    let selectedAddresses;
-    if (addresses) {
-      selectedAddresses = author.addresses.filter((address) =>
-        addresses.some((selectedAddress) => selectedAddress.id === address.id),
-      );
-    }
+    try {
+      const author = await this.userService.getUserById(userId);
+      // 사용자의 주소 중 선택된 주소만 필터링하여 추가
+      let selectedAddresses;
+      if (addresses) {
+        selectedAddresses = author.addresses.filter((address) =>
+          addresses.some(
+            (selectedAddress) => selectedAddress.id === address.id,
+          ),
+        );
+      }
 
-    return await this.articleRepository.createArticle(
-      title,
-      content,
-      dailyprice,
-      currency,
-      selectedAddresses,
-      author,
-      categories,
-      weeklyprice,
-      monthlyprice,
-    );
+      return await this.articleRepository.createArticle(
+        title,
+        content,
+        dailyprice,
+        currency,
+        selectedAddresses,
+        author,
+        categories,
+        weeklyprice,
+        monthlyprice,
+      );
+    } catch (err) {
+      throw new BadRequestException('AS: 알 수 없는 에러가 발생하였습니다.');
+    }
   }
 
   async getArticleDetailById(
     articleId: number,
   ): Promise<ArticleDetail | undefined> {
-    return this.articleRepository.getArticleDetailById(articleId);
+    try {
+      return this.articleRepository.getArticleDetailById(articleId);
+    } catch (err) {
+      throw new BadRequestException('AS: 알 수 없는 에러가 발생하였습니다.');
+    }
   }
 
   async deleteArticleById(
     articleId: number,
   ): Promise<ArticleEntity | undefined> {
-    return this.articleRepository.deleteArticleById(articleId);
+    try {
+      return this.articleRepository.deleteArticleById(articleId);
+    } catch (err) {
+      throw new BadRequestException('AS: 알 수 없는 에러가 발생하였습니다.');
+    }
   }
 
   async updateArticle(articleId: number, updateStatus: Partial<ArticleEntity>) {
-    return await this.articleRepository.updateArticle(articleId, updateStatus);
+    try {
+      return await this.articleRepository.updateArticle(
+        articleId,
+        updateStatus,
+      );
+    } catch (err) {
+      throw new BadRequestException('AS: 알 수 없는 에러가 발생하였습니다.');
+    }
   }
 }

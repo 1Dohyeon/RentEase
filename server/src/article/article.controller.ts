@@ -34,7 +34,7 @@ export class ArticleController {
 
   /**
    * 특정 카테고리에 속한 게시글 조회
-   * 예: /articles?categoryId=1
+   * 예: /articles/category?categoryId=1
    */
   @Get('category')
   async getArticlesByCategory(
@@ -45,35 +45,36 @@ export class ArticleController {
 
   /**
    * 사용자 주소 정보와 동일한 게시글만 조회
-   * 예: /articles?location=true
+   * 예: /articles/location?location=true
    */
   @Get('location')
   @UseGuards(JwtAuthGuard)
   async getArticlesByLocation(
     @Request() req,
-    @Query('location') location: boolean,
+    @Query('isLocation') isLocation: boolean,
   ): Promise<ArticleBanner[]> {
     const userId = req.user.id;
-    return await this.articleService.getArticlesByLocation(userId, location);
+    return await this.articleService.getArticlesByLocation(userId, isLocation);
   }
 
   /**
    * 특정 카테고리에서 사용자 주소 정보와 동일한 게시글만 조회
-   * 예: /articles?category=1&location=true
+   * 예: /articles/category-location?category=1&location=true
    */
-  // @Get()
-  // @UseGuards(JwtAuthGuard)
-  // async getArticlesByCategoryAndLocation(
-  //   @Query('category') categoryId: number,
-  //   @Request() req,
-  //   @Query('location') location: boolean,
-  // ): Promise<ArticleBanner[]> {
-  //   const userId = '사용자 식별 정보'; // 예시로 사용자 식별 정보를 넣어야 함
-  //   return await this.articleService.getArticlesByCategoryAndLocation(
-  //     categoryId,
-  //     userId,
-  //   );
-  // }
+  @Get('category-location')
+  @UseGuards(JwtAuthGuard)
+  async getArticlesByCategoryAndLocation(
+    @Query('categoryId') categoryId: number,
+    @Request() req,
+    @Query('isLocation') isLocation: boolean,
+  ): Promise<ArticleBanner[]> {
+    const userId = req.user.id;
+    return await this.articleService.getArticlesByCategoryAndLocation(
+      userId,
+      categoryId,
+      isLocation,
+    );
+  }
 
   /**
    * 게시글 작성

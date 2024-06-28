@@ -26,30 +26,34 @@ export class ArticleRepository extends Repository<ArticleEntity> {
   }
 
   async getAllArticles(): Promise<ArticleBanner[]> {
-    const articles = await this.repository
-      .createQueryBuilder('article')
-      .select([
-        'article.id',
-        'article.title',
-        'article.dailyprice',
-        'article.createdAt',
-        'address.id',
-        'address.city',
-        'address.district',
-        'category.id',
-        'category.title',
-        'author.id',
-        'author.nickname',
-      ])
-      .leftJoin('article.addresses', 'address')
-      .leftJoin('article.categories', 'category')
-      .leftJoin('article.author', 'author')
-      .getMany();
+    try {
+      const articles = await this.repository
+        .createQueryBuilder('article')
+        .select([
+          'article.id',
+          'article.title',
+          'article.dailyprice',
+          'article.createdAt',
+          'address.id',
+          'address.city',
+          'address.district',
+          'category.id',
+          'category.title',
+          'author.id',
+          'author.nickname',
+        ])
+        .leftJoin('article.addresses', 'address')
+        .leftJoin('article.categories', 'category')
+        .leftJoin('article.author', 'author')
+        .getMany();
 
-    return articles.map((article) => ({
-      ...article,
-      createdAt: timeSince(article.createdAt),
-    }));
+      return articles.map((article) => ({
+        ...article,
+        createdAt: timeSince(article.createdAt),
+      }));
+    } catch (err) {
+      throw new BadRequestException('AR: 알 수 없는 에러가 발생하였습니다.');
+    }
   }
 
   /**
@@ -86,7 +90,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
         createdAt: timeSince(article.createdAt),
       }));
     } catch (err) {
-      throw new BadRequestException('알 수 없는 에러가 발생하였습니다.');
+      throw new BadRequestException('AR: 알 수 없는 에러가 발생하였습니다.');
     }
   }
 
@@ -96,7 +100,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
    * @param location 사용자 주소 정보를 반영할지 여부
    */
   async getArticlesByLocation(
-    addressIds,
+    addressIds: number[],
   ): Promise<ArticleBanner[] | undefined> {
     try {
       // 사용자의 주소 정보에 맞는 게시글을 조회
@@ -126,22 +130,52 @@ export class ArticleRepository extends Repository<ArticleEntity> {
         createdAt: timeSince(article.createdAt),
       }));
     } catch (err) {
-      throw new BadRequestException('알 수 없는 에러가 발생하였습니다.');
+      throw new BadRequestException('AR: 알 수 없는 에러가 발생하였습니다.');
     }
   }
 
   /**
    * 특정 카테고리에서 사용자 주소 정보와 동일한 게시글 조회
+   * @param categoryId 카테고리 ID
+   * @param addressIds 사용자의 주소 ID 배열
    */
-  // async getArticlesByCategoryAndLocation(
-  //   categoryId: number,
-  //   location: boolean,
-  // ): Promise<ArticleBanner[] | undefined> {
-  //   return await this.articleRepository.getArticlesByCategoryAndLocation(
-  //     categoryId,
-  //     location,
-  //   );
-  // }
+  async getArticlesByCategoryAndLocation(
+    categoryId: number,
+    addressIds: number[],
+  ): Promise<ArticleBanner[] | undefined> {
+    try {
+      console.log(`addressIds: ${addressIds}`);
+      const articles = await this.repository
+        .createQueryBuilder('article')
+        .select([
+          'article.id',
+          'article.title',
+          'article.dailyprice',
+          'article.createdAt',
+          'address.id',
+          'address.city',
+          'address.district',
+          'category.id',
+          'category.title',
+          'author.id',
+          'author.nickname',
+        ])
+        .leftJoin('article.addresses', 'address')
+        .leftJoin('article.categories', 'category')
+        .leftJoin('article.author', 'author')
+        .where('category.id = :categoryId', { categoryId })
+        .andWhere('address.id IN (:...addressIds)', { addressIds })
+        .getMany();
+
+      console.log(articles);
+      return articles.map((article) => ({
+        ...article,
+        createdAt: timeSince(article.createdAt),
+      }));
+    } catch (err) {
+      throw new BadRequestException('AR: 알 수 없는 에러가 발생하였습니다.');
+    }
+  }
 
   /**
    * article 생성
@@ -208,7 +242,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
       // createdAt 필드가 Date 타입이라고 가정하고, 타입 캐스팅을 통해 변환
       return article;
     } catch (error) {
-      throw new BadRequestException('해당하는 게시글을 찾을 수 없습니다.');
+      throw new BadRequestException('AR: 해당하는 게시글을 찾을 수 없습니다.');
     }
   }
 
@@ -254,7 +288,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
         createdAt: timeSince(article.createdAt),
       };
     } catch (error) {
-      throw new BadRequestException('해당하는 게시글을 찾을 수 없습니다.');
+      throw new BadRequestException('AR: 해당하는 게시글을 찾을 수 없습니다.');
     }
   }
 

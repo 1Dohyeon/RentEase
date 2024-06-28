@@ -15,13 +15,12 @@ export class CategoryRepository implements OnModuleInit {
     private readonly repository: Repository<CategoryEntity>,
   ) {}
 
-  async findCategoryById(id: number) {
+  async findCategoryById(id: number): Promise<CategoryEntity> {
     try {
       const category = await this.repository.findOne({ where: { id } });
-      console.log(category);
-      if (category === null) {
+      if (!category) {
         throw new NotFoundException(
-          'CR: 해당하는 카테고리는 존재하지 않습니다.',
+          `카테고리 ID ${id}에 해당하는 카테고리를 찾을 수 없습니다.`,
         );
       }
       return category;
