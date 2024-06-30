@@ -13,6 +13,7 @@ import {
 import { AccountService } from 'src/account/account.service';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { AddressEntity } from 'src/models/address.entity';
+import { UserEntity } from 'src/models/user.entity';
 import { ProfileService } from 'src/profile/profile.service';
 
 @Controller('settings')
@@ -108,8 +109,8 @@ export class SettingController {
   /**
    * 계정 삭제
    */
-  @Delete('/account/delete-user')
-  async deleteAccount(@Request() req) {
+  @Patch('/account/delete-user')
+  async deleteAccount(@Request() req): Promise<UserEntity> {
     const userId = req.user.id;
     return await this.accountService.deleteUserById(userId);
   }

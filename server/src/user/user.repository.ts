@@ -37,6 +37,7 @@ export class UserRepository extends Repository<UserEntity> {
         .createQueryBuilder('user')
         .leftJoinAndSelect('user.addresses', 'address')
         .where('user.id = :id', { id: userId })
+        .andWhere('article.isDeleted = false')
         // 실명과 password 제외하고 불러옴
         .select([
           'user.id',
@@ -66,6 +67,7 @@ export class UserRepository extends Repository<UserEntity> {
         .createQueryBuilder('user')
         .leftJoinAndSelect('user.addresses', 'address')
         .where('user.id = :id', { id: userId })
+        .andWhere('article.isDeleted = false')
         // password 제외하고 불러옴
         .select([
           'user.id',
