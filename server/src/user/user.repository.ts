@@ -23,7 +23,7 @@ export class UserRepository extends Repository<UserEntity> {
     const user = this.repository.create(userRegisterDto);
     await this.repository.save(user);
 
-    return this.getUserById(user.id);
+    return await this.getUserById(user.id);
   }
 
   /** ---------- READ ---------- */
@@ -35,25 +35,27 @@ export class UserRepository extends Repository<UserEntity> {
     try {
       const user = await this.repository
         .createQueryBuilder('user')
-        .leftJoinAndSelect('user.addresses', 'address')
-        .where('user.id = :id', { id: userId })
         // 실명과 password 제외하고 불러옴
         .select([
           'user.id',
           'user.nickname',
           'user.createdAt',
           'user.updatedAt',
-          'user.deletedAt',
           'address.id',
           'address.city',
           'address.district',
+          'article.id',
+          'article.title',
         ])
+        .leftJoin('user.addresses', 'address')
+        .leftJoin('user.articles', 'article')
+        .where('user.id = :id', { id: userId })
+        .andWhere('user.isDeleted = false')
         .getOne();
 
-      if (!user) throw new Error();
       return user;
     } catch (error) {
-      throw new BadRequestException('해당하는 사용자를 찾을 수 없습니다.');
+      throw new BadRequestException('UR: 해당하는 사용자를 찾을 수 없습니다.');
     }
   }
 
@@ -65,7 +67,9 @@ export class UserRepository extends Repository<UserEntity> {
       const user = await this.repository
         .createQueryBuilder('user')
         .leftJoinAndSelect('user.addresses', 'address')
+        .leftJoinAndSelect('user.articles', 'article')
         .where('user.id = :id', { id: userId })
+        .andWhere('user.isDeleted = false')
         // password 제외하고 불러옴
         .select([
           'user.id',
@@ -74,10 +78,11 @@ export class UserRepository extends Repository<UserEntity> {
           'user.nickname',
           'user.createdAt',
           'user.updatedAt',
-          'user.deletedAt',
           'address.id',
           'address.city',
           'address.district',
+          'article.id',
+          'article.title',
         ])
         .getOne();
 
@@ -95,7 +100,7 @@ export class UserRepository extends Repository<UserEntity> {
    */
   async getUserBySubForValidate(sub: string): Promise<UserEntity | undefined> {
     try {
-      return this.repository
+      return await this.repository
         .createQueryBuilder('user')
         .addSelect(['user.id', 'user.email', 'user.username', 'user.nickname'])
         .where('user.id = :sub', { sub })

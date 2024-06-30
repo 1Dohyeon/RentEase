@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { UserAccount } from 'src/models/user.entity';
+import { UserAccount, UserEntity } from 'src/models/user.entity';
 import { AccountRepository } from './account.repository';
 
 @Injectable()
@@ -42,7 +42,7 @@ export class AccountService {
   }
 
   /** 계정 삭제 */
-  async deleteUserById(userId: number) {
+  async deleteUserById(userId: number): Promise<UserEntity> {
     return await this.accountRepository.deleteUserById(userId);
   }
 }

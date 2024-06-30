@@ -1,5 +1,6 @@
 import { Exclude } from 'class-transformer';
 import {
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   PrimaryGeneratedColumn,
@@ -19,6 +20,9 @@ export abstract class CommonEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ default: false })
+  isDeleted: boolean;
 
   // Soft Delete : 기존에는 null, 삭제시에 timestamp를 찍는다.
   @Exclude()

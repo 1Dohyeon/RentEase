@@ -55,6 +55,7 @@ export interface UserProfile {
   nickname: string;
   updatedAt: Date;
   addresses: AddressEntity[];
+  articles: ArticleEntity[];
 }
 
 /** 사용자 계정(실명, 이메일 포함) */

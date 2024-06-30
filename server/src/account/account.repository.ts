@@ -65,12 +65,14 @@ export class AccountRepository extends Repository<UserEntity> {
   /**
    * 계정 삭제
    */
-  async deleteUserById(userId: number) {
+  async deleteUserById(userId: number): Promise<UserEntity> {
     const deletedUser = await this.userRepository.getUserById(userId);
-    await this.repository.delete(userId);
-    return {
-      id: deletedUser.id,
-      deletedAt: deletedUser.deletedAt,
-    };
+    await this.repository
+      .createQueryBuilder()
+      .update(UserEntity)
+      .set({ isDeleted: true, deletedAt: new Date() })
+      .where('id = :id', { id: userId })
+      .execute();
+    return deletedUser;
   }
 }

@@ -1,23 +1,79 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { AddressEntity } from 'src/models/address.entity';
-import { ArticleEntity, Currency } from 'src/models/article.entity';
+import {
+  ArticleBanner,
+  ArticleDetail,
+  ArticleEntity,
+  Currency,
+} from 'src/models/article.entity';
 import { CategoryEntity } from 'src/models/category.entity';
 import { ArticleService } from './article.service';
 
 @Controller('articles')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
+  /**
+   * 모든 게시글 조회
+   */
+  @Get()
+  async getAllArticles(): Promise<ArticleBanner[]> {
+    return await this.articleService.getAllArticles();
+  }
+
+  /**
+   * 특정 카테고리에 속한 게시글 조회
+   * 예: /articles/category?categoryId=1
+   */
+  @Get('category')
+  async getArticlesByCategory(
+    @Query('categoryId') categoryId: number,
+  ): Promise<ArticleBanner[]> {
+    return await this.articleService.getArticlesByCategory(categoryId);
+  }
+
+  /**
+   * 사용자 주소 정보와 동일한 게시글만 조회
+   * 예: /articles/location?location=true
+   */
+  @Get('location')
+  @UseGuards(JwtAuthGuard)
+  async getArticlesByLocation(
+    @Request() req,
+    @Query('isLocation') isLocation: boolean,
+  ): Promise<ArticleBanner[]> {
+    const userId = req.user.id;
+    return await this.articleService.getArticlesByLocation(userId, isLocation);
+  }
+
+  /**
+   * 특정 카테고리에서 사용자 주소 정보와 동일한 게시글만 조회
+   * 예: /articles/category-location?category=1&location=true
+   */
+  @Get('category-location')
+  @UseGuards(JwtAuthGuard)
+  async getArticlesByCategoryAndLocation(
+    @Query('categoryId') categoryId: number,
+    @Request() req,
+    @Query('isLocation') isLocation: boolean,
+  ): Promise<ArticleBanner[]> {
+    const userId = req.user.id;
+    return await this.articleService.getArticlesByCategoryAndLocation(
+      userId,
+      categoryId,
+      isLocation,
+    );
+  }
 
   /**
    * 게시글 작성
@@ -34,9 +90,8 @@ export class ArticleController {
     @Body('categories') categories: CategoryEntity[],
     @Body('weeklyprice') weeklyprice?: number,
     @Body('monthlyprice') monthlyprice?: number,
-  ) {
+  ): Promise<ArticleEntity> {
     const userId = req.user.id;
-    console.log(userId);
     return await this.articleService.createArticle(
       userId,
       title,
@@ -54,16 +109,16 @@ export class ArticleController {
    * article 정보 불러옴
    */
   @Get(':articleId')
-  async getArticleById(
+  async getArticleDetailById(
     @Param('articleId') articleId: number,
-  ): Promise<ArticleEntity | undefined> {
-    return this.articleService.getArticleById(articleId);
+  ): Promise<ArticleDetail | undefined> {
+    return this.articleService.getArticleDetailById(articleId);
   }
 
   /**
-   * 특정 article 삭제
+   * 특정 article 삭제 (소프트 삭제)
    */
-  @Delete(':articleId')
+  @Patch('delete/:articleId')
   @UseGuards(JwtAuthGuard)
   async deleteArticleById(
     @Param('articleId') articleId: number,
@@ -76,7 +131,11 @@ export class ArticleController {
    */
   @Patch('edit/:articleId')
   @UseGuards(JwtAuthGuard)
-  async updateArticle(@Param('articleId') articleId: number, @Body() body) {
-    return await this.articleService.updateArticle(articleId, body);
+  async updateArticle(
+    @Request() req,
+    @Param('articleId') articleId: number,
+    @Body() body,
+  ) {
+    return await this.articleService.updateArticle(req.id, articleId, body);
   }
 }
