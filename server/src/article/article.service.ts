@@ -147,6 +147,7 @@ export class ArticleService {
   ): Promise<ArticleEntity> {
     try {
       const author = await this.userService.getUserById(userId);
+
       // 사용자의 주소 중 선택된 주소만 필터링하여 추가
       let selectedAddresses;
       if (addresses) {
@@ -193,8 +194,26 @@ export class ArticleService {
     }
   }
 
-  async updateArticle(articleId: number, updateStatus: Partial<ArticleEntity>) {
+  async updateArticle(
+    userId: number,
+    articleId: number,
+    updateStatus: Partial<ArticleEntity>,
+  ) {
     try {
+      // const author = await this.userService.getUserById(userId);
+
+      // // 사용자의 주소 중 선택된 주소만 필터링하여 추가
+      // let selectedAddresses = [];
+      // if (updateStatus.addresses) {
+      //   selectedAddresses = author.addresses.filter((address) =>
+      //     updateStatus.addresses.some(
+      //       (selectedAddress) => selectedAddress.id === address.id,
+      //     ),
+      //   );
+      //   // updateStatus.addresses를 유효한 주소로 갱신
+      //   updateStatus.addresses = selectedAddresses;
+      // }
+
       return await this.articleRepository.updateArticle(
         articleId,
         updateStatus,

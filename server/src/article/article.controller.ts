@@ -131,7 +131,11 @@ export class ArticleController {
    */
   @Patch('edit/:articleId')
   @UseGuards(JwtAuthGuard)
-  async updateArticle(@Param('articleId') articleId: number, @Body() body) {
-    return await this.articleService.updateArticle(articleId, body);
+  async updateArticle(
+    @Request() req,
+    @Param('articleId') articleId: number,
+    @Body() body,
+  ) {
+    return await this.articleService.updateArticle(req.id, articleId, body);
   }
 }

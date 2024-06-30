@@ -33,6 +33,7 @@ export class ProfileRepository extends Repository<UserEntity> {
       username: user.username,
       updatedAt: user.updatedAt,
       addresses: user.addresses,
+      articles: user.articles,
     };
   }
 

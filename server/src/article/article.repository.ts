@@ -324,8 +324,8 @@ export class ArticleRepository extends Repository<ArticleEntity> {
     updateStatus: Partial<ArticleEntity>,
   ): Promise<ArticleEntity> {
     await this.updateArticleInfo(articleId, updateStatus);
-    await this.updateArticleAddress(articleId, updateStatus);
     await this.updateArticleCategory(articleId, updateStatus);
+    await this.updateArticleAddress(articleId, updateStatus);
 
     const updatedArticle = await this.getArticleById(articleId);
     return updatedArticle;
@@ -364,7 +364,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
     }
   }
 
-  async updateArticleAddress(
+  async updateArticleCategory(
     articleId: number,
     updateStatus: Partial<ArticleEntity>,
   ): Promise<ArticleEntity> {
@@ -394,7 +394,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
     }
   }
 
-  async updateArticleCategory(
+  async updateArticleAddress(
     articleId: number,
     updateStatus: Partial<ArticleEntity>,
   ): Promise<ArticleEntity> {
