@@ -45,6 +45,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
         .leftJoin('article.addresses', 'address')
         .leftJoin('article.categories', 'category')
         .leftJoin('article.author', 'author')
+        .where('article.isDeleted = false')
         .getMany();
 
       return articles.map((article) => ({
@@ -83,6 +84,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
         .leftJoin('article.categories', 'category')
         .leftJoin('article.author', 'author')
         .where('category.id = :categoryId', { categoryId })
+        .andWhere('article.isDeleted = false')
         .getMany();
 
       return articles.map((article) => ({
@@ -123,6 +125,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
         .leftJoin('article.categories', 'category')
         .leftJoin('article.author', 'author')
         .where('address.id IN (:...addressIds)', { addressIds })
+        .andWhere('article.isDeleted = false')
         .getMany();
 
       return articles.map((article) => ({
@@ -164,6 +167,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
         .leftJoin('article.author', 'author')
         .where('category.id = :categoryId', { categoryId })
         .andWhere('address.id IN (:...addressIds)', { addressIds })
+        .andWhere('article.isDeleted = false')
         .getMany();
 
       return articles.map((article) => ({
@@ -216,6 +220,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
         .leftJoinAndSelect('article.categories', 'category')
         .leftJoinAndSelect('article.author', 'author')
         .where('article.id = :id', { id: articleId })
+        .andWhere('article.isDeleted = false')
         .select([
           'article.id',
           'article.title',
@@ -259,6 +264,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
         .leftJoinAndSelect('article.categories', 'category')
         .leftJoinAndSelect('article.author', 'author')
         .where('article.id = :id', { id: articleId })
+        .andWhere('article.isDeleted = false')
         .select([
           'article.id',
           'article.title',
@@ -300,8 +306,12 @@ export class ArticleRepository extends Repository<ArticleEntity> {
       throw new NotFoundException('해당하는 게시글을 찾을 수 없습니다.');
     }
 
-    // 게시글을 삭제합니다.
-    await this.repository.remove(article);
+    await this.repository
+      .createQueryBuilder()
+      .update(ArticleEntity)
+      .set({ isDeleted: true, deletedAt: new Date() })
+      .where('id = :id', { id: articleId })
+      .execute();
 
     return article;
   }
@@ -313,53 +323,55 @@ export class ArticleRepository extends Repository<ArticleEntity> {
     articleId: number,
     updateStatus: Partial<ArticleEntity>,
   ): Promise<ArticleEntity> {
-    const article = await this.getArticleById(articleId);
+    await this.updateArticleInfo(articleId, updateStatus);
+    await this.updateArticleAddress(articleId, updateStatus);
+    await this.updateArticleCategory(articleId, updateStatus);
 
-    // 변경할 필드와 값 준비
-    const updateFields: { [key: string]: any } = {};
-    if (updateStatus.title) updateFields.title = updateStatus.title;
-    if (updateStatus.content) updateFields.content = updateStatus.content;
-    if (updateStatus.dailyprice)
-      updateFields.dailyprice = updateStatus.dailyprice;
-    if (updateStatus.weeklyprice)
-      updateFields.weeklyprice = updateStatus.weeklyprice;
-    if (updateStatus.monthlyprice)
-      updateFields.monthlyprice = updateStatus.monthlyprice;
-    if (updateStatus.currency) updateFields.currency = updateStatus.currency;
-    console.log(updateFields);
+    const updatedArticle = await this.getArticleById(articleId);
+    return updatedArticle;
+  }
 
-    // 필드 업데이트 쿼리
-    await this.repository
-      .createQueryBuilder()
-      .update(ArticleEntity)
-      .set(updateFields)
-      .where('id = :id', { id: articleId })
-      .execute();
+  async updateArticleInfo(
+    articleId: number,
+    updateStatus: Partial<ArticleEntity>,
+  ): Promise<ArticleEntity> {
+    try {
+      // 변경할 필드와 값 준비
+      const updateFields: { [key: string]: any } = {};
 
-    // addresses 업데이트
-    if (updateStatus.addresses) {
-      try {
-        // 기존 관계 삭제
-        await this.repository
-          .createQueryBuilder()
-          .relation(ArticleEntity, 'addresses')
-          .of(article)
-          .remove(article.addresses);
+      if (updateStatus.title) updateFields.title = updateStatus.title;
+      if (updateStatus.content) updateFields.content = updateStatus.content;
+      if (updateStatus.dailyprice)
+        updateFields.dailyprice = updateStatus.dailyprice;
+      if (updateStatus.weeklyprice)
+        updateFields.weeklyprice = updateStatus.weeklyprice;
+      if (updateStatus.monthlyprice)
+        updateFields.monthlyprice = updateStatus.monthlyprice;
+      if (updateStatus.currency) updateFields.currency = updateStatus.currency;
 
-        // 새로운 관계 추가
-        await this.repository
-          .createQueryBuilder()
-          .relation(ArticleEntity, 'addresses')
-          .of(article)
-          .add(updateStatus.addresses);
-      } catch (err) {
-        throw new NotFoundException('AS: 주소 업데이트에 실패하였습니다.');
-      }
+      // 필드 업데이트 쿼리
+      await this.repository
+        .createQueryBuilder()
+        .update(ArticleEntity)
+        .set(updateFields)
+        .where('id = :id', { id: articleId })
+        .execute();
+
+      const updatedArticle = await this.getArticleById(articleId);
+      return updatedArticle;
+    } catch {
+      throw new NotFoundException('AR: 게시글 정보 업데이트에 실패하였습니다.');
     }
+  }
 
-    // categories 업데이트
-    if (updateStatus.categories) {
-      try {
+  async updateArticleAddress(
+    articleId: number,
+    updateStatus: Partial<ArticleEntity>,
+  ): Promise<ArticleEntity> {
+    try {
+      const article = await this.getArticleById(articleId);
+      // categories 업데이트
+      if (updateStatus.categories) {
         // 기존 관계 삭제
         await this.repository
           .createQueryBuilder()
@@ -373,17 +385,47 @@ export class ArticleRepository extends Repository<ArticleEntity> {
           .relation(ArticleEntity, 'categories')
           .of(article)
           .add(updateStatus.categories);
-      } catch (err) {
-        throw new NotFoundException('AS: 카테고리 업데이트에 실패하였습니다.');
       }
+
+      const updatedArticle = await this.getArticleById(articleId);
+      return updatedArticle;
+    } catch {
+      throw new NotFoundException('AR: 게시글 주소 업데이트에 실패하였습니다.');
     }
+  }
 
-    console.log(article);
-    await this.repository.save(article);
+  async updateArticleCategory(
+    articleId: number,
+    updateStatus: Partial<ArticleEntity>,
+  ): Promise<ArticleEntity> {
+    try {
+      const article = await this.getArticleById(articleId);
 
-    const updatedArticle = await this.getArticleById(articleId);
-    console.log(updatedArticle);
+      // addresses 업데이트
+      if (updateStatus.addresses) {
+        try {
+          // 기존 관계 삭제
+          await this.repository
+            .createQueryBuilder()
+            .relation(ArticleEntity, 'addresses')
+            .of(article)
+            .remove(article.addresses);
 
-    return updatedArticle;
+          // 새로운 관계 추가
+          await this.repository
+            .createQueryBuilder()
+            .relation(ArticleEntity, 'addresses')
+            .of(article)
+            .add(updateStatus.addresses);
+        } catch (err) {
+          throw new NotFoundException('AS: 주소 업데이트에 실패하였습니다.');
+        }
+      }
+
+      const updatedArticle = await this.getArticleById(articleId);
+      return updatedArticle;
+    } catch {
+      throw new NotFoundException('AS: 게시글 정보 업데이트에 실패하였습니다.');
+    }
   }
 }

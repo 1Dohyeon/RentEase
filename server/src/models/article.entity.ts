@@ -63,6 +63,9 @@ export class ArticleEntity extends CommonEntity {
   @Column({ type: 'enum', enum: Currency, nullable: false })
   currency: Currency;
 
+  @Column({ default: false })
+  isDeleted: boolean;
+
   @ManyToOne(() => UserEntity, (user) => user.articles)
   @JoinColumn({ name: 'authorid' })
   author: UserEntity;

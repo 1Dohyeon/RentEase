@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
@@ -117,9 +116,9 @@ export class ArticleController {
   }
 
   /**
-   * 특정 article 삭제
+   * 특정 article 삭제 (소프트 삭제)
    */
-  @Delete(':articleId')
+  @Patch('delete/:articleId')
   @UseGuards(JwtAuthGuard)
   async deleteArticleById(
     @Param('articleId') articleId: number,
