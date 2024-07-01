@@ -109,7 +109,6 @@ const ArticleDetailPage: React.FC = () => {
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: "10px",
               width: "50%",
             }}
           >
