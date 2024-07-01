@@ -77,6 +77,12 @@ const ArticleDetailPage: React.FC = () => {
     <div>
       <Header />
       <div style={{ maxWidth: "840px", margin: "0 auto", padding: "20px" }}>
+        <div
+          style={{
+            width: "100%",
+            height: "70px",
+          }}
+        ></div>
         <h1>{article.title}</h1>
         <div
           style={{
