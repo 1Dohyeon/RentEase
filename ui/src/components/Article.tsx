@@ -56,16 +56,16 @@ const Article: React.FC<ArticleProps> = ({
     >
       <div
         style={{
-          width: "224px",
-          height: "350px",
-          marginTop: "20px",
+          width: "250px",
+          height: "370px",
+          marginTop: "35px",
           cursor: "pointer",
         }}
       >
         <div
           style={{
-            width: "224px",
-            height: "224px",
+            width: "250px",
+            height: "250px",
             backgroundColor: "#d2d2d2",
             borderRadius: "10px",
           }}
