@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 interface Address {
   id: number;
@@ -21,70 +22,94 @@ interface ArticleProps {
   createdAt: string;
   title: string;
   dailyprice: string;
+  currency: string;
   addresses: Address[];
   categories: Category[];
   author: Author;
 }
 
 const Article: React.FC<ArticleProps> = ({
+  id,
   title,
   dailyprice,
+  currency,
   addresses,
   author,
 }) => {
+  const getCurrencySymbol = (currency: string) => {
+    switch (currency) {
+      case "KRW":
+        return "₩";
+      case "USD":
+        return "$";
+      case "JPY":
+        return "¥";
+      default:
+        return "";
+    }
+  };
+
   return (
-    <div
-      style={{
-        width: "224px",
-        height: "350px",
-        marginTop: "20px",
-        cursor: "pointer",
-      }}
+    <Link
+      to={`/articles/${id}`}
+      style={{ textDecoration: "none", color: "inherit" }}
     >
       <div
         style={{
           width: "224px",
-          height: "224px",
-          backgroundColor: "#d2d2d2",
-          borderRadius: "10px",
-        }}
-      ></div>
-      <h3
-        style={{
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
+          height: "350px",
+          marginTop: "20px",
+          cursor: "pointer",
         }}
       >
-        {title}
-      </h3>
-      <p>₩{parseInt(dailyprice, 10).toLocaleString()}/일</p>
-      <small
-        style={{
-          display: "-webkit-box",
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: "vertical",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
-      >
-        {addresses.map((address, index) => (
-          <span key={index}>
-            {address.city} {address.district}
-            {index < addresses.length - 1 ? ", " : ""}
-          </span>
-        ))}
-      </small>
-      <p
-        style={{
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
-      >
-        {author.nickname}
-      </p>
-    </div>
+        <div
+          style={{
+            width: "224px",
+            height: "224px",
+            backgroundColor: "#d2d2d2",
+            borderRadius: "10px",
+          }}
+        ></div>
+        <h3
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {title}
+        </h3>
+        <p>
+          {getCurrencySymbol(currency)}
+          {parseInt(dailyprice, 10).toLocaleString()}/일
+        </p>
+        <p
+          style={{
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {addresses.map((address, index) => (
+            <small key={index}>
+              {address.city} {address.district}
+              {index < addresses.length - 1 ? ", " : ""}
+            </small>
+          ))}
+        </p>
+        <p
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {author.nickname}
+        </p>
+      </div>
+    </Link>
   );
 };
 

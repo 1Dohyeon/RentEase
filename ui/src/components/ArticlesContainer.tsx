@@ -23,6 +23,7 @@ interface ArticleData {
   createdAt: string;
   title: string;
   dailyprice: string;
+  currency: string;
   addresses: Address[];
   categories: Category[];
   author: Author;
