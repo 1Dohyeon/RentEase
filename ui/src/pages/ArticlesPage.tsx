@@ -1,7 +1,8 @@
 import React from "react";
+import ArticlesContainer from "../components/ArticlesContainer";
 import Header from "../components/Header";
 
-const Articles: React.FC = () => {
+const ArticlesPage: React.FC = () => {
   return (
     <div>
       <Header />
@@ -18,9 +19,10 @@ const Articles: React.FC = () => {
             backgroundColor: "#d2d2d2",
           }}
         ></div>
+        <ArticlesContainer />
       </div>
     </div>
   );
 };
 
-export default Articles;
+export default ArticlesPage;

@@ -1,0 +1,248 @@
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import Header from "../components/Header";
+
+interface Address {
+  id: number;
+  city: string;
+  district: string;
+}
+
+interface Category {
+  id: number;
+  title: string;
+}
+
+interface Author {
+  id: number;
+  nickname: string;
+}
+
+interface Article {
+  id: number;
+  createdAt: string;
+  title: string;
+  content: string;
+  dailyprice: string;
+  weeklyprice: string | null;
+  monthlyprice: string | null;
+  currency: string;
+  addresses: Address[];
+  categories: Category[];
+  author: Author;
+}
+
+const ArticleDetailPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const [article, setArticle] = useState<Article | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+
+  useEffect(() => {
+    fetch(`${apiBaseUrl}/articles/${id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setArticle(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching article:", error);
+        setLoading(false);
+      });
+  }, [id]);
+
+  const getCurrencySymbol = (currency: string) => {
+    switch (currency) {
+      case "KRW":
+        return "₩";
+      case "USD":
+        return "$";
+      case "JPY":
+        return "¥";
+      default:
+        return "";
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!article) {
+    return <div>Article not found</div>;
+  }
+
+  return (
+    <div>
+      <Header />
+      <div style={{ maxWidth: "840px", margin: "0 auto", padding: "20px" }}>
+        <h1>{article.title}</h1>
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            marginTop: "20px",
+            marginBottom: "20px",
+          }}
+        >
+          <div
+            style={{
+              width: "50%",
+              paddingTop: "50%", // 1:1 aspect ratio
+              backgroundColor: "#d2d2d2",
+              borderRadius: "10px",
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+              }}
+            ></div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+              width: "50%",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                marginBottom: "10px",
+              }}
+            >
+              <div
+                style={{
+                  width: "50%",
+                  paddingTop: "50%", // 1:1 aspect ratio
+                  backgroundColor: "#e5e5e5",
+                  borderRadius: "10px",
+                  position: "relative",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                  }}
+                ></div>
+              </div>
+              <div
+                style={{
+                  width: "50%",
+                  paddingTop: "50%", // 1:1 aspect ratio
+                  backgroundColor: "#e5e5e5",
+                  borderRadius: "10px",
+                  position: "relative",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                  }}
+                ></div>
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+              }}
+            >
+              <div
+                style={{
+                  width: "50%",
+                  paddingTop: "50%", // 1:1 aspect ratio
+                  backgroundColor: "#e5e5e5",
+                  borderRadius: "10px",
+                  position: "relative",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                  }}
+                ></div>
+              </div>
+              <div
+                style={{
+                  width: "50%",
+                  paddingTop: "50%", // 1:1 aspect ratio
+                  backgroundColor: "#e5e5e5",
+                  borderRadius: "10px",
+                  position: "relative",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                  }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <h4>{article.title}</h4>
+        <p>
+          {getCurrencySymbol(article.currency)}
+          {parseInt(article.dailyprice, 10).toLocaleString()}/일
+        </p>
+        {article.weeklyprice && (
+          <p>
+            {getCurrencySymbol(article.currency)}
+            {parseInt(article.weeklyprice, 10).toLocaleString()}/주
+          </p>
+        )}
+        {article.monthlyprice && (
+          <p>
+            {getCurrencySymbol(article.currency)}
+            {parseInt(article.monthlyprice, 10).toLocaleString()}/월
+          </p>
+        )}
+        <div>
+          {article.addresses.map((address, index) => (
+            <small key={index}>
+              {address.city} {address.district}
+              {index < article.addresses.length - 1 ? ", " : ""}
+            </small>
+          ))}
+        </div>
+        <div>
+          {article.categories.map((category) => (
+            <span key={category.id}>{category.title}</span>
+          ))}
+        </div>
+        <p>{article.author.nickname}</p>
+
+        <p>{article.createdAt}</p>
+        <p>{article.content}</p>
+      </div>
+    </div>
+  );
+};
+
+export default ArticleDetailPage;
