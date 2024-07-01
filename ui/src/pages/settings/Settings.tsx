@@ -17,9 +17,14 @@ const Settings: React.FC = () => {
       <Header />
       <div
         style={{
+          width: "100%",
+          height: "100px",
+        }}
+      ></div>
+      <div
+        style={{
           maxWidth: "480px",
           margin: "0 auto",
-          marginTop: "10px",
           border: "1px solid #e5e5e5",
           borderRadius: "10px",
           padding: "10px",

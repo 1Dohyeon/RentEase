@@ -53,6 +53,7 @@ const MyPage: React.FC = () => {
           display: "flex",
           alignItems: "center",
           padding: "0 20px",
+          paddingTop: "50px",
           borderBottom: "1px solid #e5e5e5",
           borderRadius: "10px",
         }}

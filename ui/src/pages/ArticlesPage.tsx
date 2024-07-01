@@ -8,15 +8,16 @@ const ArticlesPage: React.FC = () => {
       <Header />
       <div
         style={{
-          maxWidth: "840px",
+          maxWidth: "100%",
           margin: "0 auto",
         }}
       >
         <div
           style={{
             width: "100%",
-            height: "250px",
+            height: "300px",
             backgroundColor: "#d2d2d2",
+            paddingTop: "70px",
           }}
         ></div>
         <ArticlesContainer />
