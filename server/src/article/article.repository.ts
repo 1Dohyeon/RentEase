@@ -21,6 +21,10 @@ export class ArticleRepository extends Repository<ArticleEntity> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
+  /**
+   * 모든 게시글 조회
+   * @returns 모든 게시글의 배너 정보를 반환
+   */
   async getAllArticles(): Promise<ArticleBanner[]> {
     const articles = await this.repository
       .createQueryBuilder('article')
@@ -53,6 +57,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
   /**
    * 특정 카테고리에 속한 게시글 조회
    * @param categoryId 카테고리 ID
+   * @returns 해당 카테고리에 속한 게시글의 배너 정보를 반환
    */
   async getArticlesByCategory(
     categoryId: number,
@@ -88,8 +93,8 @@ export class ArticleRepository extends Repository<ArticleEntity> {
 
   /**
    * 사용자 주소 정보와 동일한 게시글만 조회
-   * @param author 사용자 정보 (여기서는 UserEntity)
-   * @param location 사용자 주소 정보를 반영할지 여부
+   * @param addressIds 사용자 주소 ID 배열
+   * @returns 사용자 주소 정보와 동일한 게시글의 배너 정보를 반환
    */
   async getArticlesByLocation(
     addressIds: number[],
@@ -127,6 +132,7 @@ export class ArticleRepository extends Repository<ArticleEntity> {
    * 특정 카테고리에서 사용자 주소 정보와 동일한 게시글 조회
    * @param categoryId 카테고리 ID
    * @param addressIds 사용자의 주소 ID 배열
+   * @returns 해당 카테고리와 사용자 주소 정보와 일치하는 게시글의 배너 정보를 반환
    */
   async getArticlesByCategoryAndLocation(
     categoryId: number,
@@ -167,9 +173,9 @@ export class ArticleRepository extends Repository<ArticleEntity> {
   }
 
   /**
-   * 특정 카테고리에서 사용자 주소 정보와 동일한 게시글 조회
-   * @param categoryId 카테고리 ID
-   * @param addressIds 사용자의 주소 ID 배열
+   * 작성자 ID로 게시글 조회
+   * @param authorId 작성자 ID
+   * @returns 해당 작성자가 작성한 게시글의 배너 정보를 반환
    */
   async getArticlesByAuthorId(
     authorId: number,
@@ -209,6 +215,16 @@ export class ArticleRepository extends Repository<ArticleEntity> {
 
   /**
    * article 생성
+   * @param title 게시글 제목
+   * @param content 게시글 내용
+   * @param dailyprice 일일 가격
+   * @param currency 통화
+   * @param addresses 게시글에 연결할 주소
+   * @param author 게시글 작성자
+   * @param categories 게시글에 연결할 카테고리
+   * @param weeklyprice 주간 가격 (선택 사항)
+   * @param monthlyprice 월간 가격 (선택 사항)
+   * @returns 생성된 게시글 정보를 반환
    */
   async createArticle(
     title: string,
@@ -237,6 +253,8 @@ export class ArticleRepository extends Repository<ArticleEntity> {
 
   /**
    * id를 통해 article 상세 정보 불러옴
+   * @param articleId 게시글 ID
+   * @returns 해당 게시글의 content를 제외한 상세 정보를 반환
    */
   async getArticleById(articleId: number): Promise<ArticleEntity | undefined> {
     const article = await this.repository
@@ -269,14 +287,14 @@ export class ArticleRepository extends Repository<ArticleEntity> {
 
   /**
    * id를 통해 article detail(createdAt 포맷) 정보 불러옴
+   * @param articleId 게시글 ID
+   * @returns 해당 게시글의 상세 정보를 반환
    */
   async getArticleDetailById(
     articleId: number,
   ): Promise<ArticleDetail | undefined> {
     const article = await this.repository
       .createQueryBuilder('article')
-      // leftJoinAndSelect으로 가져온경우는 select를 마지막에 써서 데이터를 걸러내야함
-      // 위 getAllArticles의 leftJoin으로 가져온경우는 select를 마지막에 안써도 됨
       .leftJoinAndSelect('article.addresses', 'address')
       .leftJoinAndSelect('article.categories', 'category')
       .leftJoinAndSelect('article.author', 'author')
@@ -307,6 +325,10 @@ export class ArticleRepository extends Repository<ArticleEntity> {
     };
   }
 
+  /**
+   * id를 통해 게시글 삭제 (soft delete)
+   * @param articleId 게시글 ID
+   */
   async deleteArticleById(articleId: number) {
     await this.repository
       .createQueryBuilder()
@@ -316,8 +338,12 @@ export class ArticleRepository extends Repository<ArticleEntity> {
       .execute();
   }
 
+  /**
+   * 게시글 정보 업데이트
+   * @param articleId 게시글 ID
+   * @param updateFields 업데이트할 필드
+   */
   async updateArticleInfo(articleId: number, updateFields: object) {
-    // 필드 업데이트 쿼리
     await this.repository
       .createQueryBuilder()
       .update(ArticleEntity)
@@ -326,9 +352,14 @@ export class ArticleRepository extends Repository<ArticleEntity> {
       .execute();
   }
 
+  /**
+   * 게시글 카테고리 업데이트
+   * @param article 게시글 엔티티
+   * @param categories 업데이트할 카테고리
+   */
   async updateArticleCategory(
     article: ArticleEntity,
-    updateStatus: Partial<ArticleEntity>,
+    categories: CategoryEntity[],
   ) {
     await this.repository
       .createQueryBuilder()
@@ -336,30 +367,32 @@ export class ArticleRepository extends Repository<ArticleEntity> {
       .of(article)
       .remove(article.categories);
 
-    // 새로운 관계 추가
     await this.repository
       .createQueryBuilder()
       .relation(ArticleEntity, 'categories')
       .of(article)
-      .add(updateStatus.categories);
+      .add(categories);
   }
 
+  /**
+   * 게시글 주소 업데이트
+   * @param article 게시글 엔티티
+   * @param updateStatus 업데이트할 주소
+   */
   async updateArticleAddress(
     article: ArticleEntity,
-    updateStatus: Partial<ArticleEntity>,
+    addresses: AddressEntity[],
   ) {
-    // 기존 관계 삭제
     await this.repository
       .createQueryBuilder()
       .relation(ArticleEntity, 'addresses')
       .of(article)
       .remove(article.addresses);
 
-    // 새로운 관계 추가
     await this.repository
       .createQueryBuilder()
       .relation(ArticleEntity, 'addresses')
       .of(article)
-      .add(updateStatus.addresses);
+      .add(addresses);
   }
 }

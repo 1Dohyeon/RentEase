@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AddressEntity } from 'src/models/address.entity';
 import { UserEntity, UserProfile } from 'src/models/user.entity';
-import { UserRepository } from 'src/user/user.repository';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -10,7 +9,6 @@ export class ProfileRepository extends Repository<UserEntity> {
   constructor(
     @InjectRepository(UserEntity)
     private readonly repository: Repository<UserEntity>,
-    private readonly userRepository: UserRepository,
   ) {
     super(repository.target, repository.manager, repository.queryRunner);
   }
