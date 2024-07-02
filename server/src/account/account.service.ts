@@ -38,11 +38,13 @@ export class AccountService {
     newPassword: string,
   ) {
     const user = await this.getAccountById(userId);
+    const userAllInfo = await this.userRepository.getUserByEmail(user.email);
 
-    const checkOldPassword = await this.accountRepository.checkPassword(
-      user,
-      oldPassword,
-    );
+    if (!userAllInfo) {
+      throw new BadRequestException('해당하는 사용자를 찾을 수 없습니다.');
+    }
+
+    const checkOldPassword = await this.checkPassword(userAllInfo, oldPassword);
 
     if (!checkOldPassword) {
       throw new BadRequestException('기존 비밀번호를 잘못되었습니다.');
@@ -50,12 +52,23 @@ export class AccountService {
 
     try {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-      await this.accountRepository.updatePassword(user, hashedPassword);
+      await this.accountRepository.updatePassword(userAllInfo, hashedPassword);
 
       return await this.getAccountById(userId);
     } catch (error) {
       throw new BadRequestException('비밀번호 업데이트에 실패했습니다.');
     }
+  }
+
+  /**
+   * password 체크
+   */
+  private async checkPassword(
+    user: UserAccount,
+    password: string,
+  ): Promise<boolean> {
+    const userAllInfo = await this.userRepository.getUserByEmail(user.email);
+    return await bcrypt.compare(password, userAllInfo.password);
   }
 
   /** 계정 삭제 */
