@@ -8,14 +8,17 @@ const Header: React.FC = () => {
   return (
     <header
       style={{
-        maxWidth: "100%",
+        width: "100vw",
         height: "70px",
+        position: "fixed",
+        margin: "0",
         boxShadow: "0 1px 4px rgba(0, 0, 0, 0.1)",
+        backgroundColor: "#fdfdfd",
       }}
     >
       <div
         style={{
-          maxWidth: "840px",
+          width: "840px",
           height: "100%",
           margin: "0 auto",
           display: "flex",
