@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryEntity } from 'src/models/category.entity';
 import { Repository } from 'typeorm';
@@ -16,17 +11,7 @@ export class CategoryRepository implements OnModuleInit {
   ) {}
 
   async findCategoryById(id: number): Promise<CategoryEntity> {
-    try {
-      const category = await this.repository.findOne({ where: { id } });
-      if (!category) {
-        throw new NotFoundException(
-          `카테고리 ID ${id}에 해당하는 카테고리를 찾을 수 없습니다.`,
-        );
-      }
-      return category;
-    } catch (err) {
-      throw new BadRequestException('CR: 알 수 없는 에러가 발생하였습니다.');
-    }
+    return await this.repository.findOne({ where: { id } });
   }
 
   async onModuleInit() {
