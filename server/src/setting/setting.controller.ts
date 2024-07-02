@@ -6,14 +6,13 @@ import {
   Patch,
   Post,
   Query,
-  Redirect,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { AccountService } from 'src/account/account.service';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { AddressEntity } from 'src/models/address.entity';
-import { UserEntity } from 'src/models/user.entity';
+import { UserAccount } from 'src/models/user.entity';
 import { ProfileService } from 'src/profile/profile.service';
 
 @Controller('settings')
@@ -25,19 +24,11 @@ export class SettingController {
   ) {}
 
   /**
-   * settings/ 로 접근시 /settings/profile 로 리다이렉트
-   */
-  @Get('/')
-  @Redirect('/settings/profile')
-  async redirectToProfile() {}
-
-  /**
    * 프로필 정보 조회
    */
   @Get('/profile')
   async getProfileById(@Request() req) {
-    const userId = req.user.id;
-    return await this.profileService.getProfileById(userId);
+    return await this.profileService.getProfileById(req.user.id);
   }
 
   /**
@@ -45,8 +36,7 @@ export class SettingController {
    */
   @Patch('/profile')
   async updateProfile(@Request() req, @Body() body) {
-    const userId = req.user.id;
-    return await this.profileService.updateProfile(userId, body);
+    return await this.profileService.updateProfile(req.user.id, body);
   }
 
   /**
@@ -54,8 +44,7 @@ export class SettingController {
    */
   @Get('/profile/address')
   async getAddress(@Request() req): Promise<AddressEntity[]> {
-    const userId = req.user.id;
-    return this.profileService.getAddresses(userId);
+    return await this.profileService.getAddressesByUserId(req.user.id);
   }
 
   /**
@@ -64,10 +53,9 @@ export class SettingController {
   @Post('/profile/address')
   async createAdress(
     @Request() req,
-    @Body('address') addresses: string,
+    @Body('address') address: string,
   ): Promise<AddressEntity[]> {
-    const userId = req.user.id;
-    return await this.profileService.addAddress(userId, addresses);
+    return await this.profileService.addAddress(req.user.id, address);
   }
 
   /**
@@ -102,15 +90,14 @@ export class SettingController {
    */
   @Get('/account')
   async getAccountById(@Request() req) {
-    const userId = req.user.id;
-    return await this.accountService.getAccountById(userId);
+    return await this.accountService.getAccountById(req.user.id);
   }
 
   /**
    * 계정 삭제
    */
   @Patch('/account/delete-user')
-  async deleteAccount(@Request() req): Promise<UserEntity> {
+  async deleteAccount(@Request() req): Promise<UserAccount> {
     const userId = req.user.id;
     return await this.accountService.deleteUserById(userId);
   }

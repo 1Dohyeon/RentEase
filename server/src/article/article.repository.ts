@@ -184,6 +184,47 @@ export class ArticleRepository extends Repository<ArticleEntity> {
   }
 
   /**
+   * 특정 카테고리에서 사용자 주소 정보와 동일한 게시글 조회
+   * @param categoryId 카테고리 ID
+   * @param addressIds 사용자의 주소 ID 배열
+   */
+  async getArticlesByAuthorId(
+    authorId: number,
+  ): Promise<ArticleBanner[] | undefined> {
+    try {
+      const articles = await this.repository
+        .createQueryBuilder('article')
+        .select([
+          'article.id',
+          'article.title',
+          'article.dailyprice',
+          'article.currency',
+          'article.createdAt',
+          'address.id',
+          'address.city',
+          'address.district',
+          'category.id',
+          'category.title',
+          'author.id',
+          'author.nickname',
+        ])
+        .leftJoin('article.addresses', 'address')
+        .leftJoin('article.categories', 'category')
+        .leftJoin('article.author', 'author')
+        .where('author.id = :authorId', { authorId })
+        .andWhere('article.isDeleted = false')
+        .getMany();
+
+      return articles.map((article) => ({
+        ...article,
+        createdAt: timeSince(article.createdAt),
+      }));
+    } catch (err) {
+      throw new BadRequestException('AR: 알 수 없는 에러가 발생하였습니다.');
+    }
+  }
+
+  /**
    * article 생성
    */
   async createArticle(
