@@ -205,7 +205,7 @@ export class ArticleService {
   async updateArticle(
     articleId: number,
     updateStatus: Partial<ArticleEntity>,
-  ): Promise<ArticleEntity> {
+  ): Promise<ArticleDetail> {
     // 변경할 필드와 값 준비
     const updateFields: { [key: string]: any } = {};
     const article = await this.getArticleById(articleId);
@@ -237,7 +237,7 @@ export class ArticleService {
         );
       }
 
-      return await this.getArticleById(articleId);
+      return await this.getArticleDetailById(articleId);
     } catch (err) {
       throw new BadRequestException(
         '알 수 없는 에러로 업데이트에 실패하였습니다.',

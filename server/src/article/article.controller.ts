@@ -134,7 +134,7 @@ export class ArticleController {
   async updateArticle(
     @Param('articleId') articleId: number,
     @Body() body,
-  ): Promise<ArticleEntity> {
+  ): Promise<ArticleDetail> {
     return await this.articleService.updateArticle(articleId, body);
   }
 }
