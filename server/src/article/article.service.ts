@@ -26,6 +26,7 @@ export class ArticleService {
   /**
    * 모든 게시글 조회 (기본)
    * @returns 모든 게시글의 배너 정보를 반환
+   * @throws NotFoundException 게시글을 찾을 수 없는 경우
    */
   async getAllArticles(): Promise<ArticleBanner[] | undefined> {
     const articles: ArticleBanner[] =
@@ -42,6 +43,7 @@ export class ArticleService {
    * 특정 카테고리에 속한 게시글 조회
    * @param categoryId 카테고리 ID
    * @returns 해당 카테고리에 속한 게시글의 배너 정보를 반환
+   * @throws NotFoundException 카테고리를 찾을 수 없는 경우
    */
   async getArticlesByCategory(
     categoryId: number,
@@ -63,6 +65,7 @@ export class ArticleService {
    * @param userId 사용자 ID
    * @param isLocation 위치 기반 검색 여부
    * @returns 사용자 주소 정보와 동일한 게시글의 배너 정보를 반환
+   * @throws NotFoundException 사용자 주소를 찾을 수 없는 경우
    */
   async getArticlesByLocation(
     userId: number,
@@ -94,6 +97,7 @@ export class ArticleService {
    * @param categoryId 카테고리 ID
    * @param isLocation 위치 기반 검색 여부
    * @returns 해당 카테고리와 사용자 주소 정보와 일치하는 게시글의 배너 정보를 반환
+   * @throws NotFoundException 카테고리를 찾을 수 없는 경우 또는 사용자 주소를 찾을 수 없는 경우
    */
   async getArticlesByCategoryAndLocation(
     userId: number,
@@ -144,6 +148,7 @@ export class ArticleService {
    * @param weeklyprice 주간 가격 (선택 사항)
    * @param monthlyprice 월간 가격 (선택 사항)
    * @returns 생성된 게시글 정보를 반환
+   * @throws NotFoundException 사용자를 찾을 수 없는 경우
    */
   async createArticle(
     userId: number,
@@ -185,6 +190,7 @@ export class ArticleService {
    * 게시글 ID로 게시글 정보 조회
    * @param id 게시글 ID
    * @returns 해당 게시글 정보를 반환
+   * @throws NotFoundException 게시글을 찾을 수 없는 경우
    */
   async getArticleById(id: number): Promise<ArticleEntity> {
     const article = await this.articleRepository.getArticleById(id);
@@ -200,6 +206,7 @@ export class ArticleService {
    * 게시글 ID로 상세 게시글 정보 조회
    * @param articleId 게시글 ID
    * @returns 해당 게시글의 상세 정보를 반환
+   * @throws NotFoundException 게시글을 찾을 수 없는 경우
    */
   async getArticleDetailById(
     articleId: number,
@@ -218,6 +225,8 @@ export class ArticleService {
    * 게시글 삭제 (soft delete)
    * @param articleId 게시글 ID
    * @returns 삭제된 게시글 정보를 반환
+   * @throws NotFoundException 해당하는 게시글을 찾을 수 없는 경우
+   * @throws BadRequestException 삭제에 실패한 경우
    */
   async deleteArticleById(
     articleId: number,
@@ -240,6 +249,8 @@ export class ArticleService {
    * @param articleId 게시글 ID
    * @param updateStatus 업데이트할 필드와 값
    * @returns 업데이트된 게시글의 상세 정보를 반환
+   * @throws NotFoundException 게시글을 찾을 수 없는 경우
+   * @throws BadRequestException 업데이트에 실패한 경우
    */
   async updateArticle(
     articleId: number,

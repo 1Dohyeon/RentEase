@@ -13,25 +13,25 @@ export class UserRepository extends Repository<UserEntity> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  /** ---------- CREATE ---------- */
-
   /**
-   * user 객체 생성
+   * 사용자 등록 서비스 로직
+   * @param userRegisterDto 사용자 등록 DTO
+   * @returns 등록된 사용자 객체를 반환
    */
   async createUser(userRegisterDto: UserRegisterDto): Promise<UserEntity> {
     const user = this.repository.create(userRegisterDto);
     return await this.repository.save(user);
   }
 
-  /** ---------- READ ---------- */
-
   /**
-   * id를 통해 기본적인 사용자 정보만 가져옴(다른 사용자도 볼 수 있어야 함)
+   * 사용자 ID를 이용해 기본적인 사용자 정보를 가져오는 서비스 로직
+   * @param userId 사용자 ID
+   * @returns 기본적인 사용자 정보를 포함한 사용자 객체를 반환
    */
   async getUserById(userId: number): Promise<UserEntity | undefined> {
     return await this.repository
       .createQueryBuilder('user')
-      // 실명과 password 제외
+      // 사용자 실명과 비밀번호를 제외한 필드 선택
       .select([
         'user.id',
         'user.nickname',
@@ -47,7 +47,9 @@ export class UserRepository extends Repository<UserEntity> {
   }
 
   /**
-   * id를 통해 user 모든 정보 불러옴
+   * 사용자 ID를 이용해 모든 사용자 정보를 가져오는 서비스 로직
+   * @param userId 사용자 ID
+   * @returns 모든 사용자 정보를 포함한 사용자 객체를 반환
    */
   async getUserInfoById(userId: number): Promise<UserEntity | undefined> {
     return await this.repository
@@ -56,7 +58,7 @@ export class UserRepository extends Repository<UserEntity> {
       .leftJoinAndSelect('user.articles', 'article')
       .where('user.id = :id', { id: userId })
       .andWhere('user.isDeleted = false')
-      // password 제외하고 불러옴
+      // 비밀번호를 제외하고 필드 선택
       .select([
         'user.id',
         'user.username',
@@ -72,9 +74,9 @@ export class UserRepository extends Repository<UserEntity> {
   }
 
   /**
-   * 로그인할 때 리턴 정보.
-   * payload의 sub 데이터로 jwt 인증할 때 사용됨.
-   * to JwtStrategy.validate
+   * 사용자 서브 정보로 유효성 검사를 위해 사용자를 조회하는 서비스 로직
+   * @param sub 사용자 서브 정보
+   * @returns 주어진 서브 정보를 가진 사용자 객체를 반환
    */
   async getUserBySubForValidate(sub: string): Promise<UserEntity | undefined> {
     return await this.repository
@@ -85,19 +87,26 @@ export class UserRepository extends Repository<UserEntity> {
   }
 
   /**
-   * email로 user 불러옴
-   * to AuthService.verifyUserAndSignJwt
+   * 이메일로 사용자를 조회하는 서비스 로직
+   * @param email 사용자 이메일
+   * @returns 주어진 이메일을 가진 사용자 객체를 반환
    */
   async getUserByEmail(email: string): Promise<any | null> {
     return await this.repository.findOne({ where: { email } });
   }
 
+  /**
+   * 모든 사용자를 가져오는 서비스 로직
+   * @returns 모든 사용자 객체의 배열을 반환
+   */
   async getAllUsers(): Promise<UserEntity[]> {
     return await this.repository.find();
   }
 
   /**
-   * id를 통해 기본적인 사용자 정보와 게시글들을 가져옴(다른 사용자도 볼 수 있어야 함)
+   * 사용자 ID를 이용해 사용자가 작성한 게시글을 포함한 정보를 가져오는 서비스 로직
+   * @param userId 사용자 ID
+   * @returns 사용자가 작성한 게시글을 포함한 사용자 객체를 반환
    */
   async getArticlesByUserId(userId: number): Promise<UserEntity | undefined> {
     return await this.createQueryBuilder('user')
@@ -124,23 +133,23 @@ export class UserRepository extends Repository<UserEntity> {
       .getOne();
   }
 
-  /** ---------- db 확인 ---------- */
-
   /**
-   * db안 email 존재 여부 확인
-   * to AuthService.register
-   * */
+   * 주어진 이메일이 데이터베이스에 존재하는지 확인하는 서비스 로직
+   * @param email 사용자 이메일
+   * @returns 이메일 존재 여부를 반환 (true: 존재, false: 미존재)
+   */
   async existsByEmail(email: string): Promise<boolean> {
     const user = await this.repository.findOne({ where: { email } });
     return !!user; // 이메일이 존재하면 true, 존재하지 않으면 false를 반환
   }
 
   /**
-   * db 안에 nickname 존재 여부 확인
-   * to AuthService.register
+   * 주어진 닉네임이 데이터베이스에 존재하는지 확인하는 서비스 로직
+   * @param nickname 사용자 닉네임
+   * @returns 닉네임 존재 여부를 반환 (true: 존재, false: 미존재)
    */
   async existsByNickname(nickname: string): Promise<boolean> {
     const user = await this.repository.findOne({ where: { nickname } });
-    return !!user; // 닉네임 존재하면 true, 존재하지 않으면 false를 반환
+    return !!user; // 닉네임이 존재하면 true, 존재하지 않으면 false를 반환
   }
 }
