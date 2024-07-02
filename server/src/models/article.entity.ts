@@ -92,7 +92,7 @@ export interface ArticleBanner {
   title: string;
   dailyprice: number;
   currency: Currency;
-  createdAt: string;
+  createdTimeSince: string;
   author: UserEntity;
   addresses: AddressEntity[];
   categories: CategoryEntity[];
@@ -103,7 +103,7 @@ export interface ArticleDetail {
   title: string;
   dailyprice: number;
   currency: Currency;
-  createdAt: string;
+  createdTimeSince: string;
   author: UserEntity;
   addresses: AddressEntity[];
   categories: CategoryEntity[];

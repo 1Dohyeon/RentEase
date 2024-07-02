@@ -20,7 +20,7 @@ interface Author {
 
 interface Article {
   id: number;
-  createdAt: string;
+  createdTimeSince: string;
   title: string;
   content: string;
   dailyprice: string;
@@ -243,7 +243,7 @@ const ArticleDetailPage: React.FC = () => {
         </div>
         <p>{article.author.nickname}</p>
 
-        <p>{article.createdAt}</p>
+        <p>{article.createdTimeSince}</p>
         <p>{article.content}</p>
       </div>
     </div>

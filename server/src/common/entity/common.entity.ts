@@ -18,6 +18,9 @@ export abstract class CommonEntity {
   @CreateDateColumn()
   createdAt: Date;
 
+  @CreateDateColumn()
+  createdTimeSince: string;
+
   @UpdateDateColumn()
   updatedAt: Date;
 

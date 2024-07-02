@@ -52,8 +52,10 @@ export class ArticleController {
     @Request() req,
     @Query('isLocation') isLocation: boolean,
   ): Promise<ArticleBanner[]> {
-    const userId = req.user.id;
-    return await this.articleService.getArticlesByLocation(userId, isLocation);
+    return await this.articleService.getArticlesByLocation(
+      req.user.id,
+      isLocation,
+    );
   }
 
   /**
@@ -67,9 +69,8 @@ export class ArticleController {
     @Request() req,
     @Query('isLocation') isLocation: boolean,
   ): Promise<ArticleBanner[]> {
-    const userId = req.user.id;
     return await this.articleService.getArticlesByCategoryAndLocation(
-      userId,
+      req.user.id,
       categoryId,
       isLocation,
     );
@@ -91,9 +92,8 @@ export class ArticleController {
     @Body('weeklyprice') weeklyprice?: number,
     @Body('monthlyprice') monthlyprice?: number,
   ): Promise<ArticleEntity> {
-    const userId = req.user.id;
     return await this.articleService.createArticle(
-      userId,
+      req.user.id,
       title,
       content,
       dailyprice,
@@ -112,7 +112,7 @@ export class ArticleController {
   async getArticleDetailById(
     @Param('articleId') articleId: number,
   ): Promise<ArticleDetail | undefined> {
-    return this.articleService.getArticleDetailById(articleId);
+    return await this.articleService.getArticleDetailById(articleId);
   }
 
   /**
@@ -123,7 +123,7 @@ export class ArticleController {
   async deleteArticleById(
     @Param('articleId') articleId: number,
   ): Promise<ArticleEntity | undefined> {
-    return this.articleService.deleteArticleById(articleId);
+    return await this.articleService.deleteArticleById(articleId);
   }
 
   /**
@@ -132,10 +132,9 @@ export class ArticleController {
   @Patch('edit/:articleId')
   @UseGuards(JwtAuthGuard)
   async updateArticle(
-    @Request() req,
     @Param('articleId') articleId: number,
     @Body() body,
-  ) {
-    return await this.articleService.updateArticle(req.id, articleId, body);
+  ): Promise<ArticleDetail> {
+    return await this.articleService.updateArticle(articleId, body);
   }
 }

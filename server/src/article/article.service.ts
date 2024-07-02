@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CategoryRepository } from 'src/category/category.repository';
 import { AddressEntity } from 'src/models/address.entity';
 import {
@@ -23,11 +27,14 @@ export class ArticleService {
    * 모든 게시글 조회 (기본)
    */
   async getAllArticles(): Promise<ArticleBanner[] | undefined> {
-    try {
-      return await this.articleRepository.getAllArticles();
-    } catch (err) {
-      throw new BadRequestException('AS: 알 수 없는 에러가 발생하였습니다.');
+    const articles: ArticleBanner[] =
+      await this.articleRepository.getAllArticles();
+
+    if (!articles) {
+      throw new NotFoundException('게시글을 찾을 수 없습니다.');
     }
+
+    return articles;
   }
 
   /**
@@ -36,17 +43,16 @@ export class ArticleService {
   async getArticlesByCategory(
     categoryId: number,
   ): Promise<ArticleBanner[] | undefined> {
-    try {
-      // 카테고리 id 존재 여부 예외 처리(적용 안됨...)
-      const category =
-        await this.categoryRepository.findCategoryById(categoryId);
+    // 카테고리 id 존재 여부 예외 처리
+    const category = await this.categoryRepository.findCategoryById(categoryId);
 
-      if (category) {
-        return await this.articleRepository.getArticlesByCategory(categoryId);
-      }
-    } catch (err) {
-      throw new BadRequestException('AS: 알 수 없는 에러가 발생하였습니다.');
+    if (!category) {
+      throw new NotFoundException(
+        `카테고리 ID ${categoryId}에 해당하는 카테고리를 찾을 수 없습니다.`,
+      );
     }
+
+    return await this.articleRepository.getArticlesByCategory(categoryId);
   }
 
   /**
@@ -56,39 +62,27 @@ export class ArticleService {
     userId: number,
     isLocation: boolean,
   ): Promise<ArticleBanner[] | undefined> {
-    // userId 존재 여부 예외 처리
-    if (userId) {
-      // location이 false이면 모든 게시글을 반환
-      // 분명 false인데 예외처리가 제대로 작동 안함...
-      console.log(isLocation);
-      if (!isLocation) {
-        console.log('isLocation 예외처리');
-        return await this.articleRepository.getAllArticles();
-      }
+    // location이 false이면 모든 게시글을 반환
+    // 분명 false인데 예외처리가 제대로 작동 안함...
+    console.log(isLocation);
+    if (!isLocation) {
+      console.log('isLocation 예외처리');
+      return await this.getAllArticles();
+    }
 
-      const author = await this.userService.getUserById(userId);
+    const author = await this.userService.getUserById(userId);
 
-      // author 조회 여부 예외 처리
-      if (!author) {
-        throw new BadRequestException(
-          'AS: 사용자를 찾을 수 없습니다. 다시 로그인 해주세요.',
-        );
-      }
-
-      // 사용자 주소 존재 여부 예외 처리
-      if (!author.addresses || author.addresses.length === 0) {
-        throw new BadRequestException('AS: 사용자 주소를 설정해주세요.');
-      }
-
-      // address id 배열로 저장
-      const addressIds = author.addresses.map((address) => address.id);
-
-      return await this.articleRepository.getArticlesByLocation(addressIds);
-    } else {
-      throw new BadRequestException(
-        'AS: 사용자를 찾을 수 없습니다. 다시 로그인 해주세요.',
+    // 사용자 주소 존재 여부 예외 처리
+    if (!author.addresses || author.addresses.length === 0) {
+      throw new NotFoundException(
+        '사용자 주소를 찾을 수 없습니다. 주소를 설정해주세요.',
       );
     }
+
+    // address id 배열로 저장
+    const addressIds = author.addresses.map((address) => address.id);
+
+    return await this.articleRepository.getArticlesByLocation(addressIds);
   }
 
   /**
@@ -99,39 +93,38 @@ export class ArticleService {
     categoryId: number,
     isLocation: boolean,
   ): Promise<ArticleBanner[] | undefined> {
-    // userId 존재 여부 예외 처리
-    if (userId) {
-      // location이 false이면 모든 게시글을 반환
-      // 분명 false인데 예외처리가 제대로 작동 안함...
-      console.log(`isLocation: ${isLocation}`);
-      if (!isLocation) {
-        console.log('isLocation 예외처리');
-        return await this.articleRepository.getAllArticles();
-      }
+    // 카테고리 id 존재 여부 예외 처리
+    const category = await this.categoryRepository.findCategoryById(categoryId);
 
-      const author = await this.userService.getUserById(userId);
-
-      // 사용자 주소 존재 여부 예외 처리
-      if (
-        !author.addresses ||
-        author.addresses.length === 0 ||
-        author.addresses === null
-      ) {
-        throw new BadRequestException('AS: 사용자 주소를 설정해주세요.');
-      }
-
-      // address id 배열로 저장
-      const addressIds = author.addresses.map((address) => address.id);
-
-      return await this.articleRepository.getArticlesByCategoryAndLocation(
-        categoryId,
-        addressIds,
-      );
-    } else {
-      throw new BadRequestException(
-        'AS: 사용자를 찾을 수 없습니다. 다시 로그인 해주세요.',
+    if (!category) {
+      throw new NotFoundException(
+        `카테고리 ID ${categoryId}에 해당하는 카테고리를 찾을 수 없습니다.`,
       );
     }
+
+    // location이 false이면 모든 게시글을 반환
+    // 분명 false인데 예외처리가 제대로 작동 안함...
+    console.log(`isLocation: ${isLocation}`);
+    if (!isLocation) {
+      console.log('isLocation 예외처리');
+      return await this.getAllArticles();
+    }
+
+    const author = await this.userService.getUserById(userId);
+
+    // 사용자 주소 존재 여부 예외 처리
+    if (!author.addresses || author.addresses.length === 0) {
+      throw new NotFoundException(
+        '사용자 주소를 찾을 수 없습니다. 주소를 설정해주세요.',
+      );
+    }
+    // address id 배열로 저장
+    const addressIds = author.addresses.map((address) => address.id);
+
+    return await this.articleRepository.getArticlesByCategoryAndLocation(
+      categoryId,
+      addressIds,
+    );
   }
 
   async createArticle(
@@ -145,81 +138,110 @@ export class ArticleService {
     weeklyprice?: number,
     monthlyprice?: number,
   ): Promise<ArticleEntity> {
-    try {
-      const author = await this.userService.getUserById(userId);
+    const author = await this.userService.getUserById(userId);
 
-      // 사용자의 주소 중 선택된 주소만 필터링하여 추가
-      let selectedAddresses;
-      if (addresses) {
-        selectedAddresses = author.addresses.filter((address) =>
-          addresses.some(
-            (selectedAddress) => selectedAddress.id === address.id,
-          ),
-        );
-      }
-
-      return await this.articleRepository.createArticle(
-        title,
-        content,
-        dailyprice,
-        currency,
-        selectedAddresses,
-        author,
-        categories,
-        weeklyprice,
-        monthlyprice,
+    // 사용자의 주소 중 선택된 주소만 필터링하여 추가
+    let selectedAddresses;
+    if (addresses) {
+      selectedAddresses = author.addresses.filter((address) =>
+        addresses.some((selectedAddress) => selectedAddress.id === address.id),
       );
-    } catch (err) {
-      throw new BadRequestException('AS: 알 수 없는 에러가 발생하였습니다.');
     }
+
+    const newArticle = await this.articleRepository.createArticle(
+      title,
+      content,
+      dailyprice,
+      currency,
+      selectedAddresses,
+      author,
+      categories,
+      weeklyprice,
+      monthlyprice,
+    );
+
+    return await this.getArticleById(newArticle.id);
+  }
+
+  async getArticleById(id: number): Promise<ArticleEntity> {
+    const article = await this.articleRepository.getArticleById(id);
+
+    if (!article) {
+      throw new NotFoundException('게시글을 찾을 수 없습니다.');
+    }
+
+    return article;
   }
 
   async getArticleDetailById(
     articleId: number,
   ): Promise<ArticleDetail | undefined> {
-    try {
-      return this.articleRepository.getArticleDetailById(articleId);
-    } catch (err) {
-      throw new BadRequestException('AS: 알 수 없는 에러가 발생하였습니다.');
+    const article =
+      await this.articleRepository.getArticleDetailById(articleId);
+
+    if (!article) {
+      throw new NotFoundException('게시글을 찾을 수 없습니다.');
     }
+
+    return article;
   }
 
   async deleteArticleById(
     articleId: number,
   ): Promise<ArticleEntity | undefined> {
+    const article = await this.getArticleById(articleId);
+
+    if (!article) {
+      throw new NotFoundException('해당하는 게시글을 찾을 수 없습니다.');
+    }
     try {
-      return this.articleRepository.deleteArticleById(articleId);
+      await this.articleRepository.deleteArticleById(articleId);
+      return article;
     } catch (err) {
-      throw new BadRequestException('AS: 알 수 없는 에러가 발생하였습니다.');
+      throw new BadRequestException('알 수 없는 에러로 삭제에 실패하였습니다.');
     }
   }
 
   async updateArticle(
-    userId: number,
     articleId: number,
     updateStatus: Partial<ArticleEntity>,
-  ) {
+  ): Promise<ArticleDetail> {
+    // 변경할 필드와 값 준비
+    const updateFields: { [key: string]: any } = {};
+    const article = await this.getArticleById(articleId);
+
+    if (updateStatus.title && updateStatus.title !== '')
+      updateFields.title = updateStatus.title;
+    if (updateStatus.content && updateStatus.content !== '')
+      updateFields.content = updateStatus.content;
+    if (updateStatus.dailyprice)
+      updateFields.dailyprice = updateStatus.dailyprice;
+    if (updateStatus.weeklyprice)
+      updateFields.weeklyprice = updateStatus.weeklyprice;
+    if (updateStatus.monthlyprice)
+      updateFields.monthlyprice = updateStatus.monthlyprice;
+    if (updateStatus.currency) updateFields.currency = updateStatus.currency;
+
     try {
-      // const author = await this.userService.getUserById(userId);
+      await this.articleRepository.updateArticleInfo(articleId, updateFields);
+      if (updateStatus.categories) {
+        await this.articleRepository.updateArticleCategory(
+          article,
+          updateStatus,
+        );
+      }
+      if (updateStatus.addresses) {
+        await this.articleRepository.updateArticleAddress(
+          article,
+          updateStatus,
+        );
+      }
 
-      // // 사용자의 주소 중 선택된 주소만 필터링하여 추가
-      // let selectedAddresses = [];
-      // if (updateStatus.addresses) {
-      //   selectedAddresses = author.addresses.filter((address) =>
-      //     updateStatus.addresses.some(
-      //       (selectedAddress) => selectedAddress.id === address.id,
-      //     ),
-      //   );
-      //   // updateStatus.addresses를 유효한 주소로 갱신
-      //   updateStatus.addresses = selectedAddresses;
-      // }
-
-      return await this.articleRepository.updateArticle(
-        articleId,
-        updateStatus,
-      );
+      return await this.getArticleDetailById(articleId);
     } catch (err) {
-      throw new BadRequestException('AS: 알 수 없는 에러가 발생하였습니다.');
+      throw new BadRequestException(
+        '알 수 없는 에러로 업데이트에 실패하였습니다.',
+      );
     }
   }
 }

@@ -1,14 +1,31 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { UserAccount, UserEntity } from 'src/models/user.entity';
+import { UserAccount } from 'src/models/user.entity';
+import { UserRepository } from 'src/user/user.repository';
 import { AccountRepository } from './account.repository';
 
 @Injectable()
 export class AccountService {
-  constructor(private readonly accountRepository: AccountRepository) {}
+  constructor(
+    private readonly accountRepository: AccountRepository,
+    private readonly userRepository: UserRepository,
+  ) {}
 
   async getAccountById(userId: number): Promise<UserAccount> {
-    return await this.accountRepository.getAccountById(userId);
+    const user = await this.userRepository.getUserInfoById(userId);
+
+    if (!user) {
+      throw new BadRequestException('해당하는 사용자를 찾을 수 없습니다.');
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      nickname: user.nickname,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   }
 
   /**
@@ -20,29 +37,31 @@ export class AccountService {
     oldPassword: string,
     newPassword: string,
   ) {
+    const user = await this.getAccountById(userId);
+
     const checkOldPassword = await this.accountRepository.checkPassword(
-      userId,
+      user,
       oldPassword,
     );
 
     if (!checkOldPassword) {
-      throw new BadRequestException('기존 비밀번호를 잘못 입력하였습니다.');
+      throw new BadRequestException('기존 비밀번호를 잘못되었습니다.');
     }
 
     try {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await this.accountRepository.updatePassword(user, hashedPassword);
 
-      return await this.accountRepository.updatePassword(
-        userId,
-        hashedPassword,
-      );
+      return await this.getAccountById(userId);
     } catch (error) {
       throw new BadRequestException('비밀번호 업데이트에 실패했습니다.');
     }
   }
 
   /** 계정 삭제 */
-  async deleteUserById(userId: number): Promise<UserEntity> {
-    return await this.accountRepository.deleteUserById(userId);
+  async deleteUserById(userId: number): Promise<UserAccount> {
+    const user = await this.getAccountById(userId);
+    if (user) await this.accountRepository.deleteUserById(userId);
+    return await this.getAccountById(userId);
   }
 }

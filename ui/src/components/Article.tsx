@@ -19,7 +19,7 @@ interface Author {
 
 interface ArticleProps {
   id: number;
-  createdAt: string;
+  createdTimeSince: string;
   title: string;
   dailyprice: string;
   currency: string;
@@ -30,6 +30,7 @@ interface ArticleProps {
 
 const Article: React.FC<ArticleProps> = ({
   id,
+  createdTimeSince,
   title,
   dailyprice,
   currency,
@@ -79,10 +80,18 @@ const Article: React.FC<ArticleProps> = ({
         >
           {title}
         </h3>
-        <p>
-          {getCurrencySymbol(currency)}
-          {parseInt(dailyprice, 10).toLocaleString()}/일
-        </p>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <p>
+            {getCurrencySymbol(currency)}
+            {parseInt(dailyprice, 10).toLocaleString()}/일
+          </p>
+          <p>{createdTimeSince}</p>
+        </div>
         <p
           style={{
             display: "-webkit-box",

@@ -53,9 +53,9 @@ export interface UserProfile {
   id: number;
   username: string;
   nickname: string;
+  createdAt: Date;
   updatedAt: Date;
   addresses: AddressEntity[];
-  articles: ArticleEntity[];
 }
 
 /** 사용자 계정(실명, 이메일 포함) */
@@ -64,6 +64,6 @@ export interface UserAccount {
   username: string;
   email: string;
   nickname: string;
+  createdAt: Date;
   updatedAt: Date;
-  addresses: AddressEntity[];
 }
