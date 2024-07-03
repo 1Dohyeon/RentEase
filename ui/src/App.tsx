@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import ArticleDetailPage from "./pages/ArticleDetailPage";
 import ArticleWritePage from "./pages/ArticleWrtiePage";
 import ArticlesPage from "./pages/ArticlesPage";
+import CategoryArticlesPage from "./pages/CategoryArticlePage";
 import MyPage from "./pages/MyPage";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -19,6 +20,7 @@ const App: React.FC = () => {
       <Route path="/auth/register" element={<Register />} />
       <Route path="/users/:userId" element={<MyPage />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/articles/category" element={<CategoryArticlesPage />} />
     </Routes>
   );
 };

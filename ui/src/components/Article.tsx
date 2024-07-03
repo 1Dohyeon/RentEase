@@ -59,7 +59,7 @@ const Article: React.FC<ArticleProps> = ({
         style={{
           width: "270px",
           height: "370px",
-          marginTop: "20px",
+          marginTop: "10px",
           cursor: "pointer",
         }}
       >
