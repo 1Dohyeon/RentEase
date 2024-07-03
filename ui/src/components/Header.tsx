@@ -19,7 +19,8 @@ const Header: React.FC = () => {
     >
       <div
         style={{
-          width: "840px",
+          width: "100%",
+          maxWidth: "840px",
           height: "100%",
           margin: "0 auto",
           display: "flex",

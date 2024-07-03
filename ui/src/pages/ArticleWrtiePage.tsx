@@ -11,8 +11,15 @@ const ArticleWritePage: React.FC = () => {
           height: "70px",
         }}
       ></div>
-      <h1>게시글 작성</h1>
-      {/* 게시글 작성 폼 */}
+      <div
+        style={{
+          width: "840px",
+          margin: "0 auto",
+        }}
+      >
+        <h1>게시글 작성</h1>
+        {/* 게시글 작성 폼 */}
+      </div>
     </div>
   );
 };

@@ -25,18 +25,18 @@ const Banner: React.FC = () => {
         width: "100%",
         height: "300px",
         backgroundColor: "#d2d2d2",
-        position: "relative",
+        display: "flex",
+        justifyContent: "center", // 배너 내 요소들 가운데 정렬
+        alignItems: "flex-end", // 아래쪽 정렬
       }}
     >
       <div
         style={{
           maxWidth: "840px",
-          margin: "0 auto",
-          position: "absolute",
-          bottom: "20px",
-          display: "flex",
-          justifyContent: "center",
           width: "100%",
+          display: "flex",
+          justifyContent: "space-between", // 왼쪽과 오른쪽 정렬
+          padding: "0 20px", // 좌우 여백
         }}
       >
         <button
@@ -50,6 +50,7 @@ const Banner: React.FC = () => {
             borderRadius: "5px",
             cursor: "pointer",
             fontWeight: "600",
+            marginBottom: "20px",
           }}
         >
           게시글 작성
