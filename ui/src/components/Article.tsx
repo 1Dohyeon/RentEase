@@ -19,7 +19,7 @@ interface Author {
 
 interface ArticleProps {
   id: number;
-  createdTimeSince: string;
+  createdTimeSince: string | null;
   title: string;
   dailyprice: string;
   currency: string;

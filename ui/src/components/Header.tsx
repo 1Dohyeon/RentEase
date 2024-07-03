@@ -14,6 +14,7 @@ const Header: React.FC = () => {
         margin: "0",
         boxShadow: "0 1px 4px rgba(0, 0, 0, 0.1)",
         backgroundColor: "#fdfdfd",
+        zIndex: "99999",
       }}
     >
       <div

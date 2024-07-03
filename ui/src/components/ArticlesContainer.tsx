@@ -20,7 +20,7 @@ interface Author {
 
 interface ArticleData {
   id: number;
-  createdTimeSince: string;
+  createdTimeSince: string | null;
   title: string;
   dailyprice: string;
   currency: string;

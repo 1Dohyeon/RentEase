@@ -20,7 +20,7 @@ interface Author {
 
 interface Article {
   id: number;
-  createdTimeSince: string;
+  createdTimeSince: string | null;
   title: string;
   content: string;
   dailyprice: string;
@@ -43,7 +43,12 @@ const ArticleDetailPage: React.FC = () => {
     fetch(`${apiBaseUrl}/articles/${id}`)
       .then((response) => response.json())
       .then((data) => {
-        setArticle(data);
+        // 기본값을 설정합니다.
+        const articleData = {
+          ...data,
+          createdTimeSince: data.createdTimeSince || "N/A",
+        };
+        setArticle(articleData);
         setLoading(false);
       })
       .catch((error) => {
@@ -242,7 +247,6 @@ const ArticleDetailPage: React.FC = () => {
           ))}
         </div>
         <p>{article.author.nickname}</p>
-
         <p>{article.createdTimeSince}</p>
         <p>{article.content}</p>
       </div>

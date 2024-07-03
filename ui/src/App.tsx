@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ArticleDetailPage from "./pages/ArticleDetailPage";
+import ArticleWritePage from "./pages/ArticleWrtiePage";
 import ArticlesPage from "./pages/ArticlesPage";
 import MyPage from "./pages/MyPage";
 import Login from "./pages/auth/Login";
@@ -13,6 +14,7 @@ const App: React.FC = () => {
       <Route path="/" element={<Navigate to="/articles" />} />
       <Route path="/articles" element={<ArticlesPage />} />
       <Route path="/articles/:id" element={<ArticleDetailPage />} />
+      <Route path="/articles/write" element={<ArticleWritePage />} />
       <Route path="/auth/login" element={<Login />} />
       <Route path="/auth/register" element={<Register />} />
       <Route path="/users/:userId" element={<MyPage />} />
