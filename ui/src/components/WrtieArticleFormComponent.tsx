@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/WriteArticleFormComponent.css"; // CSS 파일 import
 import apiClient from "../utils/apiClient"; // apiClient 가져오기
 
@@ -24,6 +25,7 @@ const WriteArticleFormComponent: React.FC = () => {
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddresses, setSelectedAddresses] = useState<number[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -91,7 +93,8 @@ const WriteArticleFormComponent: React.FC = () => {
         throw new Error("게시글 작성에 실패했습니다.");
       }
 
-      console.log("게시글 작성이 완료되었습니다.");
+      alert("게시글 작성이 완료되었습니다.");
+      navigate("/articles");
     } catch (error) {
       console.error("게시글 작성 오류:", error);
     }
