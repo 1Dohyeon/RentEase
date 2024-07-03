@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import { AuthContext } from "../contexts/AuthContext";
+import apiClient from "../utils/apiClient";
 
 interface Address {
   id: number;
@@ -38,10 +39,15 @@ const ArticleDetailPage: React.FC = () => {
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const { userId, isLoggedIn } = useContext(AuthContext);
+  const navigate = useNavigate(); // useNavigate 훅 사용
 
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
+    fetchArticle();
+  }, []);
+
+  const fetchArticle = () => {
     fetch(`${apiBaseUrl}/articles/${id}`)
       .then((response) => response.json())
       .then((data) => {
@@ -57,7 +63,7 @@ const ArticleDetailPage: React.FC = () => {
         console.error("Error fetching article:", error);
         setLoading(false);
       });
-  }, [id]);
+  };
 
   const getCurrencySymbol = (currency: string) => {
     switch (currency) {
@@ -69,6 +75,22 @@ const ArticleDetailPage: React.FC = () => {
         return "¥";
       default:
         return "";
+    }
+  };
+
+  const handleDeleteArticle = () => {
+    const confirmDelete = window.confirm("게시글을 삭제하시겠습니까?");
+    if (confirmDelete) {
+      apiClient
+        .patch(`/articles/delete/${id}`)
+        .then((response) => {
+          alert("게시글이 삭제되었습니다.");
+          navigate("/articles"); // 삭제 후에 articles 페이지로 이동
+        })
+        .catch((error) => {
+          console.error("Error deleting article:", error);
+          alert("게시글 삭제에 실패했습니다.");
+        });
     }
   };
 
@@ -120,12 +142,13 @@ const ArticleDetailPage: React.FC = () => {
                 cursor: "pointer",
                 fontWeight: "600",
               }}
-              onClick={() => console.log("Delete")}
+              onClick={handleDeleteArticle} // 삭제 버튼 클릭 시 처리 함수 호출
             >
               삭제
             </button>
           </div>
         )}
+        {/* 이미지 섹션 추가 */}
         <div
           style={{
             display: "flex",
@@ -167,44 +190,28 @@ const ArticleDetailPage: React.FC = () => {
                 marginBottom: "10px",
               }}
             >
-              <div
-                style={{
-                  width: "50%",
-                  paddingTop: "50%", // 1:1 aspect ratio
-                  backgroundColor: "#e5e5e5",
-                  borderRadius: "10px",
-                  position: "relative",
-                }}
-              >
+              {[...Array(2)].map((_, index) => (
                 <div
+                  key={index}
                   style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+                    width: "50%",
+                    paddingTop: "50%", // 1:1 aspect ratio
+                    backgroundColor: "#e5e5e5",
+                    borderRadius: "10px",
+                    position: "relative",
                   }}
-                ></div>
-              </div>
-              <div
-                style={{
-                  width: "50%",
-                  paddingTop: "50%", // 1:1 aspect ratio
-                  backgroundColor: "#e5e5e5",
-                  borderRadius: "10px",
-                  position: "relative",
-                }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                  }}
-                ></div>
-              </div>
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                    }}
+                  ></div>
+                </div>
+              ))}
             </div>
             <div
               style={{
@@ -212,44 +219,28 @@ const ArticleDetailPage: React.FC = () => {
                 gap: "10px",
               }}
             >
-              <div
-                style={{
-                  width: "50%",
-                  paddingTop: "50%", // 1:1 aspect ratio
-                  backgroundColor: "#e5e5e5",
-                  borderRadius: "10px",
-                  position: "relative",
-                }}
-              >
+              {[...Array(2)].map((_, index) => (
                 <div
+                  key={index}
                   style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+                    width: "50%",
+                    paddingTop: "50%", // 1:1 aspect ratio
+                    backgroundColor: "#e5e5e5",
+                    borderRadius: "10px",
+                    position: "relative",
                   }}
-                ></div>
-              </div>
-              <div
-                style={{
-                  width: "50%",
-                  paddingTop: "50%", // 1:1 aspect ratio
-                  backgroundColor: "#e5e5e5",
-                  borderRadius: "10px",
-                  position: "relative",
-                }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                  }}
-                ></div>
-              </div>
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                    }}
+                  ></div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
