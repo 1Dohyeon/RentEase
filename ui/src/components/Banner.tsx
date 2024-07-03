@@ -50,7 +50,7 @@ const Banner: React.FC = () => {
             borderRadius: "5px",
             cursor: "pointer",
             fontWeight: "600",
-            marginBottom: "20px",
+            marginBottom: "30px",
           }}
         >
           게시글 작성

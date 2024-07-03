@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
+import { AuthContext } from "../contexts/AuthContext";
 
 interface Address {
   id: number;
@@ -36,6 +37,7 @@ const ArticleDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
+  const { userId, isLoggedIn } = useContext(AuthContext);
 
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -89,6 +91,41 @@ const ArticleDetailPage: React.FC = () => {
           }}
         ></div>
         <h1>{article.title}</h1>
+        {isLoggedIn && userId === article.author.id && (
+          <div style={{ marginBottom: "20px", marginTop: "20px" }}>
+            <button
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#7DB26B",
+                color: "white",
+                textDecoration: "none",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                fontWeight: "600",
+                marginRight: "20px",
+              }}
+              onClick={() => console.log("Edit")}
+            >
+              수정
+            </button>
+            <button
+              style={{
+                padding: "10px 20px",
+                color: "#FF6347",
+                textDecoration: "none",
+                backgroundColor: "#fdfdfd",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                fontWeight: "600",
+              }}
+              onClick={() => console.log("Delete")}
+            >
+              삭제
+            </button>
+          </div>
+        )}
         <div
           style={{
             display: "flex",
