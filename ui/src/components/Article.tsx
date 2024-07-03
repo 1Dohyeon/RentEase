@@ -90,7 +90,7 @@ const Article: React.FC<ArticleProps> = ({
             {getCurrencySymbol(currency)}
             {parseInt(dailyprice, 10).toLocaleString()}/일
           </p>
-          <p>{createdTimeSince}</p>
+          <small style={{ color: "gray" }}>{createdTimeSince}</small>
         </div>
         <p
           style={{

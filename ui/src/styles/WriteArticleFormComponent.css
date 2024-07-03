@@ -1,0 +1,45 @@
+/* WriteArticleFormComponent.css */
+
+.article-form {
+  width: 600px;
+  margin: 0 auto;
+}
+
+.price-inputs {
+  display: flex;
+  gap: 20px;
+}
+
+.category-selection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.category-selection div {
+  display: inline-block;
+}
+
+.address-selection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.address-selection div {
+  display: inline-block;
+}
+
+#title {
+  width: 100%;
+  height: 50px;
+  font-size: 20px;
+  border-radius: 20px;
+}
+
+#content {
+  width: 100%;
+  height: 300px;
+  font-size: 20px;
+  border-radius: 20px;
+}
