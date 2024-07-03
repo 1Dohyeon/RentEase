@@ -7,7 +7,7 @@ const apiClient = axios.create({
 // 요청 인터셉터 설정: 헤더에 JWT 추가
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt"); // 세션 스토리지에서 JWT 가져오기
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
