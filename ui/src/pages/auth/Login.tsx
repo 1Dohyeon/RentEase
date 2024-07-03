@@ -34,7 +34,8 @@ const Login: React.FC = () => {
         },
         { withCredentials: true }
       );
-
+      const { jwt } = response.data;
+      localStorage.setItem("jwt", jwt);
       const { loginUser } = response.data;
       login(loginUser.nickname, loginUser.id); // 로그인 함수 호출
 
