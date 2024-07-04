@@ -31,47 +31,9 @@ export class ArticleRepository {
         'article.title',
         'article.dailyprice',
         'article.currency',
+        'article.createdAt',
         'article.createdTimeSince',
-        'article.averageNumOfStars',
-        'address.id',
-        'address.city',
-        'address.district',
-        'category.id',
-        'category.title',
-        'author.id',
-        'author.nickname',
-        'review.id',
-        'review.content',
-        'review.numofstars',
-      ])
-      .leftJoin('article.addresses', 'address')
-      .leftJoin('article.categories', 'category')
-      .leftJoin('article.author', 'author')
-      .leftJoin('article.reviews', 'review')
-      .where('article.isDeleted = false')
-      .orderBy('article.createdTimeSince', 'DESC')
-      .getMany();
-
-    return articles.map((article) => ({
-      ...article,
-      createdTimeSince: timeSince(article.createdTimeSince),
-    }));
-  }
-
-  /**
-   * 모든 게시글 조회
-   * @returns 모든 게시글의 배너 정보를 반환
-   */
-  async getAllArticlesOrderByStar(): Promise<ArticleBanner[]> {
-    const articles = await this.repository
-      .createQueryBuilder('article')
-      .select([
-        'article.id',
-        'article.title',
-        'article.dailyprice',
-        'article.currency',
-        'article.createdTimeSince',
-        'article.averageNumOfStars',
+        'article.avgnumofstars',
         'address.id',
         'address.city',
         'address.district',
@@ -86,7 +48,8 @@ export class ArticleRepository {
       .leftJoin('article.author', 'author')
       .leftJoin('article.reviews', 'review')
       .where('article.isDeleted = false')
-      .orderBy('article.averageNumOfStars')
+      .orderBy('article.avgnumofstars', 'DESC') // avgnumofstars를 큰 순서대로 정렬
+      .addOrderBy('article.createdAt', 'DESC') // createdAt을 최신순으로 정렬
       .getMany();
 
     return articles.map((article) => ({
@@ -111,7 +74,7 @@ export class ArticleRepository {
         'article.dailyprice',
         'article.currency',
         'article.createdTimeSince',
-        'article.averageNumOfStars',
+        'article.avgnumofstars',
         'address.id',
         'address.city',
         'address.district',
@@ -119,6 +82,7 @@ export class ArticleRepository {
         'category.title',
         'author.id',
         'author.nickname',
+        'review.numofstars',
       ])
       .leftJoin('article.addresses', 'address')
       .leftJoin('article.categories', 'category')
@@ -151,7 +115,7 @@ export class ArticleRepository {
         'article.dailyprice',
         'article.currency',
         'article.createdTimeSince',
-        'article.averageNumOfStars',
+        'article.avgnumofstars',
         'address.id',
         'address.city',
         'address.district',
@@ -194,7 +158,7 @@ export class ArticleRepository {
           'article.dailyprice',
           'article.currency',
           'article.createdTimeSince',
-          'article.averageNumOfStars',
+          'article.avgnumofstars',
           'address.id',
           'address.city',
           'address.district',
@@ -239,7 +203,7 @@ export class ArticleRepository {
           'article.dailyprice',
           'article.currency',
           'article.createdTimeSince',
-          'article.averageNumOfStars',
+          'article.avgnumofstars',
           'address.id',
           'address.city',
           'address.district',
@@ -325,7 +289,7 @@ export class ArticleRepository {
         'article.monthlyprice',
         'article.currency',
         'article.createdAt',
-        'article.averageNumOfStars',
+        'article.avgnumofstars',
         'address.id',
         'address.city',
         'address.district',
@@ -365,7 +329,7 @@ export class ArticleRepository {
         'article.monthlyprice',
         'article.currency',
         'article.createdTimeSince',
-        'article.averageNumOfStars',
+        'article.avgnumofstars',
         'address.id',
         'address.city',
         'address.district',
@@ -373,6 +337,7 @@ export class ArticleRepository {
         'category.title',
         'author.id',
         'author.nickname',
+        'review.id',
         'review.content',
         'review.numofstars',
         'writer.id',
@@ -455,5 +420,14 @@ export class ArticleRepository {
       .relation(ArticleEntity, 'addresses')
       .of(article)
       .add(addresses);
+  }
+
+  async updateArticleAvgStars(articleId: number, newAvg: number) {
+    return await this.repository
+      .createQueryBuilder('article')
+      .update(ArticleEntity)
+      .set({ avgnumofstars: newAvg })
+      .where('id = :id', { id: articleId })
+      .execute();
   }
 }

@@ -1,5 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ArticleRepository } from 'src/article/article.repository';
+import { ArticleService } from 'src/article/article.service';
 import { ReviewEntity } from 'src/models/review.entity';
 import { UserRepository } from 'src/user/user.repository';
 import { ReviewRepository } from './review.repository';
@@ -9,6 +14,7 @@ export class ReviewService {
   constructor(
     private readonly reviewRepository: ReviewRepository,
     private readonly articleRepository: ArticleRepository,
+    private readonly articleService: ArticleService,
     private readonly userRepository: UserRepository,
   ) {}
 
@@ -55,18 +61,27 @@ export class ReviewService {
     content: string,
     numofstars: number,
   ): Promise<ReviewEntity> {
-    const article = await this.articleRepository.getArticleById(articleId);
+    const article =
+      await this.articleRepository.getArticleDetailById(articleId);
 
     if (!article) {
       throw new NotFoundException('게시글을 찾을 수 없습니다.');
     }
 
-    return await this.reviewRepository.createReview(
+    const review = await this.reviewRepository.createReview(
       writerId,
       articleId,
       content,
       numofstars,
     );
+
+    if (!review) {
+      throw new BadRequestException('리뷰 작성에 실패하였습니다.');
+    }
+
+    await this.articleService.updateArticleAvgStars(article.id);
+
+    return review;
   }
 
   //   async updateReview(

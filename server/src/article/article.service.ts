@@ -28,28 +28,15 @@ export class ArticleService {
    * @returns 모든 게시글의 배너 정보를 반환
    * @throws NotFoundException 게시글을 찾을 수 없는 경우
    */
-  async getAllArticles(
-    orderbystar: boolean = false,
-  ): Promise<ArticleBanner[] | undefined> {
-    if (orderbystar) {
-      const articles: ArticleBanner[] =
-        await this.articleRepository.getAllArticlesOrderByStar();
+  async getAllArticles(): Promise<ArticleBanner[] | undefined> {
+    const articles: ArticleBanner[] =
+      await this.articleRepository.getAllArticles();
 
-      if (!articles) {
-        throw new NotFoundException('게시글을 찾을 수 없습니다.');
-      }
-
-      return articles;
-    } else {
-      const articles: ArticleBanner[] =
-        await this.articleRepository.getAllArticles();
-
-      if (!articles) {
-        throw new NotFoundException('게시글을 찾을 수 없습니다.');
-      }
-
-      return articles;
+    if (!articles) {
+      throw new NotFoundException('게시글을 찾을 수 없습니다.');
     }
+
+    return articles;
   }
 
   /**
@@ -198,6 +185,10 @@ export class ArticleService {
       );
     }
 
+    if (selectedAddresses.length === 0) {
+      throw new BadRequestException('주소를 설정해주세요.');
+    }
+
     const newArticle = await this.articleRepository.createArticle(
       title,
       content,
@@ -320,5 +311,26 @@ export class ArticleService {
         '알 수 없는 에러로 업데이트에 실패하였습니다.',
       );
     }
+  }
+
+  async updateArticleAvgStars(articleId: number) {
+    const article = await this.getArticleDetailById(articleId);
+
+    let totalStars = 0;
+    let numReviews = 0;
+
+    if (article.reviews && article.reviews.length > 0) {
+      article.reviews.forEach((review) => {
+        totalStars += review.numofstars;
+        numReviews++;
+      });
+    }
+
+    const newAvg = numReviews > 0 ? totalStars / numReviews : 0;
+    console.log(newAvg);
+    return await this.articleRepository.updateArticleAvgStars(
+      articleId,
+      newAvg,
+    );
   }
 }

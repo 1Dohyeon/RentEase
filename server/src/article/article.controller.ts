@@ -29,10 +29,8 @@ export class ArticleController {
    * @returns 모든 게시글의 배너 정보를 반환
    */
   @Get()
-  async getAllArticles(
-    @Query('orderbystar') orderbystar: boolean,
-  ): Promise<ArticleBanner[]> {
-    return await this.articleService.getAllArticles(orderbystar);
+  async getAllArticles(): Promise<ArticleBanner[]> {
+    return await this.articleService.getAllArticles();
   }
 
   /**
