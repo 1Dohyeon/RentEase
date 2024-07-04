@@ -39,7 +39,7 @@ const ArticleDetailPage: React.FC = () => {
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const { userId, isLoggedIn } = useContext(AuthContext);
-  const navigate = useNavigate(); // useNavigate 훅 사용
+  const navigate = useNavigate();
 
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -51,7 +51,6 @@ const ArticleDetailPage: React.FC = () => {
     fetch(`${apiBaseUrl}/articles/${id}`)
       .then((response) => response.json())
       .then((data) => {
-        // 기본값을 설정합니다.
         const articleData = {
           ...data,
           createdTimeSince: data.createdTimeSince || "N/A",
@@ -85,7 +84,7 @@ const ArticleDetailPage: React.FC = () => {
         .patch(`/articles/delete/${id}`)
         .then((response) => {
           alert("게시글이 삭제되었습니다.");
-          navigate("/articles"); // 삭제 후에 articles 페이지로 이동
+          navigate("/articles");
         })
         .catch((error) => {
           console.error("Error deleting article:", error);
@@ -112,42 +111,56 @@ const ArticleDetailPage: React.FC = () => {
             height: "70px",
           }}
         ></div>
-        <h1>{article.title}</h1>
-        {isLoggedIn && userId === article.author.id && (
-          <div style={{ marginBottom: "20px", marginTop: "20px" }}>
-            <button
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#7DB26B",
-                color: "white",
-                textDecoration: "none",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                fontWeight: "600",
-                marginRight: "20px",
-              }}
-              onClick={() => console.log("Edit")}
-            >
-              수정
-            </button>
-            <button
-              style={{
-                padding: "10px 20px",
-                color: "#FF6347",
-                textDecoration: "none",
-                backgroundColor: "#fdfdfd",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                fontWeight: "600",
-              }}
-              onClick={handleDeleteArticle} // 삭제 버튼 클릭 시 처리 함수 호출
-            >
-              삭제
-            </button>
-          </div>
-        )}
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <h2
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: "calc(100% - 180px)",
+            }}
+          >
+            {article.title}
+          </h2>
+          {isLoggedIn && userId === article.author.id && (
+            <div>
+              <button
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#7DB26B",
+                  color: "white",
+                  textDecoration: "none",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  marginRight: "20px",
+                }}
+                onClick={() =>
+                  navigate(`/articles/edit/${id}`, { state: { article } })
+                }
+              >
+                수정
+              </button>
+              <button
+                style={{
+                  padding: "10px 20px",
+                  color: "#FF6347",
+                  textDecoration: "none",
+                  backgroundColor: "#fdfdfd",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                }}
+                onClick={handleDeleteArticle}
+              >
+                삭제
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* 이미지 섹션 추가 */}
         <div
           style={{
@@ -160,7 +173,7 @@ const ArticleDetailPage: React.FC = () => {
           <div
             style={{
               width: "50%",
-              paddingTop: "50%", // 1:1 aspect ratio
+              paddingTop: "50%",
               backgroundColor: "#d2d2d2",
               borderRadius: "10px",
               position: "relative",
@@ -195,7 +208,7 @@ const ArticleDetailPage: React.FC = () => {
                   key={index}
                   style={{
                     width: "50%",
-                    paddingTop: "50%", // 1:1 aspect ratio
+                    paddingTop: "50%",
                     backgroundColor: "#e5e5e5",
                     borderRadius: "10px",
                     position: "relative",
@@ -224,7 +237,7 @@ const ArticleDetailPage: React.FC = () => {
                   key={index}
                   style={{
                     width: "50%",
-                    paddingTop: "50%", // 1:1 aspect ratio
+                    paddingTop: "50%",
                     backgroundColor: "#e5e5e5",
                     borderRadius: "10px",
                     position: "relative",
@@ -244,7 +257,16 @@ const ArticleDetailPage: React.FC = () => {
             </div>
           </div>
         </div>
-        <h4>{article.title}</h4>
+        <h4
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: "840px",
+          }}
+        >
+          {article.title}
+        </h4>
         <p>
           {getCurrencySymbol(article.currency)}
           {parseInt(article.dailyprice, 10).toLocaleString()}/일

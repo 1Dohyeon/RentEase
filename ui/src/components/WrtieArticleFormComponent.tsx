@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "../styles/WriteArticleFormComponent.css"; // CSS 파일 import
-import apiClient from "../utils/apiClient"; // apiClient 가져오기
+import { useLocation, useNavigate } from "react-router-dom";
+import "../styles/WriteArticleFormComponent.css";
+import apiClient from "../utils/apiClient";
 
 interface Category {
   id: number;
@@ -14,17 +14,52 @@ interface Address {
   district: string;
 }
 
+interface Article {
+  id: number;
+  title: string;
+  content: string;
+  dailyprice: string;
+  weeklyprice: string;
+  monthlyprice: string;
+  currency: string;
+  categories: Category[];
+  addresses: Address[];
+}
+
 const WriteArticleFormComponent: React.FC = () => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [dailyPrice, setDailyPrice] = useState("");
-  const [monthlyPrice, setMonthlyPrice] = useState("");
-  const [weeklyPrice, setWeeklyPrice] = useState("");
-  const [currency, setCurrency] = useState("KRW");
+  const location = useLocation();
+  const existingArticle = (location.state as { article: Article } | undefined)
+    ?.article;
+  const [title, setTitle] = useState(
+    existingArticle ? existingArticle.title : ""
+  );
+  const [content, setContent] = useState(
+    existingArticle ? existingArticle.content : ""
+  );
+  const [dailyPrice, setDailyPrice] = useState(
+    existingArticle ? existingArticle.dailyprice : ""
+  );
+  const [monthlyPrice, setMonthlyPrice] = useState(
+    existingArticle ? existingArticle.monthlyprice : ""
+  );
+  const [weeklyPrice, setWeeklyPrice] = useState(
+    existingArticle ? existingArticle.weeklyprice : ""
+  );
+  const [currency, setCurrency] = useState(
+    existingArticle ? existingArticle.currency : "KRW"
+  );
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>(
+    existingArticle
+      ? existingArticle.categories.map((cat: Category) => cat.id)
+      : []
+  );
   const [addresses, setAddresses] = useState<Address[]>([]);
-  const [selectedAddresses, setSelectedAddresses] = useState<number[]>([]);
+  const [selectedAddresses, setSelectedAddresses] = useState<number[]>(
+    existingArticle
+      ? existingArticle.addresses.map((addr: Address) => addr.id)
+      : []
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,7 +83,7 @@ const WriteArticleFormComponent: React.FC = () => {
 
     fetchCategories();
     fetchAddresses();
-  }, []); // 빈 배열을 전달하여 한 번만 호출되도록 함
+  }, []);
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const categoryId = parseInt(event.target.value, 10);
@@ -87,13 +122,25 @@ const WriteArticleFormComponent: React.FC = () => {
     };
 
     try {
-      const response = await apiClient.post("/articles/write", articleData);
+      let response;
+      if (existingArticle) {
+        response = await apiClient.patch(
+          `/articles/edit/${existingArticle.id}`,
+          articleData
+        );
+      } else {
+        response = await apiClient.post("/articles/write", articleData);
+      }
 
       if (!response) {
         throw new Error("게시글 작성에 실패했습니다.");
       }
 
-      alert("게시글 작성이 완료되었습니다.");
+      alert(
+        existingArticle
+          ? "게시글 수정이 완료되었습니다."
+          : "게시글 작성이 완료되었습니다."
+      );
       navigate("/articles");
     } catch (error) {
       console.error("게시글 작성 오류:", error);
@@ -164,6 +211,7 @@ const WriteArticleFormComponent: React.FC = () => {
                 type="checkbox"
                 id={`category-${category.id}`}
                 value={category.id}
+                checked={selectedCategories.includes(category.id)}
                 onChange={handleCategoryChange}
               />
               <label htmlFor={`category-${category.id}`}>
@@ -181,6 +229,7 @@ const WriteArticleFormComponent: React.FC = () => {
                 type="checkbox"
                 id={`address-${address.id}`}
                 value={address.id}
+                checked={selectedAddresses.includes(address.id)}
                 onChange={handleAddressChange}
               />
               <label htmlFor={`address-${address.id}`}>
@@ -212,7 +261,7 @@ const WriteArticleFormComponent: React.FC = () => {
             fontWeight: "600",
           }}
         >
-          게시글 작성 완료
+          {existingArticle ? "게시글 수정 완료" : "게시글 작성 완료"}
         </button>
       </form>
     </div>
