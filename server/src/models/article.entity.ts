@@ -8,6 +8,7 @@ import {
 import { CommonEntity } from 'src/common/entity/common.entity';
 import { AddressEntity } from 'src/models/address.entity';
 import {
+  AfterLoad,
   Column,
   Entity,
   JoinColumn,
@@ -63,6 +64,11 @@ export class ArticleEntity extends CommonEntity {
   @Column({ type: 'enum', enum: Currency, nullable: false })
   currency: Currency;
 
+  @IsNumber()
+  @IsOptional()
+  @Column({ type: 'decimal', precision: 3, scale: 2, nullable: true })
+  averageNumOfStars: number;
+
   @ManyToOne(() => UserEntity, (user) => user.articles)
   @JoinColumn({ name: 'authorid' })
   author: UserEntity;
@@ -85,6 +91,20 @@ export class ArticleEntity extends CommonEntity {
     inverseJoinColumn: { name: 'categoryid', referencedColumnName: 'id' },
   })
   categories: CategoryEntity[];
+
+  // AfterLoad 이벤트를 사용하여 리뷰 평균 별점 계산
+  @AfterLoad()
+  calculateAverageNumOfStars() {
+    if (this.reviews && this.reviews.length > 0) {
+      const totalStars = this.reviews.reduce(
+        (acc, review) => acc + review.numofstars,
+        0,
+      );
+      this.averageNumOfStars = totalStars / this.reviews.length;
+    } else {
+      this.averageNumOfStars = 0; // 리뷰가 없을 경우 평균 별점은 0
+    }
+  }
 }
 
 export interface ArticleBanner {
