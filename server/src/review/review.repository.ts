@@ -21,17 +21,35 @@ export class ReviewRepository {
     return await this.repository
       .createQueryBuilder('review')
       .leftJoinAndSelect('review.writer', 'writer')
+      .leftJoinAndSelect('review.article', 'article')
       .where('writer.id = :userId', { userId })
       .andWhere('review.isDeleted = false')
+      .select([
+        'review.id',
+        'review.content',
+        'review.numofstars',
+        'review.createdTimeSince',
+        'article.id',
+        'article.title',
+      ])
       .getMany();
   }
 
   async getAllReviewsByArticleId(articleId: number): Promise<ReviewEntity[]> {
     return await this.repository
       .createQueryBuilder('review')
+      .leftJoinAndSelect('review.writer', 'writer')
       .leftJoinAndSelect('review.article', 'article')
       .where('article.id = :articleId', { articleId })
       .andWhere('review.isDeleted = false')
+      .select([
+        'review.id',
+        'review.content',
+        'review.numofstars',
+        'review.createdTimeSince',
+        'writer.id',
+        'writer.nickname',
+      ])
       .getMany();
   }
 
