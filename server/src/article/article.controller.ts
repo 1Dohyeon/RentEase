@@ -67,11 +67,11 @@ export class ArticleController {
 
   /**
    * 특정 카테고리에서 사용자 주소 정보와 동일한 게시글만 조회
-   * @param categoryId 카테고리 ID
    * @param req 요청 객체, JWT 토큰을 통해 사용자 정보를 확인
+   * @param categoryId 카테고리 ID
    * @param isLocation 사용자 위치 정보를 반영할지 여부
    * @returns 해당 카테고리와 사용자 주소 정보와 일치하는 게시글의 배너 정보를 반환
-   * 예: /articles/category-location?category=1&location=true
+   * 예: /articles/category-location?categoryId=1&location=true
    */
   @Get('category-location')
   @UseGuards(JwtAuthGuard)
