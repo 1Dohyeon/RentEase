@@ -90,7 +90,8 @@ export class ArticleRepository {
       .leftJoin('article.reviews', 'review')
       .where('category.id = :categoryId', { categoryId })
       .andWhere('article.isDeleted = false')
-      .orderBy('article.createdTimeSince', 'DESC')
+      .orderBy('article.avgnumofstars', 'DESC') // avgnumofstars를 큰 순서대로 정렬
+      .addOrderBy('article.createdAt', 'DESC') // createdAt을 최신순으로 정렬
       .getMany();
 
     return articles.map((article) => ({
@@ -123,6 +124,7 @@ export class ArticleRepository {
         'category.title',
         'author.id',
         'author.nickname',
+        'review.numofstars',
       ])
       .leftJoin('article.addresses', 'address')
       .leftJoin('article.categories', 'category')
@@ -130,7 +132,8 @@ export class ArticleRepository {
       .leftJoin('article.reviews', 'review')
       .where('address.id IN (:...addressIds)', { addressIds })
       .andWhere('article.isDeleted = false')
-      .orderBy('article.createdTimeSince', 'DESC')
+      .orderBy('article.avgnumofstars', 'DESC') // avgnumofstars를 큰 순서대로 정렬
+      .addOrderBy('article.createdAt', 'DESC') // createdAt을 최신순으로 정렬
       .getMany();
 
     return articles.map((article) => ({
@@ -166,6 +169,7 @@ export class ArticleRepository {
           'category.title',
           'author.id',
           'author.nickname',
+          'review.numofstars',
         ])
         .leftJoin('article.addresses', 'address')
         .leftJoin('article.categories', 'category')
@@ -174,7 +178,8 @@ export class ArticleRepository {
         .where('category.id = :categoryId', { categoryId })
         .andWhere('address.id IN (:...addressIds)', { addressIds })
         .andWhere('article.isDeleted = false')
-        .orderBy('article.createdTimeSince', 'DESC')
+        .orderBy('article.avgnumofstars', 'DESC') // avgnumofstars를 큰 순서대로 정렬
+        .addOrderBy('article.createdAt', 'DESC') // createdAt을 최신순으로 정렬
         .getMany();
 
       return articles.map((article) => ({
@@ -211,6 +216,7 @@ export class ArticleRepository {
           'category.title',
           'author.id',
           'author.nickname',
+          'review.numofstars',
         ])
         .leftJoin('article.addresses', 'address')
         .leftJoin('article.categories', 'category')
@@ -218,7 +224,8 @@ export class ArticleRepository {
         .leftJoin('article.reviews', 'review')
         .where('author.id = :authorId', { authorId })
         .andWhere('article.isDeleted = false')
-        .orderBy('article.createdTimeSince', 'DESC')
+        .orderBy('article.avgnumofstars', 'DESC') // avgnumofstars를 큰 순서대로 정렬
+        .addOrderBy('article.createdAt', 'DESC') // createdAt을 최신순으로 정렬
         .getMany();
 
       return articles.map((article) => ({
@@ -422,6 +429,11 @@ export class ArticleRepository {
       .add(addresses);
   }
 
+  /**
+   * 게시글 별점 평균 newAvg로 업데이트
+   * @param articleId 게시글 ID
+   * @param newAvg 평균 별점
+   */
   async updateArticleAvgStars(articleId: number, newAvg: number) {
     return await this.repository
       .createQueryBuilder('article')
