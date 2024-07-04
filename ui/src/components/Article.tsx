@@ -71,27 +71,18 @@ const Article: React.FC<ArticleProps> = ({
             borderRadius: "10px",
           }}
         ></div>
-        <h3
+        <p
           style={{
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
+            fontSize: "18px",
+            marginTop: "5px",
           }}
         >
           {title}
-        </h3>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <p>
-            {getCurrencySymbol(currency)}
-            {parseInt(dailyprice, 10).toLocaleString()}/일
-          </p>
-          <small style={{ color: "gray" }}>{createdTimeSince}</small>
-        </div>
+        </p>
+
         <p
           style={{
             display: "-webkit-box",
@@ -99,24 +90,45 @@ const Article: React.FC<ArticleProps> = ({
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
             textOverflow: "ellipsis",
+            marginTop: "2px",
           }}
         >
           {addresses.map((address, index) => (
-            <small key={index}>
+            <p key={index} style={{ fontSize: "14px" }}>
               {address.city} {address.district}
               {index < addresses.length - 1 ? ", " : ""}
-            </small>
+            </p>
           ))}
         </p>
         <p
           style={{
+            fontSize: "18px",
+            marginTop: "3px",
+            fontWeight: "bold",
+          }}
+        >
+          {getCurrencySymbol(currency)}
+          {parseInt(dailyprice, 10).toLocaleString()}/일
+          {/* <p
+              style={{
+                fontSize: "16PX",
+              }}
+            >
+              /일
+            </p> */}
+        </p>
+        {/* <p
+          style={{
+            fontSize: "12px",
+            marginTop: "6px",
+            fontWeight: "bold",
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
           }}
         >
           {author.nickname}
-        </p>
+        </p> */}
       </div>
     </Link>
   );
