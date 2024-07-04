@@ -1,17 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import ArticlesContainer from "../components/ArticlesContainer";
 import Banner from "../components/Banner";
 import CategoriesList from "../components/CategoriesList";
 import Header from "../components/Header";
 
-const ArticlesPage: React.FC = () => {
+const CategoryArticlesPage: React.FC = () => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const categoryId = searchParams.get("categoryId");
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
-    null
+    categoryId ? parseInt(categoryId) : null
   );
 
   const handleCategoryClick = (categoryId: number) => {
     setSelectedCategoryId(categoryId);
   };
+
+  useEffect(() => {
+    // categoryId가 변경될 때마다 selectedCategoryId 업데이트
+    if (categoryId) {
+      setSelectedCategoryId(parseInt(categoryId));
+    } else {
+      setSelectedCategoryId(null);
+    }
+  }, [categoryId]);
 
   return (
     <div>
@@ -36,4 +49,4 @@ const ArticlesPage: React.FC = () => {
   );
 };
 
-export default ArticlesPage;
+export default CategoryArticlesPage;

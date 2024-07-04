@@ -20,7 +20,7 @@ interface Author {
 
 interface ArticleData {
   id: number;
-  createdTimeSince: string;
+  createdTimeSince: string | null;
   title: string;
   dailyprice: string;
   currency: string;
@@ -29,7 +29,13 @@ interface ArticleData {
   author: Author;
 }
 
-const ArticlesContainer: React.FC = () => {
+interface ArticlesContainerProps {
+  selectedCategoryId: number | null;
+}
+
+const ArticlesContainer: React.FC<ArticlesContainerProps> = ({
+  selectedCategoryId,
+}) => {
   const [articles, setArticles] = useState<ArticleData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -38,9 +44,11 @@ const ArticlesContainer: React.FC = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await axios.get<ArticleData[]>(
-          `${apiBaseUrl}/articles`
-        );
+        let api = `${apiBaseUrl}/articles`;
+        if (selectedCategoryId !== null) {
+          api += `/category?categoryId=${selectedCategoryId}`;
+        }
+        const response = await axios.get<ArticleData[]>(api);
         setArticles(response.data);
         setLoading(false);
       } catch (error) {
@@ -50,7 +58,7 @@ const ArticlesContainer: React.FC = () => {
     };
 
     fetchArticles();
-  }, []);
+  }, [selectedCategoryId]);
 
   if (loading) {
     return <div>Loading...</div>;

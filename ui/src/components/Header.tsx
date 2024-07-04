@@ -14,11 +14,13 @@ const Header: React.FC = () => {
         margin: "0",
         boxShadow: "0 1px 4px rgba(0, 0, 0, 0.1)",
         backgroundColor: "#fdfdfd",
+        zIndex: "99999",
       }}
     >
       <div
         style={{
-          width: "840px",
+          width: "80%",
+          maxWidth: "840px",
           height: "100%",
           margin: "0 auto",
           display: "flex",

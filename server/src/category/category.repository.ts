@@ -14,6 +14,10 @@ export class CategoryRepository implements OnModuleInit {
     return await this.repository.findOne({ where: { id } });
   }
 
+  async getAllCategories(): Promise<CategoryEntity[]> {
+    return await this.repository.createQueryBuilder('category').getMany();
+  }
+
   async onModuleInit() {
     const categories = [
       { title: '캠핑용' },
