@@ -313,6 +313,10 @@ export class ArticleService {
     }
   }
 
+  /**
+   * 게시글 별점 평균 업데이트
+   * @param articleId 게시글 ID
+   */
   async updateArticleAvgStars(articleId: number) {
     const article = await this.getArticleDetailById(articleId);
 
