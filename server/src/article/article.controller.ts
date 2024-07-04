@@ -76,8 +76,8 @@ export class ArticleController {
   @Get('category-location')
   @UseGuards(JwtAuthGuard)
   async getArticlesByCategoryAndLocation(
-    @Query('categoryId') categoryId: number,
     @Request() req,
+    @Query('categoryId') categoryId: number,
     @Query('isLocation') isLocation: boolean,
   ): Promise<ArticleBanner[]> {
     return await this.articleService.getArticlesByCategoryAndLocation(

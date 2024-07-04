@@ -4,31 +4,49 @@ import { ReviewEntity } from 'src/models/review.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class ReviewRepository extends Repository<ReviewEntity> {
+export class ReviewRepository {
   constructor(
     @InjectRepository(ReviewEntity)
     private readonly repository: Repository<ReviewEntity>,
-  ) {
-    super(repository.target, repository.manager, repository.queryRunner);
+  ) {}
+
+  async getReviewById(reviewId: number): Promise<ReviewEntity | undefined> {
+    return await this.repository
+      .createQueryBuilder('review')
+      .where('review.id = :id', { id: reviewId })
+      .getOne();
   }
 
-  //   async findOneById(reviewId: number): Promise<ReviewEntity | undefined> {
-  //     return await this.repository.findOne(reviewId);
-  //   }
-
-  async findAllByUserId(userId: number): Promise<ReviewEntity[]> {
+  async getAllReviewsByUserId(userId: number): Promise<ReviewEntity[]> {
     return await this.repository
       .createQueryBuilder('review')
       .leftJoinAndSelect('review.writer', 'writer')
       .where('writer.id = :userId', { userId })
+      .andWhere('review.isDeleted = false')
       .getMany();
   }
 
-  async findAllByArticleId(articleId: number): Promise<ReviewEntity[]> {
+  async getAllReviewsByArticleId(articleId: number): Promise<ReviewEntity[]> {
     return await this.repository
       .createQueryBuilder('review')
       .leftJoinAndSelect('review.article', 'article')
       .where('article.id = :articleId', { articleId })
+      .andWhere('review.isDeleted = false')
       .getMany();
+  }
+
+  async createReview(
+    writerId: number,
+    articleId: number,
+    content: string,
+    numofstars: number,
+  ): Promise<ReviewEntity> {
+    const review = this.repository.create({
+      content,
+      numofstars,
+      writer: { id: writerId },
+      article: { id: articleId },
+    });
+    return await this.repository.save(review);
   }
 }

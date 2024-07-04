@@ -67,7 +67,7 @@ export class ArticleEntity extends CommonEntity {
   @JoinColumn({ name: 'authorid' })
   author: UserEntity;
 
-  @OneToMany(() => UserEntity, (user) => user.reviews)
+  @OneToMany(() => ReviewEntity, (review) => review.article)
   reviews: ReviewEntity[];
 
   @ManyToMany(() => AddressEntity, (address) => address.articles)

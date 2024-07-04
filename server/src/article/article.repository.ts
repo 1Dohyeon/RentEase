@@ -234,7 +234,7 @@ export class ArticleRepository {
     categories: CategoryEntity[],
     weeklyprice?: number,
     monthlyprice?: number,
-  ) {
+  ): Promise<ArticleEntity> {
     const article = this.repository.create({
       title,
       content,
@@ -296,6 +296,8 @@ export class ArticleRepository {
       .leftJoinAndSelect('article.addresses', 'address')
       .leftJoinAndSelect('article.categories', 'category')
       .leftJoinAndSelect('article.author', 'author')
+      .leftJoinAndSelect('article.reviews', 'review')
+      .leftJoinAndSelect('review.writer', 'writer')
       .where('article.id = :id', { id: articleId })
       .andWhere('article.isDeleted = false')
       .select([
@@ -314,6 +316,10 @@ export class ArticleRepository {
         'category.title',
         'author.id',
         'author.nickname',
+        'review.content',
+        'review.numofstars',
+        'writer.id',
+        'writer.nickname',
       ])
       .getOne();
 
