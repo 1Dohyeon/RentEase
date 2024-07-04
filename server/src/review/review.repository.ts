@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { timeSince } from 'src/helper/timeSince';
 import { ReviewEntity } from 'src/models/review.entity';
 import { Repository } from 'typeorm';
 
@@ -11,19 +12,25 @@ export class ReviewRepository {
   ) {}
 
   async getReviewById(reviewId: number): Promise<ReviewEntity | undefined> {
-    return await this.repository
+    const review = await this.repository
       .createQueryBuilder('review')
       .where('review.id = :id', { id: reviewId })
       .getOne();
+
+    return {
+      ...review,
+      createdTimeSince: timeSince(review.createdTimeSince),
+    };
   }
 
   async getAllReviewsByUserId(userId: number): Promise<ReviewEntity[]> {
-    return await this.repository
+    const reviews = await this.repository
       .createQueryBuilder('review')
       .leftJoinAndSelect('review.writer', 'writer')
       .leftJoinAndSelect('review.article', 'article')
       .where('writer.id = :userId', { userId })
       .andWhere('review.isDeleted = false')
+      .orderBy('review.createdTimeSince', 'DESC')
       .select([
         'review.id',
         'review.content',
@@ -33,15 +40,21 @@ export class ReviewRepository {
         'article.title',
       ])
       .getMany();
+
+    return reviews.map((review) => ({
+      ...review,
+      createdTimeSince: timeSince(review.createdTimeSince),
+    }));
   }
 
   async getAllReviewsByArticleId(articleId: number): Promise<ReviewEntity[]> {
-    return await this.repository
+    const reviews = await this.repository
       .createQueryBuilder('review')
       .leftJoinAndSelect('review.writer', 'writer')
       .leftJoinAndSelect('review.article', 'article')
       .where('article.id = :articleId', { articleId })
       .andWhere('review.isDeleted = false')
+      .orderBy('review.createdTimeSince', 'DESC')
       .select([
         'review.id',
         'review.content',
@@ -51,6 +64,11 @@ export class ReviewRepository {
         'writer.nickname',
       ])
       .getMany();
+
+    return reviews.map((review) => ({
+      ...review,
+      createdTimeSince: timeSince(review.createdTimeSince),
+    }));
   }
 
   async createReview(

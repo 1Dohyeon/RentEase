@@ -44,6 +44,7 @@ export class ArticleRepository {
       .leftJoin('article.categories', 'category')
       .leftJoin('article.author', 'author')
       .where('article.isDeleted = false')
+      .orderBy('article.createdTimeSince', 'DESC')
       .getMany();
 
     return articles.map((article) => ({
@@ -81,6 +82,7 @@ export class ArticleRepository {
       .leftJoin('article.author', 'author')
       .where('category.id = :categoryId', { categoryId })
       .andWhere('article.isDeleted = false')
+      .orderBy('article.createdTimeSince', 'DESC')
       .getMany();
 
     return articles.map((article) => ({
@@ -118,6 +120,7 @@ export class ArticleRepository {
       .leftJoin('article.author', 'author')
       .where('address.id IN (:...addressIds)', { addressIds })
       .andWhere('article.isDeleted = false')
+      .orderBy('article.createdTimeSince', 'DESC')
       .getMany();
 
     return articles.map((article) => ({
@@ -159,6 +162,7 @@ export class ArticleRepository {
         .where('category.id = :categoryId', { categoryId })
         .andWhere('address.id IN (:...addressIds)', { addressIds })
         .andWhere('article.isDeleted = false')
+        .orderBy('article.createdTimeSince', 'DESC')
         .getMany();
 
       return articles.map((article) => ({
@@ -200,6 +204,7 @@ export class ArticleRepository {
         .leftJoin('article.author', 'author')
         .where('author.id = :authorId', { authorId })
         .andWhere('article.isDeleted = false')
+        .orderBy('article.createdTimeSince', 'DESC')
         .getMany();
 
       return articles.map((article) => ({
