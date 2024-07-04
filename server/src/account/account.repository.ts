@@ -4,13 +4,11 @@ import { UserEntity } from 'src/models/user.entity';
 import { Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
-export class AccountRepository extends Repository<UserEntity> {
+export class AccountRepository {
   constructor(
     @InjectRepository(UserEntity)
     private readonly repository: Repository<UserEntity>,
-  ) {
-    super(repository.target, repository.manager, repository.queryRunner);
-  }
+  ) {}
 
   /**
    * 사용자의 비밀번호를 업데이트

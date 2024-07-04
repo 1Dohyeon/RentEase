@@ -5,13 +5,11 @@ import { UserEntity, UserProfile } from 'src/models/user.entity';
 import { Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
-export class ProfileRepository extends Repository<UserEntity> {
+export class ProfileRepository {
   constructor(
     @InjectRepository(UserEntity)
     private readonly repository: Repository<UserEntity>,
-  ) {
-    super(repository.target, repository.manager, repository.queryRunner);
-  }
+  ) {}
 
   /**
    * 사용자명 업데이트

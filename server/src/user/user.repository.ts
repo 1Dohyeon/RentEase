@@ -5,13 +5,11 @@ import { UserEntity } from '../models/user.entity';
 import { UserRegisterDto } from './dtos/user.register.req';
 
 @Injectable()
-export class UserRepository extends Repository<UserEntity> {
+export class UserRepository {
   constructor(
     @InjectRepository(UserEntity)
     private readonly repository: Repository<UserEntity>,
-  ) {
-    super(repository.target, repository.manager, repository.queryRunner);
-  }
+  ) {}
 
   /**
    * 사용자 등록 서비스 로직
@@ -109,7 +107,8 @@ export class UserRepository extends Repository<UserEntity> {
    * @returns 사용자가 작성한 게시글을 포함한 사용자 객체를 반환
    */
   async getArticlesByUserId(userId: number): Promise<UserEntity | undefined> {
-    return await this.createQueryBuilder('user')
+    return await this.repository
+      .createQueryBuilder('user')
       .leftJoinAndSelect('user.addresses', 'address')
       .leftJoinAndSelect('user.articles', 'article')
       .leftJoinAndSelect('article.addresses', 'article-address')

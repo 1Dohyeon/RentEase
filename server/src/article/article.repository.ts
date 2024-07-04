@@ -13,13 +13,11 @@ import { UserEntity } from 'src/models/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class ArticleRepository extends Repository<ArticleEntity> {
+export class ArticleRepository {
   constructor(
     @InjectRepository(ArticleEntity)
     private readonly repository: Repository<ArticleEntity>,
-  ) {
-    super(repository.target, repository.manager, repository.queryRunner);
-  }
+  ) {}
 
   /**
    * 모든 게시글 조회
