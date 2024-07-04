@@ -28,15 +28,28 @@ export class ArticleService {
    * @returns 모든 게시글의 배너 정보를 반환
    * @throws NotFoundException 게시글을 찾을 수 없는 경우
    */
-  async getAllArticles(): Promise<ArticleBanner[] | undefined> {
-    const articles: ArticleBanner[] =
-      await this.articleRepository.getAllArticles();
+  async getAllArticles(
+    orderbystar: boolean = false,
+  ): Promise<ArticleBanner[] | undefined> {
+    if (orderbystar) {
+      const articles: ArticleBanner[] =
+        await this.articleRepository.getAllArticlesOrderByStar();
 
-    if (!articles) {
-      throw new NotFoundException('게시글을 찾을 수 없습니다.');
+      if (!articles) {
+        throw new NotFoundException('게시글을 찾을 수 없습니다.');
+      }
+
+      return articles;
+    } else {
+      const articles: ArticleBanner[] =
+        await this.articleRepository.getAllArticles();
+
+      if (!articles) {
+        throw new NotFoundException('게시글을 찾을 수 없습니다.');
+      }
+
+      return articles;
     }
-
-    return articles;
   }
 
   /**
@@ -73,7 +86,13 @@ export class ArticleService {
   ): Promise<ArticleBanner[] | undefined> {
     // 위치 기반 검색이 아닌 경우 모든 게시글 반환
     if (!isLocation) {
-      return await this.getAllArticles();
+      const articles = await this.articleRepository.getAllArticles();
+
+      if (!articles) {
+        throw new NotFoundException('게시글을 찾을 수 없습니다.');
+      }
+
+      return articles;
     }
 
     const author = await this.userService.getUserById(userId);
@@ -115,7 +134,15 @@ export class ArticleService {
 
     // 위치 기반 검색이 아닌 경우 모든 게시글 반환
     if (!isLocation) {
-      return await this.getAllArticles();
+      if (!isLocation) {
+        const articles = await this.articleRepository.getAllArticles();
+
+        if (!articles) {
+          throw new NotFoundException('게시글을 찾을 수 없습니다.');
+        }
+
+        return articles;
+      }
     }
 
     const author = await this.userService.getUserById(userId);

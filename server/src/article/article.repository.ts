@@ -40,12 +40,53 @@ export class ArticleRepository {
         'category.title',
         'author.id',
         'author.nickname',
+        'review.id',
+        'review.content',
+        'review.numofstars',
       ])
       .leftJoin('article.addresses', 'address')
       .leftJoin('article.categories', 'category')
       .leftJoin('article.author', 'author')
+      .leftJoin('article.reviews', 'review')
       .where('article.isDeleted = false')
       .orderBy('article.createdTimeSince', 'DESC')
+      .getMany();
+
+    return articles.map((article) => ({
+      ...article,
+      createdTimeSince: timeSince(article.createdTimeSince),
+    }));
+  }
+
+  /**
+   * 모든 게시글 조회
+   * @returns 모든 게시글의 배너 정보를 반환
+   */
+  async getAllArticlesOrderByStar(): Promise<ArticleBanner[]> {
+    const articles = await this.repository
+      .createQueryBuilder('article')
+      .select([
+        'article.id',
+        'article.title',
+        'article.dailyprice',
+        'article.currency',
+        'article.createdTimeSince',
+        'article.averageNumOfStars',
+        'address.id',
+        'address.city',
+        'address.district',
+        'category.id',
+        'category.title',
+        'author.id',
+        'author.nickname',
+        'review.numofstars',
+      ])
+      .leftJoin('article.addresses', 'address')
+      .leftJoin('article.categories', 'category')
+      .leftJoin('article.author', 'author')
+      .leftJoin('article.reviews', 'review')
+      .where('article.isDeleted = false')
+      .orderBy('article.averageNumOfStars')
       .getMany();
 
     return articles.map((article) => ({
@@ -82,6 +123,7 @@ export class ArticleRepository {
       .leftJoin('article.addresses', 'address')
       .leftJoin('article.categories', 'category')
       .leftJoin('article.author', 'author')
+      .leftJoin('article.reviews', 'review')
       .where('category.id = :categoryId', { categoryId })
       .andWhere('article.isDeleted = false')
       .orderBy('article.createdTimeSince', 'DESC')
@@ -121,6 +163,7 @@ export class ArticleRepository {
       .leftJoin('article.addresses', 'address')
       .leftJoin('article.categories', 'category')
       .leftJoin('article.author', 'author')
+      .leftJoin('article.reviews', 'review')
       .where('address.id IN (:...addressIds)', { addressIds })
       .andWhere('article.isDeleted = false')
       .orderBy('article.createdTimeSince', 'DESC')
@@ -163,6 +206,7 @@ export class ArticleRepository {
         .leftJoin('article.addresses', 'address')
         .leftJoin('article.categories', 'category')
         .leftJoin('article.author', 'author')
+        .leftJoin('article.reviews', 'review')
         .where('category.id = :categoryId', { categoryId })
         .andWhere('address.id IN (:...addressIds)', { addressIds })
         .andWhere('article.isDeleted = false')
@@ -207,6 +251,7 @@ export class ArticleRepository {
         .leftJoin('article.addresses', 'address')
         .leftJoin('article.categories', 'category')
         .leftJoin('article.author', 'author')
+        .leftJoin('article.reviews', 'review')
         .where('author.id = :authorId', { authorId })
         .andWhere('article.isDeleted = false')
         .orderBy('article.createdTimeSince', 'DESC')
