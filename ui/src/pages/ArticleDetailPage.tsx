@@ -112,16 +112,17 @@ const ArticleDetailPage: React.FC = () => {
           }}
         ></div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <h2
+          <p
             style={{
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
               maxWidth: "calc(100% - 180px)",
+              fontSize: "26px",
             }}
           >
-            {article.title}
-          </h2>
+            {/* 제목 둬도 됨 */}
+          </p>
           {isLoggedIn && userId === article.author.id && (
             <div>
               <button
@@ -257,16 +258,48 @@ const ArticleDetailPage: React.FC = () => {
             </div>
           </div>
         </div>
-        <h4
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            maxWidth: "840px",
-          }}
-        >
-          {article.title}
-        </h4>
+
+        {/* 카테고리 */}
+        <div>
+          {article.categories.map((category) => (
+            <span key={category.id}>#{category.title}</span>
+          ))}
+        </div>
+
+        {/* 제목 */}
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ width: "85%" }}>
+            <p style={{ fontSize: "26px" }}>{article.title}</p>
+          </div>
+          <small>{article.createdTimeSince}</small>
+        </div>
+
+        {/* 위치 */}
+        <div style={{ width: "85%" }}>
+          {article.addresses.map((address, index) => (
+            <span key={index} style={{ fontSize: "14px" }}>
+              {address.city} {address.district}
+              {index < article.addresses.length - 1 ? ", " : ""}
+            </span>
+          ))}
+          <span style={{ fontSize: "14px" }}>
+            , 다른 지역 등등등(주소가 긴 경우를 테스트하기 위해서 놔둠)
+          </span>
+        </div>
+
+        <hr></hr>
+        {/* 작성자 프로필 */}
+        <div style={{ display: "flex", alignItems: "end" }}>
+          <div
+            style={{
+              width: "40px",
+              height: "40px",
+              backgroundColor: "#d2d2d2",
+            }}
+          ></div>
+          <p>{article.author.nickname}</p>
+        </div>
+        {/* 가격 */}
         <p>
           {getCurrencySymbol(article.currency)}
           {parseInt(article.dailyprice, 10).toLocaleString()}/일
@@ -283,21 +316,6 @@ const ArticleDetailPage: React.FC = () => {
             {parseInt(article.monthlyprice, 10).toLocaleString()}/월
           </p>
         )}
-        <div>
-          {article.addresses.map((address, index) => (
-            <small key={index}>
-              {address.city} {address.district}
-              {index < article.addresses.length - 1 ? ", " : ""}
-            </small>
-          ))}
-        </div>
-        <div>
-          {article.categories.map((category) => (
-            <span key={category.id}>{category.title}</span>
-          ))}
-        </div>
-        <p>{article.author.nickname}</p>
-        <p>{article.createdTimeSince}</p>
         <p>{article.content}</p>
       </div>
     </div>
