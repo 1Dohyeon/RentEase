@@ -42,7 +42,7 @@ const Header: React.FC = () => {
           {isLoggedIn ? (
             <>
               <Link
-                to={`/users/${userId}`}
+                to={`/users/${userId}`} // userId가 있을 경우 해당 사용자의 마이페이지로 링크
                 style={{
                   textDecoration: "none",
                   color: "#7DB26B",
@@ -62,7 +62,6 @@ const Header: React.FC = () => {
                   textDecoration: "none",
                   color: "#7DB26B",
                   display: "inline-block",
-
                   height: "30px",
                   textAlign: "center",
                   fontWeight: "600",

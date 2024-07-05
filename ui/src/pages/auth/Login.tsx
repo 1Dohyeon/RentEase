@@ -34,11 +34,8 @@ const Login: React.FC = () => {
         },
         { withCredentials: true }
       );
-      const { jwt } = response.data;
-      sessionStorage.setItem("jwt", jwt); // sessionStorage에 저장
-
-      const { loginUser } = response.data;
-      login(loginUser.nickname, loginUser.id); // 로그인 함수 호출
+      const { jwt, loginUser } = response.data;
+      login(loginUser.nickname, loginUser.id, jwt); // AuthProvider의 login 함수 호출
 
       // 성공적으로 로그인된 경우, /articles로 이동
       navigate("/articles");
@@ -57,12 +54,7 @@ const Login: React.FC = () => {
   return (
     <div>
       <Header />
-      <div
-        style={{
-          width: "480px",
-          margin: "0 auto",
-        }}
-      >
+      <div style={{ width: "480px", margin: "0 auto" }}>
         <h2
           style={{
             textAlign: "center",
@@ -75,10 +67,7 @@ const Login: React.FC = () => {
         </h2>
         <form
           onSubmit={handleSubmit}
-          style={{
-            width: "353px",
-            margin: "0 auto",
-          }}
+          style={{ width: "353px", margin: "0 auto" }}
         >
           <div style={{ padding: "5px 0px" }}>
             <label htmlFor="email" style={{ display: "block" }}>
