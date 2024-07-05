@@ -325,8 +325,11 @@ export class ArticleService {
 
     if (article.reviews && article.reviews.length > 0) {
       article.reviews.forEach((review) => {
-        totalStars += review.numofstars;
-        numReviews++;
+        // 애초에 게시글 조회할 때 isDeleted true를 걸러내기에 없어도 되긴 함
+        if (!review.isDeleted) {
+          totalStars += review.numofstars;
+          numReviews++;
+        }
       });
     }
 
