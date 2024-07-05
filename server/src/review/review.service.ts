@@ -84,28 +84,56 @@ export class ReviewService {
     return review;
   }
 
-  //   async updateReview(
-  //     reviewId: number,
-  //     content: string,
-  //     numofstars: number,
-  //   ): Promise<ReviewEntity> {
-  //     const review = await this.findOneById(reviewId);
-  //     if (!review) {
-  //       throw new NotFoundException(`Review with ID ${reviewId} not found.`);
-  //     }
+  async updateReview(
+    reviewId: number,
+    content: string,
+    numofstars: number,
+  ): Promise<ReviewEntity> {
+    const review = await this.getReviewById(reviewId);
 
-  //     review.content = content;
-  //     review.numofstars = numofstars;
+    if (!review) {
+      throw new NotFoundException(`해당 리뷰를 찾을 수 없습니다.`);
+    }
 
-  //     return await this.reviewRepository.save(review);
-  //   }
+    const article = await this.articleRepository.getArticleDetailById(
+      review.article.id,
+    );
 
-  //   async deleteReview(reviewId: number): Promise<void> {
-  //     const review = await this.findOneById(reviewId);
-  //     if (!review) {
-  //       throw new NotFoundException(`Review with ID ${reviewId} not found.`);
-  //     }
+    if (!article) {
+      throw new NotFoundException(`게시글을 찾을 수 없습니다.`);
+    }
 
-  //     await await this.reviewRepository.remove(review);
-  //   }
+    try {
+      await this.reviewRepository.updateReview(reviewId, content, numofstars);
+      await this.articleService.updateArticleAvgStars(article.id);
+
+      return await this.reviewRepository.getReviewById(reviewId);
+    } catch (err) {
+      throw new BadRequestException(`업데이트에 실패하였습니다.`);
+    }
+  }
+
+  async deleteReview(reviewId: number): Promise<ReviewEntity> {
+    const review = await this.getReviewById(reviewId);
+
+    if (!review) {
+      throw new NotFoundException(`해당 리뷰를 찾을 수 없습니다.`);
+    }
+
+    const article = await this.articleRepository.getArticleDetailById(
+      review.article.id,
+    );
+
+    if (!article) {
+      throw new NotFoundException(`게시글을 찾을 수 없습니다.`);
+    }
+
+    try {
+      await this.reviewRepository.deleteReview(reviewId);
+      await this.articleService.updateArticleAvgStars(article.id);
+      return review;
+    } catch (err) {
+      throw new BadRequestException(`삭제에 실패하였습니다.`);
+    }
+  }
 }

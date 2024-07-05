@@ -14,7 +14,22 @@ export class ReviewRepository {
   async getReviewById(reviewId: number): Promise<ReviewEntity | undefined> {
     const review = await this.repository
       .createQueryBuilder('review')
+      .leftJoinAndSelect('review.writer', 'writer')
+      .leftJoinAndSelect('review.article', 'article')
       .where('review.id = :id', { id: reviewId })
+      .andWhere('review.isDeleted = false')
+      .select([
+        'review.id',
+        'review.content',
+        'review.numofstars',
+        'review.createdAt',
+        'review.createdTimeSince',
+        'review.updatedAt',
+        'article.id',
+        'article.title',
+        'writer.id',
+        'writer.nickname',
+      ])
       .getOne();
 
     return {
@@ -38,6 +53,8 @@ export class ReviewRepository {
         'review.createdTimeSince',
         'article.id',
         'article.title',
+        'writer.id',
+        'writer.nickname',
       ])
       .getMany();
 
@@ -60,6 +77,8 @@ export class ReviewRepository {
         'review.content',
         'review.numofstars',
         'review.createdTimeSince',
+        'article.id',
+        'article.title',
         'writer.id',
         'writer.nickname',
       ])
@@ -84,5 +103,23 @@ export class ReviewRepository {
       article: { id: articleId },
     });
     return await this.repository.save(review);
+  }
+
+  async updateReview(reviewId: number, content: string, numofstars: number) {
+    await this.repository
+      .createQueryBuilder('review')
+      .update(ReviewEntity)
+      .set({ content: content, numofstars: numofstars })
+      .where('id = :id', { id: reviewId })
+      .execute();
+  }
+
+  async deleteReview(reviewId: number) {
+    await this.repository
+      .createQueryBuilder('review')
+      .update(ReviewEntity)
+      .set({ isDeleted: true })
+      .where('id = :id', { id: reviewId })
+      .execute();
   }
 }
