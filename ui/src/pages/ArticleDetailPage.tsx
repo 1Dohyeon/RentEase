@@ -164,7 +164,6 @@ const ArticleDetailPage: React.FC = () => {
             </div>
           )}
         </div>
-
         {/* 이미지 섹션 추가 */}
         <div
           style={{
@@ -261,7 +260,6 @@ const ArticleDetailPage: React.FC = () => {
             </div>
           </div>
         </div>
-
         {/* 카테고리 */}
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div style={{ width: "85%" }}>
@@ -271,14 +269,12 @@ const ArticleDetailPage: React.FC = () => {
           </div>
           <small>{article.createdTimeSince}</small>
         </div>
-
         {/* 제목 */}
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div style={{ width: "85%" }}>
             <p style={{ fontSize: "26px" }}>{article.title}</p>
           </div>
         </div>
-
         {/* 위치 */}
         <div style={{ width: "85%" }}>
           {article.addresses.map((address, index) => (
@@ -291,7 +287,6 @@ const ArticleDetailPage: React.FC = () => {
             , 다른 지역 등등등(주소가 긴 경우를 테스트하기 위해서 놔둠)
           </span>
         </div>
-
         {/* 별점 */}
         <div
           style={{ fontSize: "20px", display: "flex", alignItems: "center" }}
@@ -303,7 +298,6 @@ const ArticleDetailPage: React.FC = () => {
             <p>{article.avgnumofstars}</p>
           )}
         </div>
-
         <hr style={{ margin: "30px 0px" }}></hr>
         {/* 작성자 프로필 */}
         <div
@@ -349,7 +343,6 @@ const ArticleDetailPage: React.FC = () => {
             </p>
           )}
         </div>
-
         <p
           style={{
             borderBottom: "1px solid #ddd",
