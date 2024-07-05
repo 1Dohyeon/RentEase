@@ -60,7 +60,7 @@ const WriteArticleFormComponent: React.FC = () => {
       ? existingArticle.addresses.map((addr: Address) => addr.id)
       : []
   );
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // useNavigate 훅 사용
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -128,8 +128,11 @@ const WriteArticleFormComponent: React.FC = () => {
           `/articles/edit/${existingArticle.id}`,
           articleData
         );
+        navigate(-1);
       } else {
         response = await apiClient.post("/articles/write", articleData);
+        const newArticleId = response.data.id; // 새로 작성된 게시글의 ID
+        navigate(`/articles/${newArticleId}`); // 새로 작성된 게시글 페이지로 이동
       }
 
       if (!response) {
@@ -141,7 +144,6 @@ const WriteArticleFormComponent: React.FC = () => {
           ? "게시글 수정이 완료되었습니다."
           : "게시글 작성이 완료되었습니다."
       );
-      navigate("/articles");
     } catch (error) {
       console.error("게시글 작성 오류:", error);
     }
