@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
+import StarRating from "../components/StarRating";
 import { AuthContext } from "../contexts/AuthContext";
 import apiClient from "../utils/apiClient";
 
@@ -29,6 +30,7 @@ interface Article {
   weeklyprice: string | null;
   monthlyprice: string | null;
   currency: string;
+  avgnumofstars: number;
   addresses: Address[];
   categories: Category[];
   author: Author;
@@ -260,10 +262,13 @@ const ArticleDetailPage: React.FC = () => {
         </div>
 
         {/* 카테고리 */}
-        <div>
-          {article.categories.map((category) => (
-            <span key={category.id}>#{category.title}</span>
-          ))}
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ width: "85%" }}>
+            {article.categories.map((category) => (
+              <span key={category.id}>#{category.title}</span>
+            ))}
+          </div>
+          <small>{article.createdTimeSince}</small>
         </div>
 
         {/* 제목 */}
@@ -271,51 +276,75 @@ const ArticleDetailPage: React.FC = () => {
           <div style={{ width: "85%" }}>
             <p style={{ fontSize: "26px" }}>{article.title}</p>
           </div>
-          <small>{article.createdTimeSince}</small>
         </div>
 
         {/* 위치 */}
         <div style={{ width: "85%" }}>
           {article.addresses.map((address, index) => (
-            <span key={index} style={{ fontSize: "14px" }}>
+            <span key={index} style={{ fontSize: "16px" }}>
               {address.city} {address.district}
               {index < article.addresses.length - 1 ? ", " : ""}
             </span>
           ))}
-          <span style={{ fontSize: "14px" }}>
+          <span style={{ fontSize: "16px" }}>
             , 다른 지역 등등등(주소가 긴 경우를 테스트하기 위해서 놔둠)
           </span>
         </div>
 
+        {/* 별점 */}
+        <div
+          style={{ fontSize: "20px", display: "flex", alignItems: "center" }}
+        >
+          <StarRating rating={article.avgnumofstars} />
+          {article.avgnumofstars == 0 ? (
+            <p>아직 후기가 없습니다.</p>
+          ) : (
+            <p>{article.avgnumofstars}</p>
+          )}
+        </div>
+
         <hr></hr>
         {/* 작성자 프로필 */}
-        <div style={{ display: "flex", alignItems: "end" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            marginTop: "25px",
+            marginBottom: "10px",
+          }}
+        >
           <div
             style={{
               width: "40px",
               height: "40px",
               backgroundColor: "#d2d2d2",
+              marginRight: "5px",
+              borderRadius: "20px",
             }}
           ></div>
           <p>{article.author.nickname}</p>
         </div>
         {/* 가격 */}
-        <p>
-          {getCurrencySymbol(article.currency)}
-          {parseInt(article.dailyprice, 10).toLocaleString()}/일
-        </p>
-        {article.weeklyprice && (
+        <div>
           <p>
             {getCurrencySymbol(article.currency)}
-            {parseInt(article.weeklyprice, 10).toLocaleString()}/주
+            {parseInt(article.dailyprice, 10).toLocaleString()}/일
           </p>
-        )}
-        {article.monthlyprice && (
-          <p>
-            {getCurrencySymbol(article.currency)}
-            {parseInt(article.monthlyprice, 10).toLocaleString()}/월
-          </p>
-        )}
+          {article.weeklyprice && (
+            <p>
+              {getCurrencySymbol(article.currency)}
+              {parseInt(article.weeklyprice, 10).toLocaleString()}/주
+            </p>
+          )}
+          {article.monthlyprice && (
+            <p>
+              {getCurrencySymbol(article.currency)}
+              {parseInt(article.monthlyprice, 10).toLocaleString()}/월
+            </p>
+          )}
+        </div>
+
+        <hr style={{ margin: "20px 0px" }}></hr>
         <p>{article.content}</p>
       </div>
     </div>
