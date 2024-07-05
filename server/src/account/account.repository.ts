@@ -1,42 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcrypt';
-import { UserAccount, UserEntity } from 'src/models/user.entity';
-import { UserRepository } from 'src/user/user.repository';
-import { Repository } from 'typeorm';
+import { UserEntity } from 'src/models/user.entity';
+import { Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
-export class AccountRepository extends Repository<UserEntity> {
+export class AccountRepository {
   constructor(
     @InjectRepository(UserEntity)
     private readonly repository: Repository<UserEntity>,
-    private readonly userRepository: UserRepository,
-  ) {
-    super(repository.target, repository.manager, repository.queryRunner);
-  }
+  ) {}
 
   /**
-   * password 체크
+   * 사용자의 비밀번호를 업데이트
+   * @param userAllInfo 업데이트할 사용자 정보
+   * @param hashedPassword 해싱된 새로운 비밀번호
+   * @returns 업데이트된 사용자 정보를 나타내는 객체
    */
-  async checkPassword(user: UserAccount, password: string): Promise<boolean> {
-    const userAllInfo = await this.userRepository.getUserByEmail(user.email);
-    return await bcrypt.compare(password, userAllInfo.password);
-  }
-
-  /**
-   * password 업데이트
-   */
-  async updatePassword(user: UserAccount, hashedPassword: string) {
-    const userAllInfo = await this.userRepository.getUserByEmail(user.email);
+  async updatePassword(
+    userAllInfo: UserEntity,
+    hashedPassword: string,
+  ): Promise<UserEntity> {
     userAllInfo.password = hashedPassword;
-    await this.repository.save(userAllInfo);
+    return await this.repository.save(userAllInfo);
   }
 
   /**
-   * 계정 삭제
+   * 사용자 계정을 소프트 삭제
+   * @param userId 삭제할 사용자의 ID
+   * @returns {Promise<UpdateResult>} 업데이트 작업의 결과를 나타내는 객체
    */
-  async deleteUserById(userId: number) {
-    await this.repository
+  async deleteUserById(userId: number): Promise<UpdateResult> {
+    return await this.repository
       .createQueryBuilder()
       .update(UserEntity)
       .set({ isDeleted: true, deletedAt: new Date() })

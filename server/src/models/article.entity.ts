@@ -63,11 +63,22 @@ export class ArticleEntity extends CommonEntity {
   @Column({ type: 'enum', enum: Currency, nullable: false })
   currency: Currency;
 
+  @IsNumber()
+  @IsOptional()
+  @Column({
+    type: 'decimal',
+    precision: 3,
+    scale: 2,
+    nullable: false,
+    default: 0,
+  })
+  avgnumofstars: number;
+
   @ManyToOne(() => UserEntity, (user) => user.articles)
   @JoinColumn({ name: 'authorid' })
   author: UserEntity;
 
-  @OneToMany(() => UserEntity, (user) => user.reviews)
+  @OneToMany(() => ReviewEntity, (review) => review.article)
   reviews: ReviewEntity[];
 
   @ManyToMany(() => AddressEntity, (address) => address.articles)
@@ -96,6 +107,7 @@ export interface ArticleBanner {
   author: UserEntity;
   addresses: AddressEntity[];
   categories: CategoryEntity[];
+  reviews: ReviewEntity[];
 }
 
 export interface ArticleDetail {
@@ -107,6 +119,7 @@ export interface ArticleDetail {
   author: UserEntity;
   addresses: AddressEntity[];
   categories: CategoryEntity[];
+  reviews: ReviewEntity[];
   weeklyprice?: number;
   monthlyprice?: number;
 }

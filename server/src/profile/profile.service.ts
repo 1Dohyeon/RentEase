@@ -18,8 +18,11 @@ export class ProfileService {
   ) {}
 
   /**
-   * 프로필 정보만 불러옴(nickname, username, addresses)
-   * to SettingController.getProfileById
+   * 사용자 프로필 정보 조회
+   * @param userId 조회할 사용자의 ID
+   * @returns 사용자 프로필 정보 (id, nickname, username, createdAt, updatedAt, addresses)
+   * @throws BadRequestException 사용자 ID가 없을 경우
+   * @throws NotFoundException 해당하는 사용자를 찾을 수 없을 경우
    */
   async getProfileById(userId: number): Promise<UserProfile> {
     if (!userId) {
@@ -43,7 +46,10 @@ export class ProfileService {
   }
 
   /**
-   * 사용자 프로필 업데이트(실명, 닉네임)
+   * 사용자 프로필 업데이트
+   * @param userId 업데이트할 사용자의 ID
+   * @param updateStatus 업데이트할 정보 (username, nickname)
+   * @returns 업데이트된 사용자 프로필 정보
    */
   async updateProfile(
     userId: number,
@@ -59,7 +65,12 @@ export class ProfileService {
     return await this.getProfileById(userId);
   }
 
-  /** 사용자 주소만 가져옴 */
+  /**
+   * 사용자 주소 목록 조회
+   * @param userId 주소를 조회할 사용자의 ID
+   * @returns 사용자의 주소 목록
+   * @throws NotFoundException 주소를 찾을 수 없는 경우
+   */
   async getAddressesByUserId(userId: number): Promise<AddressEntity[]> {
     const user = await this.getProfileById(userId);
     const addresses = user.addresses;
@@ -73,13 +84,22 @@ export class ProfileService {
     return addresses;
   }
 
-  /** front에서 string으로 입력 받은 주소 정보 split */
+  /**
+   * 주소 문자열을 파싱하여 주소 엔티티 검색
+   * @param address 주소 문자열
+   * @returns { city: string, district: string } 주소의 도시와 구 정보
+   */
   private parseAddress(address: string): { city: string; district: string } {
     const [city, district] = address.split(' ');
     return { city, district };
   }
 
-  /** 사용자가 이미 등록한 주소인지 체크 */
+  /**
+   * 이미 등록된 주소인지 확인
+   * @param user 사용자 정보
+   * @param address 주소 엔티티
+   * @throws Error 이미 등록된 주소인 경우
+   */
   private checkAddress(user: UserProfile, address: AddressEntity) {
     const existingAddress = user.addresses.find(
       (addr) => addr.id === address.id,
@@ -89,7 +109,14 @@ export class ProfileService {
     }
   }
 
-  /** 사용자 주소 정보 추가(최대 3개) */
+  /**
+   * 사용자 주소 추가 (최대 3개)
+   * @param userId 주소를 추가할 사용자의 ID
+   * @param address 추가할 주소 문자열
+   * @returns 업데이트된 사용자 주소 목록
+   * @throws Error 주소 추가 제한에 걸린 경우
+   * @throws NotFoundException 주소를 찾을 수 없는 경우
+   */
   async addAddress(userId: number, address: string): Promise<AddressEntity[]> {
     const user = await this.getProfileById(userId);
 
@@ -115,7 +142,12 @@ export class ProfileService {
     return updatedAddresses;
   }
 
-  /** 사용자 주소 정보 삭제(1개씩) */
+  /**
+   * 사용자 주소 삭제
+   * @param userId 주소를 삭제할 사용자의 ID
+   * @param addressId 삭제할 주소의 ID
+   * @returns 삭제된 주소 엔티티
+   */
   async removeAddress(
     userId: number,
     addressId: number,
@@ -123,7 +155,6 @@ export class ProfileService {
     const user = await this.getProfileById(userId);
 
     const addressIdToNumber = Number(addressId);
-    // 삭제할 주소를 반환하기 위해 미리 변수로 지정
     const addressToRemove = user.addresses.find(
       (address) => address.id === addressIdToNumber,
     );
@@ -133,7 +164,15 @@ export class ProfileService {
     return addressToRemove;
   }
 
-  /** 사용자 주소 정보 업데이트 */
+  /**
+   * 사용자 주소 업데이트
+   * @param userId 업데이트할 사용자의 ID
+   * @param oldAddressId 업데이트 전 주소의 ID
+   * @param newAddress 새로운 주소 문자열
+   * @returns 업데이트된 사용자 주소 목록
+   * @throws NotFoundException 주소를 찾을 수 없는 경우
+   * @throws Error 이미 등록된 주소인 경우
+   */
   async updateAddress(
     userId: number,
     oldAddressId: number,
@@ -152,7 +191,6 @@ export class ProfileService {
 
     await this.profileRepository.updateAddress(user, oldAddressId, address);
 
-    // 사용자 주소 목록 갱신
     const updatedUser = await this.getProfileById(user.id);
     return updatedUser.addresses;
   }
