@@ -118,7 +118,7 @@ export class ReviewRepository {
     await this.repository
       .createQueryBuilder('review')
       .update(ReviewEntity)
-      .set({ isDeleted: true })
+      .set({ isDeleted: true, deletedAt: () => 'CURRENT_TIMESTAMP' })
       .where('id = :id', { id: reviewId })
       .execute();
   }
