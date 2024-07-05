@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
+import ReviewsContainer from "../components/ReviewsContainer";
 import StarRating from "../components/StarRating";
 import { AuthContext } from "../contexts/AuthContext";
 import apiClient from "../utils/apiClient";
@@ -303,13 +304,12 @@ const ArticleDetailPage: React.FC = () => {
           )}
         </div>
 
-        <hr></hr>
+        <hr style={{ margin: "30px 0px" }}></hr>
         {/* 작성자 프로필 */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            marginTop: "25px",
             marginBottom: "10px",
           }}
         >
@@ -325,7 +325,13 @@ const ArticleDetailPage: React.FC = () => {
           <p>{article.author.nickname}</p>
         </div>
         {/* 가격 */}
-        <div>
+        <div
+          style={{
+            borderBottom: "1px solid #ddd",
+            margin: "30px 0px",
+            paddingBottom: "30px",
+          }}
+        >
           <p>
             {getCurrencySymbol(article.currency)}
             {parseInt(article.dailyprice, 10).toLocaleString()}/일
@@ -344,8 +350,19 @@ const ArticleDetailPage: React.FC = () => {
           )}
         </div>
 
-        <hr style={{ margin: "20px 0px" }}></hr>
-        <p>{article.content}</p>
+        <p
+          style={{
+            borderBottom: "1px solid #ddd",
+            margin: "30px 0px",
+            paddingBottom: "30px",
+          }}
+        >
+          {article.content}
+        </p>
+        <ReviewsContainer
+          articleId={article.id}
+          avgnumofstars={article.avgnumofstars}
+        />
       </div>
     </div>
   );
