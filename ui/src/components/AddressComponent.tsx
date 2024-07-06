@@ -57,7 +57,50 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
 
       // 서버에서 전달한 에러 메시지를 확인하여 처리
       if (error.response && error.response.data) {
-        const { success, path, error: serverError } = error.response.data;
+        const { success, error: serverError } = error.response.data;
+
+        if (!success) {
+          errorMessage = `${serverError}`;
+        }
+      }
+
+      alert(errorMessage);
+    }
+  };
+
+  const handleEditAddress = async () => {
+    if (!address || !address.id) {
+      alert("수정할 주소 정보가 유효하지 않습니다.");
+      return;
+    }
+
+    const confirmMessage = `주소 "${address.city} ${address.district}"를 "${selectedCity} ${selectedDistrict}"로 수정하시겠습니까?`;
+    const confirmed = window.confirm(confirmMessage);
+
+    if (!confirmed) {
+      return;
+    }
+
+    const newAddress = `${selectedCity} ${selectedDistrict}`;
+
+    try {
+      const response = await apiClient.patch(
+        `/settings/profile/address?userId=${userId}&addressId=${address.id}`,
+        {
+          newAddress,
+        }
+      );
+
+      if (response) {
+        alert("주소가 수정되었습니다.");
+        window.location.reload();
+      }
+    } catch (error: any) {
+      console.error("주소 수정 중 오류 발생:", error);
+      let errorMessage = "주소 수정 중 오류가 발생했습니다.";
+
+      if (error.response && error.response.data) {
+        const { success, error: serverError } = error.response.data;
 
         if (!success) {
           errorMessage = `${serverError}`;
@@ -132,7 +175,9 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
       </div>
       {address ? (
         <>
-          <button className="edit-button">수정</button>
+          <button className="edit-button" onClick={handleEditAddress}>
+            수정
+          </button>
           <button className="delete-button" onClick={handleDeleteAddress}>
             삭제
           </button>
