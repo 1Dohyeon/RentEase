@@ -70,6 +70,10 @@ export class ProfileService {
         );
       }
 
+      if (user.nickname === updateStatus.nickname) {
+        throw new Error('이미 설정되었습니다.');
+      }
+
       if (updateStatus.nickname) {
         const { nickname } = updateStatus;
 
