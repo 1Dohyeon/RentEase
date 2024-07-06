@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../contexts/AuthContext";
+import apiClient from "../utils/apiClient";
 import "./AddressComponent.css";
 
 interface Address {
@@ -20,6 +22,7 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
   const [selectedDistrict, setSelectedDistrict] = useState(
     address?.district || ""
   );
+  const { userId } = useContext(AuthContext);
 
   useEffect(() => {
     if (!address) {
@@ -31,6 +34,57 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
     }
   }, [address]);
 
+  const handleAddAddress = async () => {
+    if (!selectedCity || !selectedDistrict) {
+      alert("시/도와 군/구를 선택해주세요.");
+      return;
+    }
+
+    const newAddress = `${selectedCity} ${selectedDistrict}`;
+
+    try {
+      const response = await apiClient.post("/settings/profile/address", {
+        address: newAddress,
+      });
+
+      if (response) {
+        alert("주소가 추가되었습니다.");
+        window.location.reload();
+      }
+    } catch (error: any) {
+      console.error("주소 추가 중 오류 발생:", error);
+      let errorMessage = "주소 추가 중 오류가 발생했습니다.";
+
+      // 서버에서 전달한 에러 메시지를 확인하여 처리
+      if (error.response && error.response.data) {
+        const { success, path, error: serverError } = error.response.data;
+
+        if (!success) {
+          errorMessage = `${serverError}`;
+        }
+      }
+
+      alert(errorMessage);
+    }
+  };
+
+  const handleDeleteAddress = async () => {
+    if (!address || !address.id) {
+      alert("삭제할 주소 정보가 유효하지 않습니다.");
+      return;
+    }
+
+    try {
+      const response = await apiClient.delete(
+        `/settings/profile/address?userId=${userId}&addressId=${address.id}`
+      );
+      if (response) window.location.reload();
+    } catch (error) {
+      console.error("주소 삭제 중 오류 발생:", error);
+      alert("주소 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <div className="address-component">
       <div>
@@ -41,11 +95,14 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
           onChange={(e) => setSelectedCity(e.target.value)}
         >
           <option value="">시/도 선택</option>
-          {allCities.map((addr) => (
-            <option key={addr.id} value={addr.city}>
-              {addr.city}
-            </option>
-          ))}
+          {allCities
+            .map((addr) => addr.city)
+            .filter((value, index, self) => self.indexOf(value) === index) // 중복 제거
+            .map((city, index) => (
+              <option key={index} value={city}>
+                {city}
+              </option>
+            ))}
         </select>
       </div>
       <div>
@@ -69,10 +126,14 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
       {address ? (
         <>
           <button className="edit-button">수정</button>
-          <button className="delete-button">삭제</button>
+          <button className="delete-button" onClick={handleDeleteAddress}>
+            삭제
+          </button>
         </>
       ) : (
-        <button className="add-button">추가하기</button>
+        <button className="add-button" onClick={handleAddAddress}>
+          추가하기
+        </button>
       )}
     </div>
   );
