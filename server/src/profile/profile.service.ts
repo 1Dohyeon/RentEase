@@ -97,15 +97,15 @@ export class ProfileService {
       throw new Error('주소 문자열이 유효하지 않습니다.');
     }
 
-    const parts = address.split(' ');
-
-    if (parts.length !== 2) {
+    const firstSpaceIndex = address.indexOf(' ');
+    if (firstSpaceIndex === -1) {
       throw new Error(
         '주소 문자열 형식이 올바르지 않습니다. 도시와 구를 포함해야 합니다.',
       );
     }
 
-    const [city, district] = parts;
+    const city = address.slice(0, firstSpaceIndex);
+    const district = address.slice(firstSpaceIndex + 1);
 
     return { city, district };
   }
