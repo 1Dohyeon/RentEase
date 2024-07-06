@@ -60,10 +60,23 @@ const ProfileSettingsComponent: React.FC = () => {
         "/settings/profile",
         updatedProfileData
       );
-      alert("프로필 수정이 완료되었습니다.");
-      setProfile(response.data);
-    } catch (error) {
+
+      if (response.data.success) {
+        alert("프로필 수정이 완료되었습니다.");
+        setProfile(response.data);
+      } else {
+        alert(response.data.error);
+      }
+    } catch (error: any) {
       console.error("프로필 수정 오류:", error);
+      let errorMessage = "프로필 수정 중 오류가 발생했습니다.";
+
+      if (error.response && error.response.data) {
+        const { error: serverError } = error.response.data;
+        errorMessage = `${serverError}`;
+      }
+
+      alert(errorMessage);
     }
   };
 
