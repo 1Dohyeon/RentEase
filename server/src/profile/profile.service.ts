@@ -9,6 +9,7 @@ import { AddressRepository } from 'src/address/address.repository';
 import { AddressEntity } from 'src/models/address.entity';
 import { UserEntity, UserProfile } from 'src/models/user.entity';
 import { UserRepository } from 'src/user/user.repository';
+import { UserService } from 'src/user/user.service';
 import { ProfileRepository } from './profile.repository';
 
 @Injectable()
@@ -16,6 +17,7 @@ export class ProfileService {
   constructor(
     private readonly profileRepository: ProfileRepository,
     private readonly userRepository: UserRepository,
+    private readonly userService: UserService,
     private readonly addressRepository: AddressRepository,
   ) {}
 
@@ -52,19 +54,39 @@ export class ProfileService {
    * @param userId 업데이트할 사용자의 ID
    * @param updateStatus 업데이트할 정보 (username, nickname)
    * @returns 업데이트된 사용자 프로필 정보
+   * @throws Error 중복된 닉네임인 경우
    */
   async updateProfile(
     userId: number,
     updateStatus: Partial<UserEntity>,
   ): Promise<UserProfile> {
-    const user = await this.getProfileById(userId);
+    try {
+      const user = await this.getProfileById(userId);
 
-    if (updateStatus.username)
-      await this.profileRepository.updateUsername(user, updateStatus.username);
-    if (updateStatus.nickname)
-      await this.profileRepository.updateNickname(user, updateStatus.nickname);
+      if (updateStatus.username) {
+        await this.profileRepository.updateUsername(
+          user,
+          updateStatus.username,
+        );
+      }
 
-    return await this.getProfileById(userId);
+      if (updateStatus.nickname) {
+        const { nickname } = updateStatus;
+
+        const nicknameExists =
+          await this.userService.existsByNickname(nickname);
+        if (nicknameExists) {
+          throw new Error('중복된 닉네임입니다.');
+        }
+
+        await this.profileRepository.updateNickname(user, nickname);
+      }
+
+      return await this.getProfileById(userId);
+    } catch (error) {
+      // 예외 처리 후 클라이언트로 에러 응답 전송
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
