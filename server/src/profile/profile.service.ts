@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -7,6 +9,7 @@ import { AddressRepository } from 'src/address/address.repository';
 import { AddressEntity } from 'src/models/address.entity';
 import { UserEntity, UserProfile } from 'src/models/user.entity';
 import { UserRepository } from 'src/user/user.repository';
+import { UserService } from 'src/user/user.service';
 import { ProfileRepository } from './profile.repository';
 
 @Injectable()
@@ -14,6 +17,7 @@ export class ProfileService {
   constructor(
     private readonly profileRepository: ProfileRepository,
     private readonly userRepository: UserRepository,
+    private readonly userService: UserService,
     private readonly addressRepository: AddressRepository,
   ) {}
 
@@ -50,19 +54,43 @@ export class ProfileService {
    * @param userId 업데이트할 사용자의 ID
    * @param updateStatus 업데이트할 정보 (username, nickname)
    * @returns 업데이트된 사용자 프로필 정보
+   * @throws Error 중복된 닉네임인 경우
    */
   async updateProfile(
     userId: number,
     updateStatus: Partial<UserEntity>,
   ): Promise<UserProfile> {
-    const user = await this.getProfileById(userId);
+    try {
+      const user = await this.getProfileById(userId);
 
-    if (updateStatus.username)
-      await this.profileRepository.updateUsername(user, updateStatus.username);
-    if (updateStatus.nickname)
-      await this.profileRepository.updateNickname(user, updateStatus.nickname);
+      if (updateStatus.username) {
+        await this.profileRepository.updateUsername(
+          user,
+          updateStatus.username,
+        );
+      }
 
-    return await this.getProfileById(userId);
+      if (user.nickname === updateStatus.nickname) {
+        throw new Error('이미 설정되었습니다.');
+      }
+
+      if (updateStatus.nickname) {
+        const { nickname } = updateStatus;
+
+        const nicknameExists =
+          await this.userService.existsByNickname(nickname);
+        if (nicknameExists) {
+          throw new Error('중복된 닉네임입니다.');
+        }
+
+        await this.profileRepository.updateNickname(user, nickname);
+      }
+
+      return await this.getProfileById(userId);
+    } catch (error) {
+      // 예외 처리 후 클라이언트로 에러 응답 전송
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
@@ -88,9 +116,23 @@ export class ProfileService {
    * 주소 문자열을 파싱하여 주소 엔티티 검색
    * @param address 주소 문자열
    * @returns { city: string, district: string } 주소의 도시와 구 정보
+   * @throws Error 주소 문자열이 유효하지 않을 경우 예외 발생
    */
   private parseAddress(address: string): { city: string; district: string } {
-    const [city, district] = address.split(' ');
+    if (!address || typeof address !== 'string') {
+      throw new Error('주소 문자열이 유효하지 않습니다.');
+    }
+
+    const firstSpaceIndex = address.indexOf(' ');
+    if (firstSpaceIndex === -1) {
+      throw new Error(
+        '주소 문자열 형식이 올바르지 않습니다. 도시와 구를 포함해야 합니다.',
+      );
+    }
+
+    const city = address.slice(0, firstSpaceIndex);
+    const district = address.slice(firstSpaceIndex + 1);
+
     return { city, district };
   }
 
@@ -118,28 +160,33 @@ export class ProfileService {
    * @throws NotFoundException 주소를 찾을 수 없는 경우
    */
   async addAddress(userId: number, address: string): Promise<AddressEntity[]> {
-    const user = await this.getProfileById(userId);
+    try {
+      const user = await this.getProfileById(userId);
 
-    if (user.addresses.length >= 3) {
-      throw new Error('주소는 최대 3개까지만 설정할 수 있습니다.');
+      if (user.addresses.length >= 3) {
+        throw new Error('주소는 최대 3개까지만 설정할 수 있습니다.');
+      }
+
+      const { city, district } = this.parseAddress(address);
+
+      const addressEntity = await this.addressRepository.findAddress(
+        city,
+        district,
+      );
+
+      if (!addressEntity) {
+        throw new NotFoundException('해당 주소를 찾을 수 없습니다.');
+      }
+
+      this.checkAddress(user, addressEntity);
+      await this.profileRepository.addAddress(user, addressEntity);
+
+      const updatedAddresses = await this.getAddressesByUserId(userId);
+      return updatedAddresses;
+    } catch (error) {
+      // 예외 처리 후 클라이언트로 에러 응답 전송
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
-
-    const { city, district } = this.parseAddress(address);
-
-    const addressEntity = await this.addressRepository.findAddress(
-      city,
-      district,
-    );
-
-    if (!addressEntity) {
-      throw new NotFoundException('해당 주소를 찾을 수 없습니다.');
-    }
-
-    this.checkAddress(user, addressEntity);
-    await this.profileRepository.addAddress(user, addressEntity);
-
-    const updatedAddresses = await this.getAddressesByUserId(userId);
-    return updatedAddresses;
   }
 
   /**
@@ -152,16 +199,21 @@ export class ProfileService {
     userId: number,
     addressId: number,
   ): Promise<AddressEntity> {
-    const user = await this.getProfileById(userId);
+    try {
+      const user = await this.getProfileById(userId);
 
-    const addressIdToNumber = Number(addressId);
-    const addressToRemove = user.addresses.find(
-      (address) => address.id === addressIdToNumber,
-    );
+      const addressIdToNumber = Number(addressId);
+      const addressToRemove = user.addresses.find(
+        (address) => address.id === addressIdToNumber,
+      );
 
-    await this.profileRepository.removeAddress(user, addressId);
+      await this.profileRepository.removeAddress(user, addressId);
 
-    return addressToRemove;
+      return addressToRemove;
+    } catch (error) {
+      // 예외 처리 후 클라이언트로 에러 응답 전송
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
@@ -178,20 +230,25 @@ export class ProfileService {
     oldAddressId: number,
     newAddress: string,
   ): Promise<AddressEntity[]> {
-    const user = await this.getProfileById(userId);
+    try {
+      const user = await this.getProfileById(userId);
 
-    const { city, district } = this.parseAddress(newAddress);
-    const address = await this.addressRepository.findAddress(city, district);
+      const { city, district } = this.parseAddress(newAddress);
+      const address = await this.addressRepository.findAddress(city, district);
 
-    if (!address) {
-      throw new NotFoundException('해당 주소를 찾을 수 없습니다.');
+      if (!address) {
+        throw new NotFoundException('해당 주소를 찾을 수 없습니다.');
+      }
+
+      this.checkAddress(user, address);
+
+      await this.profileRepository.updateAddress(user, oldAddressId, address);
+
+      const updatedUser = await this.getProfileById(user.id);
+      return updatedUser.addresses;
+    } catch (error) {
+      // 예외 처리 후 클라이언트로 에러 응답 전송
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
-
-    this.checkAddress(user, address);
-
-    await this.profileRepository.updateAddress(user, oldAddressId, address);
-
-    const updatedUser = await this.getProfileById(user.id);
-    return updatedUser.addresses;
   }
 }
