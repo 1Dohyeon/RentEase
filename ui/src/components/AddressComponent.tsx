@@ -74,6 +74,13 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
       return;
     }
 
+    const confirmMessage = `주소 "${address.city} ${address.district}" 를 삭제하시겠습니까?`;
+    const confirmed = window.confirm(confirmMessage);
+
+    if (!confirmed) {
+      return;
+    }
+
     try {
       const response = await apiClient.delete(
         `/settings/profile/address?userId=${userId}&addressId=${address.id}`
