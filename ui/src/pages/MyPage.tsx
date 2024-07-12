@@ -9,13 +9,16 @@ interface User {
   updatedAt: string;
   deletedAt: string | null;
   nickname: string;
-  addresses: { city: string; district: string }[]; // 주소 객체 타입 수정
+  addresses: { city: string; district: string }[];
 }
 
 const MyPage: React.FC = () => {
-  const { userId } = useParams(); // userId 파라미터 가져오기
+  const { userId } = useParams<{ userId: string }>();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedTab, setSelectedTab] = useState<
+    "articles" | "reviews" | "bookmarks"
+  >("articles");
 
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -23,23 +26,23 @@ const MyPage: React.FC = () => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get<User>(`${apiBaseUrl}/users/${userId}`);
-        setUser(response.data); // 사용자 정보 설정
-        setLoading(false); // 로딩 상태 변경
+        setUser(response.data);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching user data:", error);
-        setLoading(false); // 로딩 상태 변경
+        setLoading(false);
       }
     };
 
-    fetchUserData(); // 데이터 가져오기 함수 호출
-  }, [userId]); // userId가 변경될 때마다 useEffect가 실행됨
+    fetchUserData();
+  }, [userId]);
 
   if (loading) {
-    return <div>Loading...</div>; // 로딩 중일 때 표시할 UI
+    return <div>Loading...</div>;
   }
 
   if (!user) {
-    return <div>User not found</div>; // 사용자 정보가 없을 경우 표시할 UI
+    return <div>User not found</div>;
   }
 
   return (
@@ -55,7 +58,6 @@ const MyPage: React.FC = () => {
           padding: "0 20px",
           paddingTop: "50px",
           borderBottom: "1px solid #e5e5e5",
-          borderRadius: "10px",
         }}
       >
         <div
@@ -85,12 +87,74 @@ const MyPage: React.FC = () => {
                 <span key={index}>
                   {address.city} {address.district}
                   {index !== user.addresses.length - 1 && "/"}
-                  {/* 마지막 주소가 아니면 '/' 추가 */}
                 </span>
               ))}
             </div>
           )}
         </div>
+      </div>
+      <div
+        style={{
+          maxWidth: "840px",
+          height: "250px",
+          margin: "0 auto",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            height: "50px",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <div
+            onClick={() => setSelectedTab("articles")}
+            style={{
+              width: "33%",
+              textAlign: "center",
+              padding: "10px 0",
+              fontWeight: "600",
+              color: selectedTab === "articles" ? "#7DB26B" : "#aaaaaa",
+              borderBottom:
+                selectedTab === "articles" ? "2px solid #7DB26B" : "none",
+              cursor: "pointer",
+            }}
+          >
+            게시글
+          </div>
+          <div
+            onClick={() => setSelectedTab("reviews")}
+            style={{
+              width: "33%",
+              textAlign: "center",
+              padding: "10px 0",
+              fontWeight: "600",
+              color: selectedTab === "reviews" ? "#7DB26B" : "#aaaaaa",
+              borderBottom:
+                selectedTab === "reviews" ? "2px solid #7DB26B" : "none",
+              cursor: "pointer",
+            }}
+          >
+            후기
+          </div>
+          <div
+            onClick={() => setSelectedTab("bookmarks")}
+            style={{
+              width: "33%",
+              textAlign: "center",
+              padding: "10px 0",
+              fontWeight: "600",
+              color: selectedTab === "bookmarks" ? "#7DB26B" : "#aaaaaa",
+              borderBottom:
+                selectedTab === "bookmarks" ? "2px solid #7DB26B" : "none",
+              cursor: "pointer",
+            }}
+          >
+            북마크
+          </div>
+        </div>
+        <div>이곳에 컨텐츠</div>
       </div>
     </div>
   );
