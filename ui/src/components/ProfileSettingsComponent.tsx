@@ -61,12 +61,8 @@ const ProfileSettingsComponent: React.FC = () => {
         updatedProfileData
       );
 
-      if (response.data.success) {
-        alert("프로필 수정이 완료되었습니다.");
-        setProfile(response.data);
-      } else {
-        alert(response.data.error);
-      }
+      alert("프로필 수정이 완료되었습니다.");
+      setProfile(response.data);
     } catch (error: any) {
       console.error("프로필 수정 오류:", error);
       let errorMessage = "프로필 수정 중 오류가 발생했습니다.";

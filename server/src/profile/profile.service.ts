@@ -70,16 +70,19 @@ export class ProfileService {
         );
       }
 
-      if (user.nickname === updateStatus.nickname) {
-        throw new Error('이미 설정되었습니다.');
-      }
-
       if (updateStatus.nickname) {
+        if (
+          user.nickname == updateStatus.nickname &&
+          user.username == updateStatus.username
+        ) {
+          throw new Error('이미 설정되었습니다.');
+        }
+
         const { nickname } = updateStatus;
 
         const nicknameExists =
           await this.userService.existsByNickname(nickname);
-        if (nicknameExists) {
+        if (nicknameExists && user.nickname !== updateStatus.nickname) {
           throw new Error('중복된 닉네임입니다.');
         }
 
