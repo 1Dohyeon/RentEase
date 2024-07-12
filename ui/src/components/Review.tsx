@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import StarRating from "./StarRating";
 
 interface ReviewWriter {
@@ -17,6 +18,12 @@ interface ReviewProps {
 }
 
 const Review: React.FC<ReviewProps> = ({ review }) => {
+  const navigate = useNavigate();
+
+  const handleNicknameClick = () => {
+    navigate(`/users/${review.writer.id}`);
+  };
+
   return (
     <div style={{ padding: "20px 0" }}>
       <div
@@ -27,7 +34,10 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
           marginBottom: "5px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div
+          onClick={handleNicknameClick}
+          style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+        >
           <div
             style={{
               width: "30px",
