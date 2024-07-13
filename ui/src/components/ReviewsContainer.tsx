@@ -76,7 +76,16 @@ const ReviewsContainer: React.FC<ReviewsContainerProps> = ({
         window.location.reload();
       })
       .catch((error) => {
-        console.error("Error submitting review:", error);
+        console.error("리뷰 작성 수정 오류:", error);
+        let errorMessage = "리뷰 작성 중 오류가 발생했습니다.";
+
+        if (error.response && error.response.data) {
+          const { error: serverError } = error.response.data;
+          errorMessage = `${serverError}`;
+        }
+
+        alert(errorMessage);
+        window.location.reload();
       });
   };
 
