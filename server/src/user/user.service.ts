@@ -102,6 +102,22 @@ export class UserService {
   }
 
   /**
+   * 사용자가 작성한 리뷰 조회 서비스 로직
+   * @param userId 사용자 ID
+   * @returns 해당 사용자가 작성한 리뷰를 포함한 사용자의 정보를 반환
+   * @throws NotFoundException 해당하는 사용자와 리뷰를 찾을 수 없는 경우 예외 발생
+   */
+  async getReviewsByUserId(userId: number): Promise<UserEntity | undefined> {
+    const user = await this.userRepository.getReviewsByUserId(userId);
+
+    if (!user) {
+      throw new NotFoundException('해당하는 사용자와 리뷰를 찾을 수 없습니다.');
+    }
+
+    return user;
+  }
+
+  /**
    * 이메일 존재 여부 확인 서비스 로직
    * @param email 사용자 이메일
    * @returns 이메일 존재 여부를 반환

@@ -133,6 +133,35 @@ export class UserRepository {
   }
 
   /**
+   * 사용자 ID를 이용해 사용자가 작성한 리뷰를 포함한 정보를 가져오는 서비스 로직
+   * @param userId 사용자 ID
+   * @returns 사용자가 작성한 리뷰를 포함한 사용자 객체를 반환
+   */
+  async getReviewsByUserId(userId: number): Promise<UserEntity | undefined> {
+    return await this.repository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.addresses', 'address')
+      .leftJoinAndSelect('user.reviews', 'review')
+      .leftJoinAndSelect('review.article', 'article')
+      .where('user.id = :userId', { userId })
+      .andWhere('user.isDeleted = false')
+      .andWhere('article.isDeleted = false')
+      .select([
+        'user.id',
+        'user.nickname',
+        'address.id',
+        'address.city',
+        'address.district',
+        'review.id',
+        'review.numofstars',
+        'review.content',
+        'article.id',
+        'article.title',
+      ])
+      .getOne();
+  }
+
+  /**
    * 주어진 이메일이 데이터베이스에 존재하는지 확인하는 서비스 로직
    * @param email 사용자 이메일
    * @returns 이메일 존재 여부를 반환 (true: 존재, false: 미존재)
