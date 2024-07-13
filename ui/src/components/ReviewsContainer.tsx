@@ -72,6 +72,8 @@ const ReviewsContainer: React.FC<ReviewsContainerProps> = ({
         setNewReviewContent("");
         setNewReviewStars(0);
         setIsReviewModalOpen(false);
+        alert("리뷰가 작성되었습니다.");
+        window.location.reload();
       })
       .catch((error) => {
         console.error("Error submitting review:", error);

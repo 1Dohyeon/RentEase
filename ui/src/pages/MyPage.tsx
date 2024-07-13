@@ -52,49 +52,56 @@ const MyPage: React.FC = () => {
       <Header />
       <div
         style={{
-          maxWidth: "840px",
-          height: "250px",
+          width: "840px",
           margin: "0 auto",
-          display: "flex",
-          alignItems: "center",
-          padding: "0 20px",
-          paddingTop: "50px",
-          borderBottom: "1px solid #e5e5e5",
         }}
       >
         <div
           style={{
-            width: "160px",
-            height: "160px",
-            backgroundColor: "#d2d2d2",
+            width: "100%",
+            height: "250px",
             display: "flex",
             alignItems: "center",
-          }}
-        ></div>
-        <div
-          style={{
-            height: "160px",
+            padding: "0 20px",
+            paddingTop: "70px",
+            borderBottom: "1px solid #e5e5e5",
           }}
         >
-          <h3
+          <div
             style={{
-              marginLeft: "10px",
+              width: "160px",
+              height: "160px",
+              backgroundColor: "#d2d2d2",
+              display: "flex",
+              alignItems: "center",
+            }}
+          ></div>
+          <div
+            style={{
+              height: "160px",
             }}
           >
-            {user.nickname}
-          </h3>
-          {user.addresses.length > 0 && (
-            <div style={{ marginLeft: "10px" }}>
-              {user.addresses.map((address, index) => (
-                <span key={index}>
-                  {address.city} {address.district}
-                  {index !== user.addresses.length - 1 && "/"}
-                </span>
-              ))}
-            </div>
-          )}
+            <h3
+              style={{
+                marginLeft: "10px",
+              }}
+            >
+              {user.nickname}
+            </h3>
+            {user.addresses.length > 0 && (
+              <div style={{ marginLeft: "10px" }}>
+                {user.addresses.map((address, index) => (
+                  <span key={index}>
+                    {address.city} {address.district}
+                    {index !== user.addresses.length - 1 && "/"}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
       <div
         style={{
           maxWidth: "840px",
@@ -104,10 +111,11 @@ const MyPage: React.FC = () => {
       >
         <div
           style={{
-            width: "100%",
+            maxWidth: "840px",
             height: "50px",
             display: "flex",
             justifyContent: "space-between",
+            padding: "0 20px",
           }}
         >
           <div
@@ -156,12 +164,8 @@ const MyPage: React.FC = () => {
             북마크
           </div>
         </div>
-        <div>
-          {selectedTab === "articles" && (
-            <MyArticlesComponent userId={user.id} />
-          )}
-          {selectedTab === "reviews" && <MyReviewsComponent userId={user.id} />}
-        </div>
+        {selectedTab === "articles" && <MyArticlesComponent userId={user.id} />}
+        {selectedTab === "reviews" && <MyReviewsComponent userId={user.id} />}
       </div>
     </div>
   );
