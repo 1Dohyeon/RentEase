@@ -7,35 +7,20 @@ interface Address {
   district: string;
 }
 
-interface Category {
-  id: number;
-  title: string;
-}
-
-interface Author {
-  id: number;
-  nickname: string;
-}
-
 interface ArticleProps {
   id: number;
-  createdTimeSince: string | null;
   title: string;
   dailyprice: string;
   currency: string;
   addresses: Address[];
-  categories: Category[];
-  author: Author;
 }
 
 const Article: React.FC<ArticleProps> = ({
   id,
-  createdTimeSince,
   title,
   dailyprice,
   currency,
   addresses,
-  author,
 }) => {
   const getCurrencySymbol = (currency: string) => {
     switch (currency) {
@@ -82,7 +67,6 @@ const Article: React.FC<ArticleProps> = ({
         >
           {title}
         </p>
-
         <p
           style={{
             display: "-webkit-box",
@@ -94,10 +78,10 @@ const Article: React.FC<ArticleProps> = ({
           }}
         >
           {addresses.map((address, index) => (
-            <p key={index} style={{ fontSize: "14px" }}>
+            <span key={index} style={{ fontSize: "14px" }}>
               {address.city} {address.district}
               {index < addresses.length - 1 ? ", " : ""}
-            </p>
+            </span>
           ))}
         </p>
         <p
@@ -109,26 +93,7 @@ const Article: React.FC<ArticleProps> = ({
         >
           {getCurrencySymbol(currency)}
           {parseInt(dailyprice, 10).toLocaleString()}/일
-          {/* <p
-              style={{
-                fontSize: "16PX",
-              }}
-            >
-              /일
-            </p> */}
         </p>
-        {/* <p
-          style={{
-            fontSize: "12px",
-            marginTop: "6px",
-            fontWeight: "bold",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {author.nickname}
-        </p> */}
       </div>
     </Link>
   );

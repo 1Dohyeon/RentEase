@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
+import MyArticlesComponent from "../components/MyArticlesComponent";
 
 interface User {
   id: number;
@@ -154,7 +155,11 @@ const MyPage: React.FC = () => {
             북마크
           </div>
         </div>
-        <div>이곳에 컨텐츠</div>
+        <div>
+          {selectedTab === "articles" && (
+            <MyArticlesComponent userId={user.id} />
+          )}
+        </div>
       </div>
     </div>
   );
