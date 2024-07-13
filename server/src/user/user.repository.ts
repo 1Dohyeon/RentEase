@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { timeSince } from 'src/helper/timeSince';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../models/user.entity';
 import { UserRegisterDto } from './dtos/user.register.req';
@@ -138,10 +139,11 @@ export class UserRepository {
    * @returns 사용자가 작성한 리뷰를 포함한 사용자 객체를 반환
    */
   async getReviewsByUserId(userId: number): Promise<UserEntity | undefined> {
-    return await this.repository
+    const user = await this.repository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.addresses', 'address')
       .leftJoinAndSelect('user.reviews', 'review')
+      .leftJoinAndSelect('review.writer', 'writer')
       .leftJoinAndSelect('review.article', 'article')
       .where('user.id = :userId', { userId })
       .andWhere('user.isDeleted = false')
@@ -155,10 +157,22 @@ export class UserRepository {
         'review.id',
         'review.numofstars',
         'review.content',
+        'review.createdTimeSince',
+        'writer.id',
+        'writer.nickname',
         'article.id',
         'article.title',
       ])
       .getOne();
+
+    if (user && user.reviews) {
+      user.reviews = user.reviews.map((review) => ({
+        ...review,
+        createdTimeSince: timeSince(review.createdTimeSince),
+      }));
+    }
+
+    return user;
   }
 
   /**
