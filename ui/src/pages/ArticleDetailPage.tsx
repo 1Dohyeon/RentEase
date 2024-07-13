@@ -96,6 +96,10 @@ const ArticleDetailPage: React.FC = () => {
     }
   };
 
+  const handleNicknameClick = () => {
+    navigate(`/users/${article?.author.id}`);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -301,10 +305,12 @@ const ArticleDetailPage: React.FC = () => {
         <hr style={{ margin: "30px 0px" }}></hr>
         {/* 작성자 프로필 */}
         <div
+          onClick={handleNicknameClick}
           style={{
             display: "flex",
             alignItems: "center",
             marginBottom: "10px",
+            cursor: "pointer",
           }}
         >
           <div

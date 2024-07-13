@@ -72,6 +72,8 @@ const ReviewsContainer: React.FC<ReviewsContainerProps> = ({
         setNewReviewContent("");
         setNewReviewStars(0);
         setIsReviewModalOpen(false);
+        alert("리뷰가 작성되었습니다.");
+        window.location.reload();
       })
       .catch((error) => {
         console.error("Error submitting review:", error);
@@ -125,7 +127,22 @@ const ReviewsContainer: React.FC<ReviewsContainerProps> = ({
       </div>
 
       {/* 리뷰 작성 버튼 */}
-      <button onClick={handleReviewButtonClick}>리뷰 작성하기</button>
+      <button
+        onClick={handleReviewButtonClick}
+        style={{
+          padding: "10px 20px",
+          backgroundColor: "#7DB26B",
+          color: "white",
+          textDecoration: "none",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+          fontWeight: "600",
+          marginRight: "20px",
+        }}
+      >
+        리뷰 작성하기
+      </button>
 
       {/* 리뷰 작성 모달 */}
       {isReviewModalOpen && (
