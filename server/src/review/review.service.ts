@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -68,6 +70,18 @@ export class ReviewService {
       throw new NotFoundException('게시글을 찾을 수 없습니다.');
     }
 
+    // 사용자가 이미 작성한 게시글인지 확인
+    const existingReview = await this.findReviewByWriterAndArticle(
+      writerId,
+      articleId,
+    );
+    if (existingReview) {
+      throw new HttpException(
+        '이미 리뷰를 작성한 게시글입니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const review = await this.reviewRepository.createReview(
       writerId,
       articleId,
@@ -82,6 +96,23 @@ export class ReviewService {
     await this.articleService.updateArticleAvgStars(article.id);
 
     return review;
+  }
+
+  async findReviewByWriterAndArticle(
+    writerId: number,
+    articleId: number,
+  ): Promise<boolean> {
+    // 해당 게시글의 모든 리뷰를 가져옴
+    const reviews = await this.getAllReviewsByArticleId(articleId);
+
+    // 해당 사용자가 이미 작성한 리뷰가 있는지 확인
+    for (const review of reviews) {
+      if (review.writer.id === writerId) {
+        return true; // 이미 작성한 리뷰가 있으면 true 반환
+      }
+    }
+
+    return false; // 해당 사용자의 리뷰를 찾지 못하면 false 반환
   }
 
   async updateReview(
