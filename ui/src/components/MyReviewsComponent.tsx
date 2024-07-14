@@ -55,16 +55,27 @@ const MyReviewsComponent: React.FC<MyReviewsComponentProps> = ({ userId }) => {
   }
 
   return (
-    <div>
+    <div style={{ marginTop: "20px" }}>
       {reviews.map((review) => (
-        <div key={review.id} style={{ marginBottom: "20px" }}>
-          <Review review={review} />
+        <div
+          key={review.id}
+          style={{
+            marginBottom: "20px",
+            borderRadius: "15px",
+            border: "1px solid #e5e5e5",
+            padding: "10px 20px",
+          }}
+        >
           <div
             style={{
+              width: "90%",
+              margin: "0 auto",
               marginTop: "10px",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
+              borderBottom: "1px solid #e5e5e5",
+              padding: "10px 0px",
             }}
           >
             <strong className="ellipsis">게시글: {review.article.title}</strong>
@@ -75,6 +86,7 @@ const MyReviewsComponent: React.FC<MyReviewsComponentProps> = ({ userId }) => {
               게시글로 이동 &gt;
             </Link>
           </div>
+          <Review review={review} />
         </div>
       ))}
     </div>
