@@ -20,10 +20,20 @@ export class ReviewService {
     private readonly userRepository: UserRepository,
   ) {}
 
+  /**
+   * 리뷰 ID로 리뷰 조회
+   * @param reviewId 리뷰 ID
+   * @returns 리뷰 정보를 반환
+   */
   async getReviewById(reviewId: number): Promise<ReviewEntity | undefined> {
     return await this.reviewRepository.getReviewById(reviewId);
   }
 
+  /**
+   * 작성자 ID로 모든 리뷰 조회
+   * @param userId 작성자 ID
+   * @returns 작성자가 작성한 모든 리뷰를 반환
+   */
   async getAllReviewsByUserId(userId: number): Promise<ReviewEntity[]> {
     const user = await this.userRepository.getUserById(userId);
 
@@ -40,6 +50,11 @@ export class ReviewService {
     return reviews;
   }
 
+  /**
+   * 게시글 ID로 모든 리뷰 조회
+   * @param articleId 게시글 ID
+   * @returns 게시글에 작성된 모든 리뷰를 반환
+   */
   async getAllReviewsByArticleId(articleId: number): Promise<ReviewEntity[]> {
     const article = await this.articleRepository.getArticleById(articleId);
 
@@ -57,6 +72,14 @@ export class ReviewService {
     return reviews;
   }
 
+  /**
+   * 새로운 리뷰 작성
+   * @param writerId 작성자 ID
+   * @param articleId 게시글 ID
+   * @param content 리뷰 내용
+   * @param numofstars 별점
+   * @returns 작성된 리뷰 정보를 반환
+   */
   async createReview(
     writerId: number,
     articleId: number,
@@ -106,6 +129,12 @@ export class ReviewService {
     return review;
   }
 
+  /**
+   * 사용자가 이미 작성한 리뷰가 있는지 확인
+   * @param writerId 작성자 ID
+   * @param articleId 게시글 ID
+   * @returns 리뷰가 있으면 true, 없으면 false 반환
+   */
   async findReviewByWriterAndArticle(
     writerId: number,
     articleId: number,
@@ -123,6 +152,13 @@ export class ReviewService {
     return false; // 해당 사용자의 리뷰를 찾지 못하면 false 반환
   }
 
+  /**
+   * 리뷰 수정
+   * @param reviewId 리뷰 ID
+   * @param content 수정할 리뷰 내용
+   * @param numofstars 수정할 별점
+   * @returns 수정된 리뷰 정보를 반환
+   */
   async updateReview(
     reviewId: number,
     content: string,
@@ -152,6 +188,11 @@ export class ReviewService {
     }
   }
 
+  /**
+   * 리뷰 삭제
+   * @param reviewId 리뷰 ID
+   * @returns 삭제된 리뷰 정보를 반환
+   */
   async deleteReview(reviewId: number): Promise<ReviewEntity> {
     const review = await this.getReviewById(reviewId);
 
