@@ -70,6 +70,14 @@ export class ReviewService {
       throw new NotFoundException('게시글을 찾을 수 없습니다.');
     }
 
+    // 자신이 작성한 게시글에 리뷰를 작성하지 못함
+    if (article.author.id === writerId) {
+      throw new HttpException(
+        '본인이 작성한 게시글에 리뷰를 작성할 수 없습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     // 사용자가 이미 작성한 게시글인지 확인
     const existingReview = await this.findReviewByWriterAndArticle(
       writerId,
