@@ -1,28 +1,28 @@
-import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { BookmarkEntity } from 'src/models/bookmark.entity';
 import { UserService } from 'src/user/user.service';
 import { BookmarkRepository } from './bookmark.repository';
 
 @Injectable()
-export class BookmarkService implements OnModuleInit {
+export class BookmarkService {
   constructor(
     private readonly userService: UserService,
     private readonly bookmarkRepository: BookmarkRepository,
   ) {}
 
-  async onModuleInit() {
-    await this.createBookmarksForExistingUsers();
-  }
+  // async onModuleInit() {
+  //   await this.createBookmarksForExistingUsers();
+  // }
 
-  // 기존 사용자 북마크 생성
-  async createBookmarksForExistingUsers() {
-    const users = await this.userService.getAllUsers();
-    for (const user of users) {
-      if (!user.bookmark) {
-        await this.createBookmark(user.id);
-      }
-    }
-  }
+  // // 기존 사용자 북마크 생성
+  // async createBookmarksForExistingUsers() {
+  //   const users = await this.userService.getAllUsers();
+  //   for (const user of users) {
+  //     if (!user.bookmark) {
+  //       await this.createBookmark(user.id);
+  //     }
+  //   }
+  // }
 
   // 북마크는 기본적으로 회원가입 시에 생성됨
   async createBookmark(userId: number): Promise<BookmarkEntity> {
