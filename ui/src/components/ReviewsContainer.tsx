@@ -6,8 +6,8 @@ import Review from "./Review";
 import StarRating from "./StarRating";
 
 interface ReviewWriter {
-  id: number;
-  nickname: string;
+  id: number | null;
+  nickname: string | null;
 }
 
 interface ReviewData {
@@ -15,7 +15,7 @@ interface ReviewData {
   createdTimeSince: string;
   content: string;
   numofstars: number;
-  writer: ReviewWriter;
+  writer: ReviewWriter | null; // 변경: writer가 null일 수 있음
 }
 
 interface ReviewsContainerProps {
@@ -45,7 +45,11 @@ const ReviewsContainer: React.FC<ReviewsContainerProps> = ({
     apiClient
       .get(`${apiBaseUrl}/reviews?articleId=${articleId}`)
       .then((response) => {
-        setReviews(response.data);
+        const reviewsData = response.data.map((review: ReviewData) => ({
+          ...review,
+          writer: review.writer || { id: 0, nickname: "탈퇴한 사용자" }, // writer가 null일 경우 "탈퇴한 사용자"로 설정
+        }));
+        setReviews(reviewsData);
         setLoading(false);
       })
       .catch((error) => {

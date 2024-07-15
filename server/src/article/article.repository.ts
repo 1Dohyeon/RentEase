@@ -48,6 +48,7 @@ export class ArticleRepository {
       .leftJoin('article.author', 'author')
       .leftJoin('article.reviews', 'review')
       .where('article.isDeleted = false')
+      .andWhere('author.isDeleted = false')
       .orderBy('article.avgnumofstars', 'DESC') // avgnumofstars를 큰 순서대로 정렬
       .addOrderBy('article.createdAt', 'DESC') // createdAt을 최신순으로 정렬
       .getMany();
@@ -90,6 +91,7 @@ export class ArticleRepository {
       .leftJoin('article.reviews', 'review')
       .where('category.id = :categoryId', { categoryId })
       .andWhere('article.isDeleted = false')
+      .andWhere('author.isDeleted = false')
       .orderBy('article.avgnumofstars', 'DESC') // avgnumofstars를 큰 순서대로 정렬
       .addOrderBy('article.createdAt', 'DESC') // createdAt을 최신순으로 정렬
       .getMany();
@@ -132,6 +134,7 @@ export class ArticleRepository {
       .leftJoin('article.reviews', 'review')
       .where('address.id IN (:...addressIds)', { addressIds })
       .andWhere('article.isDeleted = false')
+      .andWhere('author.isDeleted = false')
       .orderBy('article.avgnumofstars', 'DESC') // avgnumofstars를 큰 순서대로 정렬
       .addOrderBy('article.createdAt', 'DESC') // createdAt을 최신순으로 정렬
       .getMany();
@@ -178,6 +181,7 @@ export class ArticleRepository {
         .where('category.id = :categoryId', { categoryId })
         .andWhere('address.id IN (:...addressIds)', { addressIds })
         .andWhere('article.isDeleted = false')
+        .andWhere('author.isDeleted = false')
         .orderBy('article.avgnumofstars', 'DESC') // avgnumofstars를 큰 순서대로 정렬
         .addOrderBy('article.createdAt', 'DESC') // createdAt을 최신순으로 정렬
         .getMany();
@@ -224,6 +228,7 @@ export class ArticleRepository {
         .leftJoin('article.reviews', 'review')
         .where('author.id = :authorId', { authorId })
         .andWhere('article.isDeleted = false')
+        .andWhere('author.isDeleted = false')
         .orderBy('article.avgnumofstars', 'DESC') // avgnumofstars를 큰 순서대로 정렬
         .addOrderBy('article.createdAt', 'DESC') // createdAt을 최신순으로 정렬
         .getMany();
@@ -288,6 +293,7 @@ export class ArticleRepository {
       .leftJoinAndSelect('article.author', 'author')
       .where('article.id = :id', { id: articleId })
       .andWhere('article.isDeleted = false')
+      .andWhere('author.isDeleted = false')
       .select([
         'article.id',
         'article.title',
@@ -327,6 +333,7 @@ export class ArticleRepository {
       .leftJoinAndSelect('review.writer', 'writer')
       .where('article.id = :id', { id: articleId })
       .andWhere('article.isDeleted = false')
+      .andWhere('author.isDeleted = false')
       .select([
         'article.id',
         'article.title',
