@@ -176,6 +176,31 @@ export class UserRepository {
     return user;
   }
 
+  /**
+   * 사용자 ID를 이용해 사용자가 작성한 리뷰를 포함한 정보를 가져오는 서비스 로직
+   * @param userId 사용자 ID
+   * @returns 사용자가 작성한 리뷰를 포함한 사용자 객체를 반환
+   */
+  async getBookmarksByUserId(userId: number): Promise<UserEntity | undefined> {
+    return await this.repository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.addresses', 'address')
+      .leftJoinAndSelect('user.bookmark', 'bookmark')
+      .leftJoinAndSelect('bookmark.articles', 'article')
+      .where('user.id = :userId', { userId })
+      .andWhere('user.isDeleted = false')
+      .select([
+        'user.id',
+        'user.nickname',
+        'address.id',
+        'address.city',
+        'address.district',
+        'bookmark.id',
+        'article.id',
+      ])
+      .getOne();
+  }
+
   async updateUser(user: UserEntity): Promise<UserEntity> {
     return this.repository.save(user);
   }

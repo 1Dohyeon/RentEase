@@ -40,4 +40,10 @@ export class BookmarkService {
 
     return bookmark;
   }
+
+  async getBookmarkByUserId(
+    userId: number,
+  ): Promise<BookmarkEntity | undefined> {
+    return await this.bookmarkRepository.getBookmarkByUserId(userId);
+  }
 }
