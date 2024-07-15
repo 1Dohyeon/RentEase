@@ -1,5 +1,6 @@
 import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+import AccountSettingsPage from "./pages/AccountSettingsPage";
 import AddressSettingsPage from "./pages/AddressSettingsPage";
 import ArticleDetailPage from "./pages/ArticleDetailPage";
 import ArticleEditPage from "./pages/ArticleEditPage";
@@ -30,6 +31,7 @@ const App: React.FC = () => {
         path="/settings/profile/address"
         element={<AddressSettingsPage />}
       />
+      <Route path="/settings/account" element={<AccountSettingsPage />} />
     </Routes>
   );
 };
