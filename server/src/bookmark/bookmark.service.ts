@@ -44,6 +44,31 @@ export class BookmarkService {
   async getBookmarkByUserId(
     userId: number,
   ): Promise<BookmarkEntity | undefined> {
-    return await this.bookmarkRepository.getBookmarkByUserId(userId);
+    const bookmark = await this.bookmarkRepository.getBookmarkByUserId(userId);
+
+    if (!bookmark) {
+      throw new BadRequestException('북마크가 존재하지 않습니다.');
+    }
+
+    return bookmark;
+  }
+
+  async addArticleInBookmark(userId: number, articleId: number): Promise<void> {
+    const bookmark = await this.getBookmarkByUserId(userId);
+    return await this.bookmarkRepository.addArticleInBookmark(
+      bookmark.id,
+      articleId,
+    );
+  }
+
+  async removeArticleInBookmark(
+    userId: number,
+    articleId: number,
+  ): Promise<void> {
+    const bookmark = await this.getBookmarkByUserId(userId);
+    return await this.bookmarkRepository.removeArticleInBookmark(
+      bookmark.id,
+      articleId,
+    );
   }
 }

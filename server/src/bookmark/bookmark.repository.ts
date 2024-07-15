@@ -42,4 +42,26 @@ export class BookmarkRepository {
 
     return queryBuilder.getOne();
   }
+
+  async addArticleInBookmark(
+    bookmarkid: number,
+    articleId: number,
+  ): Promise<void> {
+    await this.repository
+      .createQueryBuilder()
+      .relation(BookmarkEntity, 'articles')
+      .of(bookmarkid)
+      .add(articleId);
+  }
+
+  async removeArticleInBookmark(
+    bookmarkid: number,
+    articleId: number,
+  ): Promise<void> {
+    await this.repository
+      .createQueryBuilder()
+      .relation(BookmarkEntity, 'articles')
+      .of(bookmarkid)
+      .remove(articleId);
+  }
 }

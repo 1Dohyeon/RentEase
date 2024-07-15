@@ -37,9 +37,11 @@ export class UserRepository {
         'address.id',
         'address.city',
         'address.district',
+        'bookmark.id',
       ])
       .leftJoin('user.addresses', 'address')
       .leftJoin('user.articles', 'article')
+      .leftJoin('user.bookmark', 'bookmark')
       .where('user.id = :id', { id: userId })
       .andWhere('user.isDeleted = false')
       .getOne();
@@ -177,7 +179,7 @@ export class UserRepository {
   }
 
   /**
-   * 사용자 ID를 이용해 사용자가 작성한 리뷰를 포함한 정보를 가져오는 서비스 로직
+   * 사용자 ID를 이용해 사용자가 등록한 북마크 목록을 가져오는 서비스 로직
    * @param userId 사용자 ID
    * @returns 사용자가 작성한 리뷰를 포함한 사용자 객체를 반환
    */
@@ -187,6 +189,7 @@ export class UserRepository {
       .leftJoinAndSelect('user.addresses', 'address')
       .leftJoinAndSelect('user.bookmark', 'bookmark')
       .leftJoinAndSelect('bookmark.articles', 'article')
+      .leftJoinAndSelect('article.addresses', 'article_address')
       .where('user.id = :userId', { userId })
       .andWhere('user.isDeleted = false')
       .select([
@@ -197,6 +200,12 @@ export class UserRepository {
         'address.district',
         'bookmark.id',
         'article.id',
+        'article.title',
+        'article.dailyprice',
+        'article.currency',
+        'article_address.id',
+        'article_address.city',
+        'article_address.district',
       ])
       .getOne();
   }
