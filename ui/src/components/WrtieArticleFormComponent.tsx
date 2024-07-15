@@ -76,6 +76,11 @@ const WriteArticleFormComponent: React.FC = () => {
       try {
         const response = await apiClient.get("/settings/profile/address");
         setAddresses(response.data);
+
+        // 사용자 주소가 설정되어 있지 않으면 설정 페이지로 이동
+        if (!response.data.length) {
+          setNoAddressPrompt(true); // 사용자 주소 없음을 나타내는 상태 업데이트
+        }
       } catch (error) {
         console.error("주소 데이터 로딩 오류:", error);
       }
@@ -84,6 +89,8 @@ const WriteArticleFormComponent: React.FC = () => {
     fetchCategories();
     fetchAddresses();
   }, []);
+
+  const [noAddressPrompt, setNoAddressPrompt] = useState(false);
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const categoryId = parseInt(event.target.value, 10);
@@ -96,13 +103,19 @@ const WriteArticleFormComponent: React.FC = () => {
     }
   };
 
-  const handleAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const addressId = parseInt(event.target.value, 10);
+  const handleAddressChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    addressId: number
+  ) => {
     if (event.target.checked) {
       setSelectedAddresses([...selectedAddresses, addressId]);
     } else {
       setSelectedAddresses(selectedAddresses.filter((id) => id !== addressId));
     }
+  };
+
+  const handleAddressSetup = () => {
+    navigate("/settings/profile/address");
   };
 
   const handleSubmit = async () => {
@@ -225,20 +238,40 @@ const WriteArticleFormComponent: React.FC = () => {
 
         <h3 style={{ marginTop: "20px" }}>주소 설정</h3>
         <div className="address-selection">
-          {addresses.map((address) => (
-            <div key={address.id}>
-              <input
-                type="checkbox"
-                id={`address-${address.id}`}
-                value={address.id}
-                checked={selectedAddresses.includes(address.id)}
-                onChange={handleAddressChange}
-              />
-              <label htmlFor={`address-${address.id}`}>
-                {address.city} {address.district}
-              </label>
+          {/* 주소 설정 섹션 */}
+          {noAddressPrompt ? (
+            <div>
+              사용자 주소가 없습니다.{" "}
+              <button
+                onClick={handleAddressSetup}
+                style={{
+                  backgroundColor: "#7DB26B",
+                  color: "white",
+                  border: "none",
+                  padding: "5px 10px",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
+                설정하러 가기
+              </button>
             </div>
-          ))}
+          ) : (
+            addresses.map((address) => (
+              <div key={address.id}>
+                <input
+                  type="checkbox"
+                  id={`address-${address.id}`}
+                  value={address.id}
+                  checked={selectedAddresses.includes(address.id)}
+                  onChange={(e) => handleAddressChange(e, address.id)}
+                />
+                <label htmlFor={`address-${address.id}`}>
+                  {address.city} {address.district}
+                </label>
+              </div>
+            ))
+          )}
         </div>
 
         <h3 style={{ marginTop: "20px" }}>내용 작성</h3>
