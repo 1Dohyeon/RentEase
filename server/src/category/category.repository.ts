@@ -10,7 +10,7 @@ export class CategoryRepository implements OnModuleInit {
     private readonly repository: Repository<CategoryEntity>,
   ) {}
 
-  async findCategoryById(id: number): Promise<CategoryEntity> {
+  async getCategoryById(id: number): Promise<CategoryEntity> {
     return await this.repository.findOne({ where: { id } });
   }
 

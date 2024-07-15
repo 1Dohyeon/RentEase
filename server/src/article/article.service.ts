@@ -49,7 +49,7 @@ export class ArticleService {
     categoryId: number,
   ): Promise<ArticleBanner[] | undefined> {
     // 카테고리 id 존재 여부 예외 처리
-    const category = await this.categoryRepository.findCategoryById(categoryId);
+    const category = await this.categoryRepository.getCategoryById(categoryId);
 
     if (!category) {
       throw new NotFoundException(
@@ -111,7 +111,7 @@ export class ArticleService {
     isLocation: boolean,
   ): Promise<ArticleBanner[] | undefined> {
     // 카테고리 id 존재 여부 예외 처리
-    const category = await this.categoryRepository.findCategoryById(categoryId);
+    const category = await this.categoryRepository.getCategoryById(categoryId);
 
     if (!category) {
       throw new NotFoundException(
