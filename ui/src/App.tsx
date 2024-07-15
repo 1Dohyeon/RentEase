@@ -9,6 +9,7 @@ import ArticlesPage from "./pages/ArticlesPage";
 import CategoryArticlesPage from "./pages/CategoryArticlePage";
 import MyPage from "./pages/MyPage";
 import ProfileSettingsPage from "./pages/ProfileSettingsPage";
+import SettingPasswordPage from "./pages/SettingPasswordPage";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Settings from "./pages/settings/Settings";
@@ -32,6 +33,10 @@ const App: React.FC = () => {
         element={<AddressSettingsPage />}
       />
       <Route path="/settings/account" element={<AccountSettingsPage />} />
+      <Route
+        path="/settings/account/password"
+        element={<SettingPasswordPage />}
+      />
     </Routes>
   );
 };
