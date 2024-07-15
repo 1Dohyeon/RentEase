@@ -6,13 +6,13 @@ import {
   Patch,
   Post,
   Query,
-  Redirect,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { AccountService } from 'src/account/account.service';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { AddressEntity } from 'src/models/address.entity';
+import { UserAccount } from 'src/models/user.entity';
 import { ProfileService } from 'src/profile/profile.service';
 
 @Controller('settings')
@@ -24,53 +24,55 @@ export class SettingController {
   ) {}
 
   /**
-   * settings/ 로 접근시 /settings/profile 로 리다이렉트
-   */
-  @Get('/')
-  @Redirect('/settings/profile')
-  async redirectToProfile() {}
-
-  /**
    * 프로필 정보 조회
+   * @param req 요청 객체
+   * @returns 사용자 프로필 정보를 반환
    */
   @Get('/profile')
   async getProfileById(@Request() req) {
-    const userId = req.user.id;
-    return await this.profileService.getProfileById(userId);
+    return await this.profileService.getProfileById(req.user.id);
   }
 
   /**
    * 프로필 업데이트
+   * @param req 요청 객체
+   * @param body 업데이트할 프로필 정보
+   * @returns 업데이트된 프로필 정보를 반환
    */
   @Patch('/profile')
   async updateProfile(@Request() req, @Body() body) {
-    const userId = req.user.id;
-    return await this.profileService.updateProfile(userId, body);
+    return await this.profileService.updateProfile(req.user.id, body);
   }
 
   /**
-   * 주소 정보만 가져옴
+   * 주소 정보 조회
+   * @param req 요청 객체
+   * @returns 사용자의 주소 정보를 반환
    */
   @Get('/profile/address')
   async getAddress(@Request() req): Promise<AddressEntity[]> {
-    const userId = req.user.id;
-    return this.profileService.getAddresses(userId);
+    return await this.profileService.getAddressesByUserId(req.user.id);
   }
 
   /**
    * 주소 생성
+   * @param req 요청 객체
+   * @param address 새로운 주소 정보
+   * @returns 생성된 주소 정보를 반환
    */
   @Post('/profile/address')
-  async createAdress(
+  async createAddress(
     @Request() req,
-    @Body('address') addresses: string,
+    @Body('address') address: string,
   ): Promise<AddressEntity[]> {
-    const userId = req.user.id;
-    return await this.profileService.addAddress(userId, addresses);
+    return await this.profileService.addAddress(req.user.id, address);
   }
 
   /**
-   * 주소 삭제 ex) Delete /profile/address?userId=1&addressId=8
+   * 주소 삭제
+   * @param userId 사용자 ID
+   * @param addressId 주소 ID
+   * @returns 삭제된 주소 정보를 반환
    */
   @Delete('/profile/address')
   async removeAddress(
@@ -81,7 +83,11 @@ export class SettingController {
   }
 
   /**
-   * 주소 수정 ex) Patch /profile/address?userId=1&addressId=8
+   * 주소 수정
+   * @param userId 사용자 ID
+   * @param oldAddressId 기존 주소 ID
+   * @param newAddress 새로운 주소 정보
+   * @returns 수정된 주소 정보를 반환
    */
   @Patch('/profile/address')
   async updateAddress(
@@ -97,25 +103,31 @@ export class SettingController {
   }
 
   /**
-   *  계정 정보 조회(email, username)
+   * 계정 정보 조회(email, username)
+   * @param req 요청 객체
+   * @returns 사용자 계정 정보를 반환
    */
   @Get('/account')
   async getAccountById(@Request() req) {
-    const userId = req.user.id;
-    return await this.accountService.getAccountById(userId);
+    return await this.accountService.getAccountById(req.user.id);
   }
 
   /**
-   * 계정 삭제
+   * 계정 삭제 (soft delete)
+   * @param req 요청 객체
+   * @returns 삭제된 계정 정보를 반환
    */
-  @Delete('/account/delete-user')
-  async deleteAccount(@Request() req) {
+  @Patch('/account/delete-user')
+  async deleteAccount(@Request() req): Promise<UserAccount> {
     const userId = req.user.id;
     return await this.accountService.deleteUserById(userId);
   }
 
   /**
-   * password 업데이트
+   * 비밀번호 업데이트
+   * @param req 요청 객체
+   * @param body 비밀번호 업데이트 정보 (기존 비밀번호, 새로운 비밀번호)
+   * @returns 업데이트 결과를 반환
    */
   @Patch('/account/password')
   async updatePassword(@Request() req, @Body() body) {

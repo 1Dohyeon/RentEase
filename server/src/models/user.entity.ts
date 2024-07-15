@@ -53,6 +53,7 @@ export interface UserProfile {
   id: number;
   username: string;
   nickname: string;
+  createdAt: Date;
   updatedAt: Date;
   addresses: AddressEntity[];
 }
@@ -63,6 +64,6 @@ export interface UserAccount {
   username: string;
   email: string;
   nickname: string;
+  createdAt: Date;
   updatedAt: Date;
-  addresses: AddressEntity[];
 }
