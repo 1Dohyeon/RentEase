@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import MyArticlesComponent from "../components/MyArticlesComponent";
+import MyBookmarkComponent from "../components/MyBookmarkComponenet";
 import MyReviewsComponent from "../components/MyReviewsComponent";
 
 interface User {
@@ -166,6 +167,9 @@ const MyPage: React.FC = () => {
         </div>
         {selectedTab === "articles" && <MyArticlesComponent userId={user.id} />}
         {selectedTab === "reviews" && <MyReviewsComponent userId={user.id} />}
+        {selectedTab === "bookmarks" && (
+          <MyBookmarkComponent userId={user.id} />
+        )}
       </div>
     </div>
   );

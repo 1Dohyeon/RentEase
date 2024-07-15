@@ -16,6 +16,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
+import { BookmarkEntity } from './bookmark.entity';
 import { CategoryEntity } from './category.entity';
 import { ReviewEntity } from './review.entity';
 import { UserEntity } from './user.entity';
@@ -96,6 +97,14 @@ export class ArticleEntity extends CommonEntity {
     inverseJoinColumn: { name: 'categoryid', referencedColumnName: 'id' },
   })
   categories: CategoryEntity[];
+
+  @ManyToMany(() => BookmarkEntity, (bookmark) => bookmark.articles)
+  @JoinTable({
+    name: 'bookmarksarticle',
+    joinColumn: { name: 'articleid', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'bookmarkid', referencedColumnName: 'id' },
+  })
+  bookmarks: BookmarkEntity[];
 }
 
 export interface ArticleBanner {
