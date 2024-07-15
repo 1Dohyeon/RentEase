@@ -192,6 +192,7 @@ export class UserRepository {
       .leftJoinAndSelect('article.addresses', 'article_address')
       .where('user.id = :userId', { userId })
       .andWhere('user.isDeleted = false')
+      .andWhere('article.isDeleted = false')
       .select([
         'user.id',
         'user.nickname',
