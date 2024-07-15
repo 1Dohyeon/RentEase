@@ -5,8 +5,8 @@ import apiClient from "../utils/apiClient";
 import StarRating from "./StarRating";
 
 interface ReviewWriter {
-  id: number;
-  nickname: string;
+  id: number | null;
+  nickname: string | null;
 }
 
 interface ReviewProps {
@@ -15,7 +15,7 @@ interface ReviewProps {
     createdTimeSince: string;
     content: string;
     numofstars: number;
-    writer: ReviewWriter;
+    writer: ReviewWriter | null;
   };
 }
 
@@ -30,8 +30,14 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
   const [newContent, setNewContent] = useState(review.content);
   const [newStars, setNewStars] = useState(review.numofstars);
 
+  // 사용자 프로필 클릭시 사용자 프로필 페이지로 이동
   const handleNicknameClick = () => {
-    navigate(`/users/${review.writer.id}`);
+    // 탈퇴한 사용자라면 클릭해도 아무일이 일어나지 않음
+    if (review.writer?.id === 0) {
+      return;
+    }
+
+    navigate(`/users/${review.writer?.id}`);
   };
 
   const toggleMenu = () => {
@@ -130,7 +136,7 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
               borderRadius: "15px",
             }}
           ></div>
-          <div>{review.writer.nickname}</div>
+          <div>{review.writer?.nickname}</div>
         </div>
         <div style={{ display: "flex", alignItems: "center" }}>
           <div style={{ fontSize: "12px", color: "#888", marginRight: "10px" }}>
@@ -162,7 +168,7 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
                 flexDirection: "column",
               }}
             >
-              {review.writer.id === currentUserID &&
+              {review.writer?.id === currentUserID &&
                 isLoggedIn && ( // 작성자와 현재 사용자 ID 비교
                   <>
                     <div
@@ -179,7 +185,7 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
                     </div>
                   </>
                 )}
-              {review.writer.id !== currentUserID && ( // 작성자와 현재 사용자 ID 다를 때
+              {review.writer?.id !== currentUserID && ( // 작성자와 현재 사용자 ID 다를 때
                 <div
                   onClick={handleReport}
                   style={{ cursor: "pointer", padding: "5px 10px" }}
