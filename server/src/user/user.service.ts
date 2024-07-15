@@ -33,6 +33,10 @@ export class UserService {
     return user;
   }
 
+  async updateUser(user: UserEntity): Promise<UserEntity> {
+    return this.userRepository.updateUser(user);
+  }
+
   /**
    * 사용자 서브 정보로 유효성 검사를 위한 사용자 조회 서비스 로직
    * @param sub 사용자 서브 정보
@@ -83,6 +87,16 @@ export class UserService {
     return user;
   }
 
+  async getAllUsers(): Promise<UserEntity[] | undefined> {
+    const users = await this.userRepository.getAllUsers();
+
+    if (!users) {
+      throw new NotFoundException('사용자 목록을 찾을 수 없습니다.');
+    }
+
+    return users;
+  }
+
   /**
    * 사용자가 작성한 게시글 조회 서비스 로직
    * @param userId 사용자 ID
@@ -112,6 +126,24 @@ export class UserService {
 
     if (!user) {
       throw new NotFoundException('해당하는 사용자와 리뷰를 찾을 수 없습니다.');
+    }
+
+    return user;
+  }
+
+  /**
+   * 사용자가 작성한 리뷰 조회 서비스 로직
+   * @param userId 사용자 ID
+   * @returns 해당 사용자가 작성한 리뷰를 포함한 사용자의 정보를 반환
+   * @throws NotFoundException 해당하는 사용자와 리뷰를 찾을 수 없는 경우 예외 발생
+   */
+  async getBookmarksByUserId(userId: number): Promise<UserEntity | undefined> {
+    const user = await this.userRepository.getBookmarksByUserId(userId);
+
+    if (!user) {
+      throw new NotFoundException(
+        '해당하는 사용자와 북마크를 찾을 수 없습니다.',
+      );
     }
 
     return user;
