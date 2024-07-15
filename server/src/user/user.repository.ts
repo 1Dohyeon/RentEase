@@ -192,7 +192,9 @@ export class UserRepository {
    * @returns 닉네임 존재 여부를 반환 (true: 존재, false: 미존재)
    */
   async existsByNickname(nickname: string): Promise<boolean> {
-    const user = await this.repository.findOne({ where: { nickname } });
+    const user = await this.repository.findOne({
+      where: { nickname, isDeleted: false },
+    });
     return !!user; // 닉네임이 존재하면 true, 존재하지 않으면 false를 반환
   }
 }

@@ -11,7 +11,7 @@ import { ReviewEntity } from './review.entity';
 export class UserEntity extends CommonEntity {
   @IsEmail({}, { message: '올바른 형태의 이메일을 작성해주세요.' })
   @IsNotEmpty({ message: '이메일을 작성해주세요.' })
-  @Column({ type: 'varchar', unique: true, nullable: false })
+  @Column({ type: 'varchar', nullable: false })
   email: string;
 
   @IsString()
@@ -26,7 +26,7 @@ export class UserEntity extends CommonEntity {
 
   @IsString()
   @IsNotEmpty()
-  @Column({ type: 'varchar', unique: true, nullable: false })
+  @Column({ type: 'varchar', nullable: false })
   nickname: string;
 
   @IsBoolean()
