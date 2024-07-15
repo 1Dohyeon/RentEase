@@ -41,15 +41,34 @@ const Article: React.FC<ArticleProps> = ({
   const [isBookmarked, setIsBookmarked] = useState(false);
   const { userId, isLoggedIn } = useContext(AuthContext);
 
-  // 로컬 스토리지에서 북마크 상태 초기화
+  // 사용자의 북마크 목록
+  const [userBookmarkIds, setUserBookmarkIds] = useState<number[]>([]);
+
+  // 페이지 로드 시 사용자의 북마크 목록 가져오기
   useEffect(() => {
-    const storedBookmarks = localStorage.getItem("bookmarks");
-    if (storedBookmarks) {
-      const bookmarks = JSON.parse(storedBookmarks);
-      const isBookmarked = bookmarks[id] || false;
-      setIsBookmarked(isBookmarked);
+    if (isLoggedIn) {
+      apiClient
+        .get(`/users/${userId}/bookmarks`)
+        .then((response) => {
+          const bookmarkedArticleIds = response.data.bookmark.articles.map(
+            (article: any) => article.id
+          );
+          setUserBookmarkIds(bookmarkedArticleIds);
+        })
+        .catch((error) => {
+          console.error("사용자의 북마크 목록을 가져오는 중 오류 발생:", error);
+        });
     }
-  }, [id]);
+  }, [userId, isLoggedIn]);
+
+  // 게시글이 사용자의 북마크 목록에 있는지 확인
+  useEffect(() => {
+    if (isLoggedIn && userBookmarkIds.includes(id)) {
+      setIsBookmarked(true);
+    } else {
+      setIsBookmarked(false);
+    }
+  }, [id, userBookmarkIds, isLoggedIn]);
 
   // 하트 클릭 이벤트 핸들러
   const handleBookmarkClick = (event: React.MouseEvent<SVGSVGElement>) => {
@@ -62,28 +81,28 @@ const Article: React.FC<ArticleProps> = ({
     }
 
     // 북마크 상태 업데이트
-    const updatedBookmarks = {
-      ...JSON.parse(localStorage.getItem("bookmarks") || "{}"),
-    };
-    updatedBookmarks[id] = !isBookmarked;
-    localStorage.setItem("bookmarks", JSON.stringify(updatedBookmarks));
-
-    // 서버에 북마크 추가 또는 삭제 요청
+    const updatedBookmarkIds = [...userBookmarkIds];
     if (isBookmarked) {
+      // 북마크 취소 요청
       apiClient
         .patch(`/bookmarks/${userId}/remove/${id}`)
         .then((response) => {
           console.log("북마크 취소 성공:", response.data);
+          updatedBookmarkIds.splice(updatedBookmarkIds.indexOf(id), 1); // 배열에서 해당 ID 제거
+          setUserBookmarkIds(updatedBookmarkIds);
           setIsBookmarked(false); // 상태 업데이트
         })
         .catch((error) => {
           console.error("북마크 취소 실패:", error);
         });
     } else {
+      // 북마크 추가 요청
       apiClient
         .patch(`/bookmarks/${userId}/add/${id}`)
         .then((response) => {
           console.log("북마크 추가 성공:", response.data);
+          updatedBookmarkIds.push(id); // 배열에 해당 ID 추가
+          setUserBookmarkIds(updatedBookmarkIds);
           setIsBookmarked(true); // 상태 업데이트
         })
         .catch((error) => {
