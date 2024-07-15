@@ -75,10 +75,24 @@ const WriteArticleFormComponent: React.FC = () => {
     const fetchAddresses = async () => {
       try {
         const response = await apiClient.get("/settings/profile/address");
-        setAddresses(response.data);
+        const fetchedAddresses = response.data;
+
+        // 기존 글의 주소가 있다면 사용자 주소 목록에 추가
+        if (existingArticle && existingArticle.addresses) {
+          const existingArticleAddresses = existingArticle.addresses.filter(
+            (existingAddr) =>
+              !fetchedAddresses.some((addr: any) => addr.id === existingAddr.id)
+          );
+          setAddresses([...fetchedAddresses, ...existingArticleAddresses]);
+        } else {
+          setAddresses(fetchedAddresses);
+        }
 
         // 사용자 주소가 설정되어 있지 않으면 설정 페이지로 이동
-        if (!response.data.length) {
+        if (
+          !fetchedAddresses.length &&
+          (!existingArticle || !existingArticle.addresses.length)
+        ) {
           setNoAddressPrompt(true); // 사용자 주소 없음을 나타내는 상태 업데이트
         }
       } catch (error) {
@@ -157,8 +171,16 @@ const WriteArticleFormComponent: React.FC = () => {
           ? "게시글 수정이 완료되었습니다."
           : "게시글 작성이 완료되었습니다."
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error("게시글 작성 오류:", error);
+      let errorMessage = "게시글 작성 중 오류가 발생했습니다.";
+
+      if (error.response && error.response.data) {
+        const { error: serverError } = error.response.data;
+        errorMessage = `${serverError}`;
+      }
+
+      alert(errorMessage);
     }
   };
 
@@ -241,6 +263,20 @@ const WriteArticleFormComponent: React.FC = () => {
           {/* 주소 설정 섹션 */}
           {noAddressPrompt ? (
             <div>
+              {addresses.map((address) => (
+                <div key={address.id}>
+                  <input
+                    type="checkbox"
+                    id={`address-${address.id}`}
+                    value={address.id}
+                    checked={selectedAddresses.includes(address.id)}
+                    onChange={(e) => handleAddressChange(e, address.id)}
+                  />
+                  <label htmlFor={`address-${address.id}`}>
+                    {address.city} {address.district}
+                  </label>
+                </div>
+              ))}
               사용자 주소가 없습니다.{" "}
               <button
                 onClick={handleAddressSetup}
