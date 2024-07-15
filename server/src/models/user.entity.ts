@@ -1,8 +1,17 @@
 import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { CommonEntity } from 'src/common/entity/common.entity';
 import { AddressEntity } from 'src/models/address.entity';
-import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { ArticleEntity } from './article.entity';
+import { BookmarkEntity } from './bookmark.entity';
 import { ReviewEntity } from './review.entity';
 
 @Entity({
@@ -46,6 +55,10 @@ export class UserEntity extends CommonEntity {
 
   @OneToMany(() => ReviewEntity, (review) => review.writer)
   reviews: ReviewEntity[];
+
+  @OneToOne(() => BookmarkEntity, { cascade: true })
+  @JoinColumn({ name: 'bookmarkid' })
+  bookmark: BookmarkEntity;
 }
 
 /** 사용자 프로필(실명x, 이메일x) */
