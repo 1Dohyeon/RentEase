@@ -176,6 +176,10 @@ export class UserRepository {
     return user;
   }
 
+  async updateUser(user: UserEntity): Promise<UserEntity> {
+    return this.repository.save(user);
+  }
+
   /**
    * 주어진 이메일이 데이터베이스에 존재하는지 확인하는 서비스 로직
    * @param email 사용자 이메일

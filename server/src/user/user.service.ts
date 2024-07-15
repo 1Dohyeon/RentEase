@@ -33,6 +33,10 @@ export class UserService {
     return user;
   }
 
+  async updateUser(user: UserEntity): Promise<UserEntity> {
+    return this.userRepository.updateUser(user);
+  }
+
   /**
    * 사용자 서브 정보로 유효성 검사를 위한 사용자 조회 서비스 로직
    * @param sub 사용자 서브 정보

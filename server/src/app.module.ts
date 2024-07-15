@@ -6,10 +6,12 @@ import { AddressModule } from './address/address.module';
 import { AppController } from './app.controller';
 import { ArticleModule } from './article/article.module';
 import { AuthModule } from './auth/auth.module';
+import { BookmarkModule } from './bookmark/bookmark.module';
 import { CategoryModule } from './category/category.module';
 import { LoggerMiddleware } from './common/logger/logger.middleware';
 import { AddressEntity } from './models/address.entity';
 import { ArticleEntity } from './models/article.entity';
+import { BookmarkEntity } from './models/bookmark.entity';
 import { CategoryEntity } from './models/category.entity';
 import { ReviewEntity } from './models/review.entity';
 import { UserEntity } from './models/user.entity';
@@ -38,6 +40,7 @@ import { UserModule } from './user/user.module';
         ArticleEntity,
         ReviewEntity,
         CategoryEntity,
+        BookmarkEntity,
       ],
       autoLoadEntities: true,
     }),
@@ -50,6 +53,7 @@ import { UserModule } from './user/user.module';
     AddressModule,
     ReviewModule,
     CategoryModule,
+    BookmarkModule,
   ],
   controllers: [AppController],
 })

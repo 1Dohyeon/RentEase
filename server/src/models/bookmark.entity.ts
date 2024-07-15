@@ -1,3 +1,4 @@
+import { CommonEntity } from 'src/common/entity/common.entity';
 import {
   Entity,
   JoinColumn,
@@ -8,13 +9,13 @@ import {
 import { ArticleEntity } from './article.entity';
 import { UserEntity } from './user.entity';
 
-@Entity({ name: 'bookmark' })
-export class BookmarkEntity {
+@Entity({ name: 'bookmarks' })
+export class BookmarkEntity extends CommonEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @OneToOne(() => UserEntity)
-  @JoinColumn({ name: 'writerid' })
+  @JoinColumn({ name: 'userid' })
   user: UserEntity;
 
   @ManyToMany(() => ArticleEntity, (article) => article.bookmarks)
