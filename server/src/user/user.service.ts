@@ -87,6 +87,16 @@ export class UserService {
     return user;
   }
 
+  async getAllUsers(): Promise<UserEntity[] | undefined> {
+    const users = await this.userRepository.getAllUsers();
+
+    if (!users) {
+      throw new NotFoundException('사용자 목록을 찾을 수 없습니다.');
+    }
+
+    return users;
+  }
+
   /**
    * 사용자가 작성한 게시글 조회 서비스 로직
    * @param userId 사용자 ID

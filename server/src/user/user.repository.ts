@@ -99,7 +99,7 @@ export class UserRepository {
    * @returns 모든 사용자 객체의 배열을 반환
    */
   async getAllUsers(): Promise<UserEntity[]> {
-    return await this.repository.find();
+    return await this.repository.find({ where: { isDeleted: false } });
   }
 
   /**

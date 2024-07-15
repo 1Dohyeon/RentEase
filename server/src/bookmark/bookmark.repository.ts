@@ -10,7 +10,7 @@ export class BookmarkRepository {
     private readonly repository: Repository<BookmarkEntity>,
   ) {}
 
-  async createBookmark(userId: number) {
+  async createBookmark(userId: number): Promise<BookmarkEntity> {
     const bookmark = this.repository.create({
       user: { id: userId },
     });
