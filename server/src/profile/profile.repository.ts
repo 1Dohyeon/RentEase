@@ -116,9 +116,13 @@ export class ProfileRepository {
    * @returns 업데이트된 사용자 엔티티
    * @throws HttpException 사용자를 찾을 수 없는 경우
    */
-  async deleteProfileImage(user: UserProfile): Promise<UserEntity> {
-    user.profileimage = null; // 프로필 이미지 삭제
-    return await this.repository.save(user);
+  async deleteProfileImage(user: UserProfile): Promise<UpdateResult> {
+    return await this.repository
+      .createQueryBuilder()
+      .update(user)
+      .set({ profileimage: null })
+      .where('id = :id', { id: user.id })
+      .execute();
   }
 
   /**
@@ -131,8 +135,12 @@ export class ProfileRepository {
   async replaceProfileImage(
     user: UserProfile,
     newProfileImageUrl: string,
-  ): Promise<UserEntity> {
-    user.profileimage = newProfileImageUrl; // 프로필 이미지 교체
-    return await this.repository.save(user);
+  ): Promise<UpdateResult> {
+    return await this.repository
+      .createQueryBuilder()
+      .update(user)
+      .set({ profileimage: newProfileImageUrl })
+      .where('id = :id', { id: user.id })
+      .execute();
   }
 }
