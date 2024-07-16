@@ -56,7 +56,7 @@ export class ProfileRepository {
   async addAddress(user: UserProfile, address: AddressEntity): Promise<void> {
     await this.repository
       .createQueryBuilder()
-      .relation(UserEntity, 'usersAddresses')
+      .relation(UserEntity, 'addresses')
       .of(user.id)
       .add(address.id);
   }
@@ -70,7 +70,7 @@ export class ProfileRepository {
   async removeAddress(user: UserProfile, addressId: number): Promise<void> {
     await this.repository
       .createQueryBuilder()
-      .relation(UserEntity, 'usersAddresses')
+      .relation(UserEntity, 'addresses')
       .of(user.id)
       .remove(addressId);
   }

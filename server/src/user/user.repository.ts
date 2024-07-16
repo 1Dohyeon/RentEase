@@ -67,6 +67,7 @@ export class UserRepository {
         'user.nickname',
         'user.createdAt',
         'user.updatedAt',
+        'user.profileimage',
         'address.id',
         'address.city',
         'address.district',

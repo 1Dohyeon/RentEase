@@ -16,6 +16,7 @@ interface Profile {
   createdAt: string;
   updatedAt: string;
   addresses: Address[];
+  profileimage: string; // profileimage 필드 추가
 }
 
 const ProfileSettingsComponent: React.FC = () => {
@@ -118,6 +119,28 @@ const ProfileSettingsComponent: React.FC = () => {
     }
   };
 
+  const handleDeleteProfileImage = async () => {
+    try {
+      await apiClient.delete("/settings/profile/profile-image");
+
+      alert("프로필 이미지가 삭제되었습니다.");
+      setProfile((prevProfile) => ({
+        ...prevProfile!,
+        profileimage: "", // 이미지 URL 초기화
+      }));
+    } catch (error: any) {
+      console.error("프로필 이미지 삭제 오류:", error);
+      let errorMessage = "프로필 이미지 삭제 중 오류가 발생했습니다.";
+
+      if (error.response && error.response.data) {
+        const { error: serverError } = error.response.data;
+        errorMessage = `${serverError}`;
+      }
+
+      alert(errorMessage);
+    }
+  };
+
   const handleAddressButtonClick = () => {
     navigate("/settings/profile/address");
   };
@@ -130,63 +153,84 @@ const ProfileSettingsComponent: React.FC = () => {
     <div>
       <div className="profile-settings">
         <h2>프로필 수정</h2>
-        <form>
+        <form
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
           <h3>프로필 이미지 설정</h3>
-          <div>
-            <div
-              className="imgContainer"
-              style={{
-                width: "200px",
-                height: "200px",
-                backgroundColor: "#d2d2d2",
-                margin: "20px 0",
-                textAlign: "center",
-              }}
-            >
-              {/* 이미지 들어갈 자리 */}
-              <input
-                type="file"
-                onChange={handleProfileImageChange}
-                accept="image/*"
-                style={{ display: "none" }}
-                id="profileImageInput"
+          <div
+            className="imgContainer"
+            style={{
+              width: "200px",
+              height: "200px",
+              backgroundColor: "#d2d2d2",
+              marginTop: "20px",
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            {/* 프로필 이미지 */}
+            {profile.profileimage && (
+              <img
+                src={profile.profileimage}
+                alt="프로필 이미지"
+                style={{ maxWidth: "100%", maxHeight: "100%" }}
               />
-              <label
-                htmlFor="profileImageInput"
+            )}
+          </div>
+          {/* 이미지 선택 및 설정 버튼 */}
+          <div style={{ textAlign: "center" }}>
+            {/* 이미지 삭제 버튼 */}
+            {profile.profileimage && (
+              <button
+                type="button"
+                className="deleteButton"
+                onClick={handleDeleteProfileImage}
                 style={{
-                  padding: "10px 20px",
-                  backgroundColor: "#7DB26B",
-                  color: "white",
-                  textDecoration: "none",
-                  border: "none",
-                  borderRadius: "5px",
+                  color: "red",
+                  fontSize: "14px",
                   cursor: "pointer",
-                  fontWeight: "600",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  marginBottom: "20px",
                 }}
               >
-                프로필 이미지 선택
-              </label>
-            </div>
+                프로필 이미지 삭제
+              </button>
+            )}
+            <br></br>
+            <input
+              type="file"
+              onChange={handleProfileImageChange}
+              accept="image/*"
+              id="profileImageInput"
+            />
+            <br />
             <button
               type="button"
-              onClick={handleProfileImageSubmit} // 이미지 설정 버튼 클릭 시 처리
+              onClick={handleProfileImageSubmit}
+              className="profileButton"
               style={{
                 padding: "10px 20px",
                 backgroundColor: "#7DB26B",
                 color: "white",
                 textDecoration: "none",
-                border: "none",
                 borderRadius: "5px",
                 cursor: "pointer",
                 fontWeight: "600",
-                margin: "0 20px",
-                marginBottom: "30px",
+                border: "none",
               }}
             >
               프로필 이미지 설정
             </button>
           </div>
         </form>
+
         <hr />
         <form onSubmit={(e) => e.preventDefault()}>
           <div>
@@ -210,7 +254,7 @@ const ProfileSettingsComponent: React.FC = () => {
           </div>
           <button
             type="submit"
-            onClick={handleSubmit} // 프로필 정보 수정 완료 버튼 클릭 시 처리
+            onClick={handleSubmit}
             style={{
               padding: "10px 20px",
               backgroundColor: "#7DB26B",

@@ -5,7 +5,6 @@ import {
   Get,
   HttpException,
   HttpStatus,
-  Param,
   Patch,
   Post,
   Query,
@@ -140,8 +139,8 @@ export class SettingController {
    */
   @Delete('/profile/profile-image')
   @UseGuards(JwtAuthGuard)
-  async deleteProfileImage(@Param('userId') userId: number) {
-    return await this.profileService.deleteProfileImage(userId);
+  async deleteProfileImage(@Request() req) {
+    return await this.profileService.deleteProfileImage(req.user.id);
   }
 
   /**

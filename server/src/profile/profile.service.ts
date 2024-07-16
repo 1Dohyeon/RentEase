@@ -46,6 +46,7 @@ export class ProfileService {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       addresses: user.addresses,
+      profileimage: user.profileimage,
     };
   }
 
