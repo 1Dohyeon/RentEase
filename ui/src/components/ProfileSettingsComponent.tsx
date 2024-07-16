@@ -88,8 +88,44 @@ const ProfileSettingsComponent: React.FC = () => {
     <div>
       <div className="profile-settings">
         <h2>프로필 수정</h2>
+        <form>
+          <h3>프로필 이미지 수정</h3>
+          <div>
+            <div
+              className="imgContainer"
+              style={{
+                width: "200px",
+                height: "200px",
+                backgroundColor: "#d2d2d2",
+                margin: "20px 0",
+                textAlign: "center",
+              }}
+            >
+              {/* 이미지 들어갈 자리 */}
+            </div>
+            <button
+              type="submit"
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#7DB26B",
+                color: "white",
+                textDecoration: "none",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                fontWeight: "600",
+                margin: "0 20px",
+                marginBottom: "30px",
+              }}
+            >
+              프로필 이미지 설정
+            </button>
+          </div>
+        </form>
+        <hr></hr>
         <form onSubmit={(e) => e.preventDefault()}>
           <div>
+            <h3 style={{ marginBottom: "10px" }}>정보 수정</h3>
             <label htmlFor="nickname">닉네임</label>
             <input
               type="text"
