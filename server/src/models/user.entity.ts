@@ -1,4 +1,10 @@
-import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { CommonEntity } from 'src/common/entity/common.entity';
 import { AddressEntity } from 'src/models/address.entity';
 import {
@@ -42,6 +48,12 @@ export class UserEntity extends CommonEntity {
   @Column({ type: 'boolean', default: false })
   isAdmin: boolean;
 
+  // 프로필 이미지 추가
+  @IsOptional()
+  @IsString()
+  @Column({ type: 'varchar', nullable: true }) // nullable: true로 설정
+  profileImage?: string;
+
   @ManyToMany(() => AddressEntity, (address) => address.users)
   @JoinTable({
     name: 'usersaddress',
@@ -69,6 +81,7 @@ export interface UserProfile {
   createdAt: Date;
   updatedAt: Date;
   addresses: AddressEntity[];
+  profileImage?: string;
 }
 
 /** 사용자 계정(실명, 이메일 포함) */

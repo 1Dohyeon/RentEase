@@ -90,4 +90,44 @@ export class ProfileRepository {
     await this.removeAddress(user, oldAddressId);
     await this.addAddress(user, newAddressEntity);
   }
+  /**
+   * 사용자 프로필 이미지 추가
+   * @param userId 사용자 ID
+   * @param profileImageUrl 프로필 이미지 URL
+   * @returns 업데이트된 사용자 엔티티
+   * @throws HttpException 사용자를 찾을 수 없는 경우
+   */
+  async addProfileImage(
+    user: UserProfile,
+    profileImageUrl: string,
+  ): Promise<UserProfile> {
+    user.profileImage = profileImageUrl; // 프로필 이미지 추가
+    return await this.repository.save(user);
+  }
+
+  /**
+   * 사용자 프로필 이미지 삭제
+   * @param userId 사용자 ID
+   * @returns 업데이트된 사용자 엔티티
+   * @throws HttpException 사용자를 찾을 수 없는 경우
+   */
+  async deleteProfileImage(user: UserProfile): Promise<UserEntity> {
+    user.profileImage = null; // 프로필 이미지 삭제
+    return await this.repository.save(user);
+  }
+
+  /**
+   * 사용자 프로필 이미지 교체
+   * @param userId 사용자 ID
+   * @param newProfileImageUrl 새로운 프로필 이미지 URL
+   * @returns 업데이트된 사용자 엔티티
+   * @throws HttpException 사용자를 찾을 수 없는 경우
+   */
+  async replaceProfileImage(
+    user: UserProfile,
+    newProfileImageUrl: string,
+  ): Promise<UserEntity> {
+    user.profileImage = newProfileImageUrl; // 프로필 이미지 교체
+    return await this.repository.save(user);
+  }
 }

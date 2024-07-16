@@ -3,18 +3,23 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
+  Param,
   Patch,
   Post,
   Query,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AccountService } from 'src/account/account.service';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { AddressEntity } from 'src/models/address.entity';
 import { UserAccount } from 'src/models/user.entity';
 import { ProfileService } from 'src/profile/profile.service';
-
 @Controller('settings')
 @UseGuards(JwtAuthGuard)
 export class SettingController {
@@ -99,6 +104,63 @@ export class SettingController {
       userId,
       oldAddressId,
       newAddress,
+    );
+  }
+
+  /**
+   * 사용자 프로필 이미지 추가
+   * @param userId 사용자 ID
+   * @param updateUserProfileImageDto 프로필 이미지 URL
+   * @returns 업데이트된 사용자 엔티티
+   */
+  @Patch(':userId/profile-image')
+  @UseInterceptors(FileInterceptor('file'))
+  async addProfileImage(
+    @Param('userId') userId: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new HttpException(
+        '프로필 이미지가 업로드되지 않았습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const profileImage = file.path;
+    return await this.profileService.addProfileImage(userId, profileImage);
+  }
+
+  /**
+   * 사용자 프로필 이미지 삭제
+   * @param userId 사용자 ID
+   * @returns 업데이트된 사용자 엔티티
+   */
+  @Delete(':userId/profile-image')
+  async deleteProfileImage(@Param('userId') userId: number) {
+    return await this.profileService.deleteProfileImage(userId);
+  }
+
+  /**
+   * 사용자 프로필 이미지 교체
+   * @param userId 사용자 ID
+   * @param updateUserProfileImageDto 새로운 프로필 이미지 URL
+   * @returns 업데이트된 사용자 엔티티
+   */
+  @Patch(':userId/profile-image/replace')
+  @UseInterceptors(FileInterceptor('file'))
+  async replaceProfileImage(
+    @Param('userId') userId: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new HttpException(
+        '새로운 프로필 이미지가 업로드되지 않았습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const newProfileImage = file.path;
+    return await this.profileService.replaceProfileImage(
+      userId,
+      newProfileImage,
     );
   }
 

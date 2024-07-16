@@ -254,4 +254,72 @@ export class ProfileService {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+  /**
+   * 사용자 프로필 이미지 추가
+   * @param userId 사용자 ID
+   * @param profileImageUrl 프로필 이미지 URL
+   * @returns 업데이트된 사용자 엔티티
+   * @throws HttpException 사용자를 찾을 수 없는 경우
+   */
+  async addProfileImage(
+    userId: number,
+    profileImageUrl: string,
+  ): Promise<UserProfile> {
+    const user = await this.userRepository.getUserInfoById(userId);
+
+    if (!user) {
+      throw new HttpException(
+        '사용자를 찾을 수 없습니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    await this.profileRepository.addProfileImage(user, profileImageUrl);
+    return await this.userRepository.getUserInfoById(userId);
+  }
+
+  /**
+   * 사용자 프로필 이미지 삭제
+   * @param userId 사용자 ID
+   * @returns 업데이트된 사용자 엔티티
+   * @throws HttpException 사용자를 찾을 수 없는 경우
+   */
+  async deleteProfileImage(userId: number): Promise<UserProfile> {
+    const user = await this.userRepository.getUserInfoById(userId);
+
+    if (!user) {
+      throw new HttpException(
+        '사용자를 찾을 수 없습니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    await this.profileRepository.deleteProfileImage(user);
+    return await this.userRepository.getUserInfoById(userId);
+  }
+
+  /**
+   * 사용자 프로필 이미지 교체
+   * @param userId 사용자 ID
+   * @param newProfileImageUrl 새로운 프로필 이미지 URL
+   * @returns 업데이트된 사용자 엔티티
+   * @throws HttpException 사용자를 찾을 수 없는 경우
+   */
+  async replaceProfileImage(
+    userId: number,
+    newProfileImageUrl: string,
+  ): Promise<UserProfile> {
+    const user = await this.userRepository.getUserInfoById(userId);
+
+    if (!user) {
+      throw new HttpException(
+        '사용자를 찾을 수 없습니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    await this.profileRepository.replaceProfileImage(user, newProfileImageUrl);
+    return await this.userRepository.getUserInfoById(userId);
+  }
 }
