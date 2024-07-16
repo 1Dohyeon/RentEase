@@ -66,6 +66,7 @@ export class SettingController {
    * @returns 생성된 주소 정보를 반환
    */
   @Post('/profile/address')
+  @UseGuards(JwtAuthGuard)
   async createAddress(
     @Request() req,
     @Body('address') address: string,
@@ -80,6 +81,7 @@ export class SettingController {
    * @returns 삭제된 주소 정보를 반환
    */
   @Delete('/profile/address')
+  @UseGuards(JwtAuthGuard)
   async removeAddress(
     @Query('userId') userId: number,
     @Query('addressId') addressId: number,
@@ -95,6 +97,7 @@ export class SettingController {
    * @returns 수정된 주소 정보를 반환
    */
   @Patch('/profile/address')
+  @UseGuards(JwtAuthGuard)
   async updateAddress(
     @Query('userId') userId: number,
     @Query('addressId') oldAddressId: number,
@@ -113,10 +116,11 @@ export class SettingController {
    * @param updateUserProfileImageDto 프로필 이미지 URL
    * @returns 업데이트된 사용자 엔티티
    */
-  @Patch(':userId/profile-image')
+  @Patch('/profile/profile-image')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async addProfileImage(
-    @Param('userId') userId: number,
+    @Request() req,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file) {
@@ -126,7 +130,7 @@ export class SettingController {
       );
     }
     const profileImage = file.path;
-    return await this.profileService.addProfileImage(userId, profileImage);
+    return await this.profileService.addProfileImage(req.user.id, profileImage);
   }
 
   /**
@@ -134,7 +138,8 @@ export class SettingController {
    * @param userId 사용자 ID
    * @returns 업데이트된 사용자 엔티티
    */
-  @Delete(':userId/profile-image')
+  @Delete('/profile/profile-image')
+  @UseGuards(JwtAuthGuard)
   async deleteProfileImage(@Param('userId') userId: number) {
     return await this.profileService.deleteProfileImage(userId);
   }
@@ -145,10 +150,11 @@ export class SettingController {
    * @param updateUserProfileImageDto 새로운 프로필 이미지 URL
    * @returns 업데이트된 사용자 엔티티
    */
-  @Patch(':userId/profile-image/replace')
+  @Patch('/profile/profile-image/replace')
   @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(JwtAuthGuard)
   async replaceProfileImage(
-    @Param('userId') userId: number,
+    @Request() req,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file) {
@@ -159,7 +165,7 @@ export class SettingController {
     }
     const newProfileImage = file.path;
     return await this.profileService.replaceProfileImage(
-      userId,
+      req.user.id,
       newProfileImage,
     );
   }

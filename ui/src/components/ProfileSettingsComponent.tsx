@@ -22,6 +22,7 @@ const ProfileSettingsComponent: React.FC = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [nickname, setNickname] = useState("");
   const [username, setUsername] = useState("");
+  const [profileImage, setProfileImage] = useState<File | null>(null); // 프로필 이미지 파일 상태 추가
   const [addresses, setAddresses] = useState<Address[]>([]);
   const navigate = useNavigate();
 
@@ -40,14 +41,6 @@ const ProfileSettingsComponent: React.FC = () => {
 
     fetchProfile();
   }, []);
-
-  const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNickname(e.target.value);
-  };
-
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
-  };
 
   const handleSubmit = async () => {
     const updatedProfileData = {
@@ -76,6 +69,55 @@ const ProfileSettingsComponent: React.FC = () => {
     }
   };
 
+  const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNickname(e.target.value);
+  };
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(e.target.value);
+  };
+
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setProfileImage(e.target.files[0]);
+    }
+  };
+
+  const handleProfileImageSubmit = async () => {
+    if (!profileImage) {
+      alert("이미지를 선택해주세요.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", profileImage);
+
+    try {
+      const response = await apiClient.patch(
+        "/settings/profile/profile-image",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      alert("프로필 이미지가 업데이트되었습니다.");
+      setProfile(response.data);
+    } catch (error: any) {
+      console.error("프로필 이미지 업데이트 오류:", error);
+      let errorMessage = "프로필 이미지 업데이트 중 오류가 발생했습니다.";
+
+      if (error.response && error.response.data) {
+        const { error: serverError } = error.response.data;
+        errorMessage = `${serverError}`;
+      }
+
+      alert(errorMessage);
+    }
+  };
+
   const handleAddressButtonClick = () => {
     navigate("/settings/profile/address");
   };
@@ -89,7 +131,7 @@ const ProfileSettingsComponent: React.FC = () => {
       <div className="profile-settings">
         <h2>프로필 수정</h2>
         <form>
-          <h3>프로필 이미지 수정</h3>
+          <h3>프로필 이미지 설정</h3>
           <div>
             <div
               className="imgContainer"
@@ -102,9 +144,32 @@ const ProfileSettingsComponent: React.FC = () => {
               }}
             >
               {/* 이미지 들어갈 자리 */}
+              <input
+                type="file"
+                onChange={handleProfileImageChange}
+                accept="image/*"
+                style={{ display: "none" }}
+                id="profileImageInput"
+              />
+              <label
+                htmlFor="profileImageInput"
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#7DB26B",
+                  color: "white",
+                  textDecoration: "none",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                }}
+              >
+                프로필 이미지 선택
+              </label>
             </div>
             <button
-              type="submit"
+              type="button"
+              onClick={handleProfileImageSubmit} // 이미지 설정 버튼 클릭 시 처리
               style={{
                 padding: "10px 20px",
                 backgroundColor: "#7DB26B",
@@ -122,7 +187,7 @@ const ProfileSettingsComponent: React.FC = () => {
             </button>
           </div>
         </form>
-        <hr></hr>
+        <hr />
         <form onSubmit={(e) => e.preventDefault()}>
           <div>
             <h3 style={{ marginBottom: "10px" }}>정보 수정</h3>
@@ -145,7 +210,7 @@ const ProfileSettingsComponent: React.FC = () => {
           </div>
           <button
             type="submit"
-            onClick={handleSubmit}
+            onClick={handleSubmit} // 프로필 정보 수정 완료 버튼 클릭 시 처리
             style={{
               padding: "10px 20px",
               backgroundColor: "#7DB26B",

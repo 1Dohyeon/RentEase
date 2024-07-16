@@ -52,7 +52,7 @@ export class UserEntity extends CommonEntity {
   @IsOptional()
   @IsString()
   @Column({ type: 'varchar', nullable: true }) // nullable: true로 설정
-  profileImage?: string;
+  profileimage?: string;
 
   @ManyToMany(() => AddressEntity, (address) => address.users)
   @JoinTable({
@@ -81,7 +81,7 @@ export interface UserProfile {
   createdAt: Date;
   updatedAt: Date;
   addresses: AddressEntity[];
-  profileImage?: string;
+  profileimage?: string;
 }
 
 /** 사용자 계정(실명, 이메일 포함) */

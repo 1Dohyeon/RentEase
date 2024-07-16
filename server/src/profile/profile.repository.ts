@@ -56,7 +56,7 @@ export class ProfileRepository {
   async addAddress(user: UserProfile, address: AddressEntity): Promise<void> {
     await this.repository
       .createQueryBuilder()
-      .relation(UserEntity, 'addresses')
+      .relation(UserEntity, 'usersAddresses')
       .of(user.id)
       .add(address.id);
   }
@@ -70,7 +70,7 @@ export class ProfileRepository {
   async removeAddress(user: UserProfile, addressId: number): Promise<void> {
     await this.repository
       .createQueryBuilder()
-      .relation(UserEntity, 'addresses')
+      .relation(UserEntity, 'usersAddresses')
       .of(user.id)
       .remove(addressId);
   }
@@ -90,6 +90,7 @@ export class ProfileRepository {
     await this.removeAddress(user, oldAddressId);
     await this.addAddress(user, newAddressEntity);
   }
+
   /**
    * 사용자 프로필 이미지 추가
    * @param userId 사용자 ID
@@ -100,9 +101,13 @@ export class ProfileRepository {
   async addProfileImage(
     user: UserProfile,
     profileImageUrl: string,
-  ): Promise<UserProfile> {
-    user.profileImage = profileImageUrl; // 프로필 이미지 추가
-    return await this.repository.save(user);
+  ): Promise<UpdateResult> {
+    return await this.repository
+      .createQueryBuilder()
+      .update(user)
+      .set({ profileimage: profileImageUrl })
+      .where('id = :id', { id: user.id })
+      .execute();
   }
 
   /**
@@ -112,7 +117,7 @@ export class ProfileRepository {
    * @throws HttpException 사용자를 찾을 수 없는 경우
    */
   async deleteProfileImage(user: UserProfile): Promise<UserEntity> {
-    user.profileImage = null; // 프로필 이미지 삭제
+    user.profileimage = null; // 프로필 이미지 삭제
     return await this.repository.save(user);
   }
 
@@ -127,7 +132,7 @@ export class ProfileRepository {
     user: UserProfile,
     newProfileImageUrl: string,
   ): Promise<UserEntity> {
-    user.profileImage = newProfileImageUrl; // 프로필 이미지 교체
+    user.profileimage = newProfileImageUrl; // 프로필 이미지 교체
     return await this.repository.save(user);
   }
 }
