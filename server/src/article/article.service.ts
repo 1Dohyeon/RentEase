@@ -24,18 +24,51 @@ export class ArticleService {
    * @returns 모든 게시글의 배너 정보를 반환
    * @throws HttpException 게시글을 찾을 수 없는 경우
    */
-  async getAllArticles(): Promise<ArticleBanner[] | undefined> {
-    const articles: ArticleBanner[] =
-      await this.articleRepository.getAllArticles();
+  async getAllArticles(userId?: number): Promise<ArticleBanner[] | undefined> {
+    if (userId) {
+      const user = await this.userService.getUserById(userId);
 
-    if (!articles) {
-      throw new HttpException(
-        '게시글을 찾을 수 없습니다.',
-        HttpStatus.BAD_REQUEST,
-      );
+      if (!user) {
+        throw new HttpException(
+          '사용자를 찾을 수 없습니다.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const addressIds = user.addresses.map((address) => address.id);
+
+      // 사용자 주소와 일치하는 게시글 조회
+      const articlesByLocation =
+        await this.articleRepository.getArticlesByLocation(addressIds);
+
+      // 사용자 주소와 일치하지 않는 게시글 조회
+      const articlesNotByLocation =
+        await this.articleRepository.getArticlesNotByLocation(addressIds);
+
+      // 두 결과를 결합
+      const allArticles = [...articlesByLocation, ...articlesNotByLocation];
+
+      if (!allArticles || allArticles.length === 0) {
+        throw new HttpException(
+          '게시글을 찾을 수 없습니다.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      return allArticles;
+    } else {
+      const articles: ArticleBanner[] =
+        await this.articleRepository.getAllArticles();
+
+      if (!articles) {
+        throw new HttpException(
+          '게시글을 찾을 수 없습니다.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      return articles;
     }
-
-    return articles;
   }
 
   /**

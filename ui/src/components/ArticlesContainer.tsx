@@ -1,5 +1,5 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
+import apiClient from "../utils/apiClient";
 import Article from "./Article";
 
 interface Address {
@@ -48,7 +48,7 @@ const ArticlesContainer: React.FC<ArticlesContainerProps> = ({
         if (selectedCategoryId !== null) {
           api += `/category?categoryId=${selectedCategoryId}`;
         }
-        const response = await axios.get<ArticleData[]>(api);
+        const response = await apiClient.get<ArticleData[]>(api);
         setArticles(response.data);
         setLoading(false);
       } catch (error) {

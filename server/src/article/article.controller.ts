@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
+import { OptionalAuthGuard } from 'src/auth/jwt/jwt.optionalAuthGuard';
 import { AddressEntity } from 'src/models/address.entity';
 import {
   ArticleBanner,
@@ -29,8 +30,11 @@ export class ArticleController {
    * @returns 모든 게시글의 배너 정보를 반환
    */
   @Get()
-  async getAllArticles(): Promise<ArticleBanner[]> {
-    return await this.articleService.getAllArticles();
+  @UseGuards(OptionalAuthGuard)
+  async getAllArticles(@Request() req): Promise<ArticleBanner[]> {
+    const userId = req.user ? req.user.id : null;
+    console.log(userId);
+    return await this.articleService.getAllArticles(userId);
   }
 
   /**
