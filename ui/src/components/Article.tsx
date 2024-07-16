@@ -141,9 +141,9 @@ const Article: React.FC<ArticleProps> = ({
             position: "absolute",
             top: "10px",
             right: "10px",
-            fill: isBookmarked ? "red" : "none", // 북마크 여부에 따라 색상 변경
-            stroke: "currentColor",
-            strokeWidth: "2",
+            fill: isBookmarked ? "hotpink" : "none", // 북마크 여부에 따라 색상 변경
+            stroke: "white", // 테두리 색상 흰색으로 변경
+            strokeWidth: "1.5",
             strokeLinecap: "round",
             strokeLinejoin: "round",
             cursor: "pointer",
@@ -151,7 +151,7 @@ const Article: React.FC<ArticleProps> = ({
           onClick={handleBookmarkClick} // 클릭 이벤트 핸들러 추가
         >
           <path
-            stroke="currentColor"
+            stroke="white"
             d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
           />
         </svg>
