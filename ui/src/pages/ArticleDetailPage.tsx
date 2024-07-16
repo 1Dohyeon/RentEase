@@ -287,9 +287,6 @@ const ArticleDetailPage: React.FC = () => {
               {index < article.addresses.length - 1 ? ", " : ""}
             </span>
           ))}
-          <span style={{ fontSize: "16px" }}>
-            , 다른 지역 등등등(주소가 긴 경우를 테스트하기 위해서 놔둠)
-          </span>
         </div>
         {/* 별점 */}
         <div

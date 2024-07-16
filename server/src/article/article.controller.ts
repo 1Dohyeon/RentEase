@@ -33,7 +33,6 @@ export class ArticleController {
   @UseGuards(OptionalAuthGuard)
   async getAllArticles(@Request() req): Promise<ArticleBanner[]> {
     const userId = req.user ? req.user.id : null;
-    console.log(userId);
     return await this.articleService.getAllArticles(userId);
   }
 
@@ -44,51 +43,13 @@ export class ArticleController {
    * 예: /articles/category?categoryId=1
    */
   @Get('category')
+  @UseGuards(OptionalAuthGuard)
   async getArticlesByCategory(
-    @Query('categoryId') categoryId: number,
-  ): Promise<ArticleBanner[]> {
-    return await this.articleService.getArticlesByCategory(categoryId);
-  }
-
-  /**
-   * 사용자 주소 정보와 동일한 게시글만 조회
-   * @param req 요청 객체, JWT 토큰을 통해 사용자 정보를 확인
-   * @param isLocation 사용자 위치 정보를 반영할지 여부
-   * @returns 사용자 주소 정보와 동일한 게시글의 배너 정보를 반환
-   * 예: /articles/location?location=true
-   */
-  @Get('location')
-  @UseGuards(JwtAuthGuard)
-  async getArticlesByLocation(
-    @Request() req,
-    @Query('isLocation') isLocation: boolean,
-  ): Promise<ArticleBanner[]> {
-    return await this.articleService.getArticlesByLocation(
-      req.user.id,
-      isLocation,
-    );
-  }
-
-  /**
-   * 특정 카테고리에서 사용자 주소 정보와 동일한 게시글만 조회
-   * @param req 요청 객체, JWT 토큰을 통해 사용자 정보를 확인
-   * @param categoryId 카테고리 ID
-   * @param isLocation 사용자 위치 정보를 반영할지 여부
-   * @returns 해당 카테고리와 사용자 주소 정보와 일치하는 게시글의 배너 정보를 반환
-   * 예: /articles/category-location?categoryId=1&location=true
-   */
-  @Get('category-location')
-  @UseGuards(JwtAuthGuard)
-  async getArticlesByCategoryAndLocation(
     @Request() req,
     @Query('categoryId') categoryId: number,
-    @Query('isLocation') isLocation: boolean,
   ): Promise<ArticleBanner[]> {
-    return await this.articleService.getArticlesByCategoryAndLocation(
-      req.user.id,
-      categoryId,
-      isLocation,
-    );
+    const userId = req.user ? req.user.id : null;
+    return await this.articleService.getArticlesByCategory(userId, categoryId);
   }
 
   /**

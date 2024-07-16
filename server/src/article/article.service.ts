@@ -20,22 +20,46 @@ export class ArticleService {
   ) {}
 
   /**
-   * 모든 게시글 조회 (기본)
+   * 중복되지 않는 게시글을 Map에 추가하는 메서드
+   * @param articleMap 게시글을 담을 Map 객체
+   * @param articles 게시글 배열
+   */
+  private addUniqueArticles(
+    articleMap: Map<number, ArticleBanner>,
+    articles: ArticleBanner[],
+  ) {
+    articles.forEach((article) => {
+      if (!articleMap.has(article.id)) {
+        articleMap.set(article.id, article);
+      }
+    });
+  }
+
+  /**
+   * 모든 게시글 조회 사용자 주소와 일치하는 게시글 우선(기본)
+   * @param userId 사용자 ID (선택적)
    * @returns 모든 게시글의 배너 정보를 반환
-   * @throws HttpException 게시글을 찾을 수 없는 경우
+   * @throws {HttpException} 게시글을 찾을 수 없는 경우
    */
   async getAllArticles(userId?: number): Promise<ArticleBanner[] | undefined> {
     if (userId) {
       const user = await this.userService.getUserById(userId);
-
-      if (!user) {
-        throw new HttpException(
-          '사용자를 찾을 수 없습니다.',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
       const addressIds = user.addresses.map((address) => address.id);
+
+      // 로그인한 사용자이지만 설정한 주소가 없을 경우
+      if (addressIds.length === 0) {
+        const articles: ArticleBanner[] =
+          await this.articleRepository.getAllArticles();
+
+        if (!articles) {
+          throw new HttpException(
+            '게시글을 찾을 수 없습니다.',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        return articles;
+      }
 
       // 사용자 주소와 일치하는 게시글 조회
       const articlesByLocation =
@@ -45,9 +69,15 @@ export class ArticleService {
       const articlesNotByLocation =
         await this.articleRepository.getArticlesNotByLocation(addressIds);
 
-      // 두 결과를 결합
-      const allArticles = [...articlesByLocation, ...articlesNotByLocation];
+      // 두 결과를 결합하고 중복 제거
+      const allArticlesMap = new Map<number, ArticleBanner>();
+      this.addUniqueArticles(allArticlesMap, articlesByLocation);
+      this.addUniqueArticles(allArticlesMap, articlesNotByLocation);
 
+      // Map을 Array로 변환
+      const allArticles = Array.from(allArticlesMap.values());
+
+      // 게시글이 없을 경우 예외 처리
       if (!allArticles || allArticles.length === 0) {
         throw new HttpException(
           '게시글을 찾을 수 없습니다.',
@@ -72,17 +102,18 @@ export class ArticleService {
   }
 
   /**
-   * 특정 카테고리에 속한 게시글 조회
+   * 특정 카테고리에 속한 게시글 조회, 사용자 주소와 일치한 게시글 우선
+   * @param userId 사용자 ID (선택적)
    * @param categoryId 카테고리 ID
    * @returns 해당 카테고리에 속한 게시글의 배너 정보를 반환
-   * @throws HttpException 카테고리를 찾을 수 없는 경우
+   * @throws {HttpException} 카테고리를 찾을 수 없는 경우 또는 게시글을 찾을 수 없는 경우
    */
   async getArticlesByCategory(
-    categoryId: number,
+    userId?: number,
+    categoryId?: number,
   ): Promise<ArticleBanner[] | undefined> {
     // 카테고리 id 존재 여부 예외 처리
     const category = await this.categoryRepository.getCategoryById(categoryId);
-
     if (!category) {
       throw new HttpException(
         `카테고리 ID ${categoryId}에 해당하는 카테고리를 찾을 수 없습니다.`,
@@ -90,77 +121,15 @@ export class ArticleService {
       );
     }
 
-    return await this.articleRepository.getArticlesByCategory(categoryId);
-  }
+    // 로그인한 사용자일 경우
+    if (userId) {
+      const user = await this.userService.getUserById(userId);
+      const addressIds = user.addresses.map((address) => address.id);
 
-  /**
-   * 사용자 주소 정보와 동일한 게시글만 조회
-   * @param userId 사용자 ID
-   * @param isLocation 위치 기반 검색 여부
-   * @returns 사용자 주소 정보와 동일한 게시글의 배너 정보를 반환
-   * @throws HttpException 사용자 주소를 찾을 수 없는 경우
-   */
-  async getArticlesByLocation(
-    userId: number,
-    isLocation: boolean,
-  ): Promise<ArticleBanner[] | undefined> {
-    // 위치 기반 검색이 아닌 경우 모든 게시글 반환
-    if (!isLocation) {
-      const articles = await this.articleRepository.getAllArticles();
-
-      if (!articles) {
-        throw new HttpException(
-          '게시글을 찾을 수 없습니다.',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      return articles;
-    }
-
-    const author = await this.userService.getUserById(userId);
-
-    // 사용자 주소 존재 여부 예외 처리
-    if (!author.addresses || author.addresses.length === 0) {
-      throw new HttpException(
-        '사용자 주소를 찾을 수 없습니다. 주소를 설정해주세요.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    // address id 배열로 저장
-    const addressIds = author.addresses.map((address) => address.id);
-
-    return await this.articleRepository.getArticlesByLocation(addressIds);
-  }
-
-  /**
-   * 특정 카테고리에서 사용자 주소 정보와 동일한 게시글 조회
-   * @param userId 사용자 ID
-   * @param categoryId 카테고리 ID
-   * @param isLocation 위치 기반 검색 여부
-   * @returns 해당 카테고리와 사용자 주소 정보와 일치하는 게시글의 배너 정보를 반환
-   * @throws HttpException 카테고리를 찾을 수 없는 경우 또는 사용자 주소를 찾을 수 없는 경우
-   */
-  async getArticlesByCategoryAndLocation(
-    userId: number,
-    categoryId: number,
-    isLocation: boolean,
-  ): Promise<ArticleBanner[] | undefined> {
-    // 카테고리 id 존재 여부 예외 처리
-    const category = await this.categoryRepository.getCategoryById(categoryId);
-
-    if (!category) {
-      throw new HttpException(
-        `카테고리 ID ${categoryId}에 해당하는 카테고리를 찾을 수 없습니다.`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    // 위치 기반 검색이 아닌 경우 모든 게시글 반환
-    if (!isLocation) {
-      if (!isLocation) {
-        const articles = await this.articleRepository.getAllArticles();
+      // 로그인은 했지만 설정한 주소가 없을 경우
+      if (addressIds.length === 0) {
+        const articles: ArticleBanner[] =
+          await this.articleRepository.getArticlesByCategory(categoryId);
 
         if (!articles) {
           throw new HttpException(
@@ -171,25 +140,41 @@ export class ArticleService {
 
         return articles;
       }
+
+      // 사용자 주소와 일치하는 카테고리의 게시글 조회
+      const articlesByLocation =
+        await this.articleRepository.getArticlesByCategoryAndLocation(
+          categoryId,
+          addressIds,
+        );
+
+      // 사용자 주소와 일치하지 않는 카테고리의 게시글 조회
+      const articlesNotByLocation =
+        await this.articleRepository.getArticlesByCategoryAndNotLocation(
+          categoryId,
+          addressIds,
+        );
+
+      // 두 결과를 결합하고 중복 제거
+      const allArticlesMap = new Map<number, ArticleBanner>();
+      this.addUniqueArticles(allArticlesMap, articlesByLocation);
+      this.addUniqueArticles(allArticlesMap, articlesNotByLocation);
+
+      // Map을 Array로 변환
+      const allArticles = Array.from(allArticlesMap.values());
+
+      // 게시글이 없을 경우 예외 처리
+      if (!allArticles || allArticles.length === 0) {
+        throw new HttpException(
+          '게시글을 찾을 수 없습니다.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      return allArticles;
+    } else {
+      return await this.articleRepository.getArticlesByCategory(categoryId);
     }
-
-    const author = await this.userService.getUserById(userId);
-
-    // 사용자 주소 존재 여부 예외 처리
-    if (!author.addresses || author.addresses.length === 0) {
-      throw new HttpException(
-        '사용자 주소를 찾을 수 없습니다. 주소를 설정해주세요.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    // address id 배열로 저장
-    const addressIds = author.addresses.map((address) => address.id);
-
-    return await this.articleRepository.getArticlesByCategoryAndLocation(
-      categoryId,
-      addressIds,
-    );
   }
 
   /**

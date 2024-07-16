@@ -146,6 +146,49 @@ export class ArticleRepository {
   }
 
   /**
+   * 사용자 주소 정보와 일치하지 않는 게시글만 조회
+   * @param addressIds 사용자 주소 ID 배열
+   * @returns 사용자 주소 정보와 일치하지 않는 게시글의 배너 정보를 반환
+   */
+  async getArticlesNotByLocation(
+    addressIds: number[],
+  ): Promise<ArticleBanner[]> {
+    const articles = await this.repository
+      .createQueryBuilder('article')
+      .select([
+        'article.id',
+        'article.title',
+        'article.dailyprice',
+        'article.currency',
+        'article.createdTimeSince',
+        'article.avgnumofstars',
+        'address.id',
+        'address.city',
+        'address.district',
+        'category.id',
+        'category.title',
+        'author.id',
+        'author.nickname',
+        'review.numofstars',
+      ])
+      .leftJoin('article.addresses', 'address')
+      .leftJoin('article.categories', 'category')
+      .leftJoin('article.author', 'author')
+      .leftJoin('article.reviews', 'review')
+      .where('address.id NOT IN (:...addressIds)', { addressIds })
+      .andWhere('article.isDeleted = false')
+      .andWhere('author.isDeleted = false')
+      .orderBy('article.avgnumofstars', 'DESC') // avgnumofstars를 큰 순서대로 정렬
+      .addOrderBy('article.createdAt', 'DESC') // createdAt을 최신순으로 정렬
+      .getMany();
+
+    return articles.map((article) => ({
+      ...article,
+      createdTimeSince: timeSince(article.createdTimeSince),
+    }));
+  }
+
+  /**
    * 특정 카테고리에서 사용자 주소 정보와 동일한 게시글 조회
    * @param categoryId 카테고리 ID
    * @param addressIds 사용자의 주소 ID 배열
@@ -196,46 +239,53 @@ export class ArticleRepository {
   }
 
   /**
-   * 사용자 주소 정보와 일치하지 않는 게시글만 조회
-   * @param addressIds 사용자 주소 ID 배열
-   * @returns 사용자 주소 정보와 일치하지 않는 게시글의 배너 정보를 반환
+   * 특정 카테고리에서 사용자 주소 정보와 일치하지 않는 게시글 조회
+   * @param categoryId 카테고리 ID
+   * @param addressIds 사용자의 주소 ID 배열
+   * @returns 해당 카테고리와 사용자 주소 정보와 일치하는 게시글의 배너 정보를 반환
    */
-  async getArticlesNotByLocation(
+  async getArticlesByCategoryAndNotLocation(
+    categoryId: number,
     addressIds: number[],
-  ): Promise<ArticleBanner[]> {
-    const articles = await this.repository
-      .createQueryBuilder('article')
-      .select([
-        'article.id',
-        'article.title',
-        'article.dailyprice',
-        'article.currency',
-        'article.createdTimeSince',
-        'article.avgnumofstars',
-        'address.id',
-        'address.city',
-        'address.district',
-        'category.id',
-        'category.title',
-        'author.id',
-        'author.nickname',
-        'review.numofstars',
-      ])
-      .leftJoin('article.addresses', 'address')
-      .leftJoin('article.categories', 'category')
-      .leftJoin('article.author', 'author')
-      .leftJoin('article.reviews', 'review')
-      .where('address.id NOT IN (:...addressIds)', { addressIds })
-      .andWhere('article.isDeleted = false')
-      .andWhere('author.isDeleted = false')
-      .orderBy('article.avgnumofstars', 'DESC') // avgnumofstars를 큰 순서대로 정렬
-      .addOrderBy('article.createdAt', 'DESC') // createdAt을 최신순으로 정렬
-      .getMany();
+  ): Promise<ArticleBanner[] | undefined> {
+    try {
+      const articles = await this.repository
+        .createQueryBuilder('article')
+        .select([
+          'article.id',
+          'article.title',
+          'article.dailyprice',
+          'article.currency',
+          'article.createdTimeSince',
+          'article.avgnumofstars',
+          'address.id',
+          'address.city',
+          'address.district',
+          'category.id',
+          'category.title',
+          'author.id',
+          'author.nickname',
+          'review.numofstars',
+        ])
+        .leftJoin('article.addresses', 'address')
+        .leftJoin('article.categories', 'category')
+        .leftJoin('article.author', 'author')
+        .leftJoin('article.reviews', 'review')
+        .where('category.id = :categoryId', { categoryId })
+        .andWhere('address.id NOT IN (:...addressIds)', { addressIds })
+        .andWhere('article.isDeleted = false')
+        .andWhere('author.isDeleted = false')
+        .orderBy('article.avgnumofstars', 'DESC') // avgnumofstars를 큰 순서대로 정렬
+        .addOrderBy('article.createdAt', 'DESC') // createdAt을 최신순으로 정렬
+        .getMany();
 
-    return articles.map((article) => ({
-      ...article,
-      createdTimeSince: timeSince(article.createdTimeSince),
-    }));
+      return articles.map((article) => ({
+        ...article,
+        createdTimeSince: timeSince(article.createdTimeSince),
+      }));
+    } catch (err) {
+      throw new BadRequestException('AR: 알 수 없는 에러가 발생하였습니다.');
+    }
   }
 
   /**
