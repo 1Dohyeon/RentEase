@@ -439,6 +439,7 @@ export class ArticleRepository {
         'article.currency',
         'article.createdTimeSince',
         'article.avgnumofstars',
+        'article.mainImage',
         'address.id',
         'address.city',
         'address.district',

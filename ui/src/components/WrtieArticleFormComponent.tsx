@@ -22,6 +22,7 @@ interface Article {
   weeklyprice: string;
   monthlyprice: string;
   currency: string;
+  mainImage?: string;
   categories: Category[];
   addresses: Address[];
 }
@@ -60,6 +61,13 @@ const WriteArticleFormComponent: React.FC = () => {
       ? existingArticle.addresses.map((addr: Address) => addr.id)
       : []
   );
+  const [mainImage, setMainImage] = useState<File | null>(null); // 이미지 파일 상태 추가
+  const [mainImagePreview, setMainImagePreview] = useState<string | null>(
+    existingArticle && existingArticle.mainImage
+      ? existingArticle.mainImage
+      : null
+  );
+
   const navigate = useNavigate(); // useNavigate 훅 사용
 
   useEffect(() => {
@@ -184,6 +192,19 @@ const WriteArticleFormComponent: React.FC = () => {
     }
   };
 
+  const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setMainImage(file);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMainImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div>
       <form className="article-form" onSubmit={(e) => e.preventDefault()}>
@@ -195,6 +216,26 @@ const WriteArticleFormComponent: React.FC = () => {
             placeholder="제목을 입력해주세요."
             onChange={(e) => setTitle(e.target.value)}
           />
+        </div>
+        <h3 style={{ marginTop: "20px" }}>메인 이미지 설정</h3>
+        <div>
+          {mainImagePreview && (
+            <div>
+              <img
+                src={mainImagePreview}
+                alt="메인 이미지"
+                style={{ maxWidth: "100%", maxHeight: "200px" }}
+              />
+            </div>
+          )}
+          <div style={{ textAlign: "center" }}>
+            <input
+              type="file"
+              onChange={handleMainImageChange}
+              accept="image/*"
+              id="mainImageInput"
+            />
+          </div>
         </div>
 
         <h3 style={{ marginTop: "20px" }}>가격 설정</h3>

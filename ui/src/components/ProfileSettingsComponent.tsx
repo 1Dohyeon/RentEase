@@ -24,6 +24,9 @@ const ProfileSettingsComponent: React.FC = () => {
   const [nickname, setNickname] = useState("");
   const [username, setUsername] = useState("");
   const [profileImage, setProfileImage] = useState<File | null>(null); // 프로필 이미지 파일 상태 추가
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
+    profile ? profile.profileimage : null
+  ); // 이미지 미리 보기 상태 추가
   const [addresses, setAddresses] = useState<Address[]>([]);
   const navigate = useNavigate();
 
@@ -80,7 +83,14 @@ const ProfileSettingsComponent: React.FC = () => {
 
   const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setProfileImage(e.target.files[0]);
+      const file = e.target.files[0];
+      setProfileImage(file);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -175,7 +185,14 @@ const ProfileSettingsComponent: React.FC = () => {
             }}
           >
             {/* 프로필 이미지 */}
-            {profile.profileimage && (
+            {profileImagePreview && (
+              <img
+                src={profileImagePreview}
+                alt="프로필 이미지"
+                style={{ maxWidth: "100%", maxHeight: "100%" }}
+              />
+            )}
+            {!profileImagePreview && profile.profileimage && (
               <img
                 src={profile.profileimage}
                 alt="프로필 이미지"
