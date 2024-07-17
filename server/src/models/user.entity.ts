@@ -51,7 +51,7 @@ export class UserEntity extends CommonEntity {
   // 프로필 이미지 추가
   @IsOptional()
   @IsString()
-  @Column({ type: 'varchar', nullable: true }) // nullable: true로 설정
+  @Column({ type: 'varchar', nullable: true })
   profileimage?: string;
 
   @ManyToMany(() => AddressEntity, (address) => address.users)
