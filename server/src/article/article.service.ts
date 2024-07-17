@@ -201,6 +201,7 @@ export class ArticleService {
     categories: CategoryEntity[],
     weeklyprice?: number,
     monthlyprice?: number,
+    mainImage?: string,
   ): Promise<ArticleEntity> {
     const author = await this.userService.getUserById(userId);
 
@@ -233,6 +234,7 @@ export class ArticleService {
       categories,
       weeklyprice,
       monthlyprice,
+      mainImage,
     );
 
     return await this.getArticleById(newArticle.id);
@@ -312,6 +314,7 @@ export class ArticleService {
    * 게시글 정보 업데이트
    * @param articleId 게시글 ID
    * @param updateStatus 업데이트할 필드와 값
+   * @param mainImageUrl 업데이트할 메인 이미지 URL
    * @returns 업데이트된 게시글의 상세 정보를 반환
    * @throws HttpException 게시글을 찾을 수 없는 경우
    * @throws HttpException 업데이트에 실패한 경우
@@ -319,6 +322,7 @@ export class ArticleService {
   async updateArticle(
     articleId: number,
     updateStatus: Partial<ArticleEntity>,
+    mainImageUrl?: string,
   ): Promise<ArticleDetail> {
     // 변경할 필드와 값 준비
     const updateFields: { [key: string]: any } = {};
@@ -337,6 +341,11 @@ export class ArticleService {
     if (updateStatus.currency) updateFields.currency = updateStatus.currency;
 
     await this.articleRepository.updateArticleInfo(articleId, updateFields);
+
+    if (mainImageUrl) {
+      await this.articleRepository.updateMainImage(article, mainImageUrl);
+    }
+
     if (updateStatus.categories) {
       await this.articleRepository.updateArticleCategory(
         article,
@@ -354,6 +363,19 @@ export class ArticleService {
     }
 
     return await this.getArticleDetailById(articleId);
+  }
+
+  /**
+   * 게시글 메인 이미지 삭제
+   * @param articleId 게시글 ID
+   * @returns 업데이트된 게시글 엔티티
+   * @throws HttpException 게시글을 찾을 수 없는 경우
+   */
+  async deleteMainImage(articleId: number): Promise<ArticleEntity> {
+    const article = await this.getArticleById(articleId);
+
+    await this.articleRepository.deleteMainImage(article);
+    return await this.getArticleById(articleId);
   }
 
   /**

@@ -1,14 +1,18 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
   Query,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { OptionalAuthGuard } from 'src/auth/jwt/jwt.optionalAuthGuard';
 import { AddressEntity } from 'src/models/address.entity';
@@ -63,10 +67,12 @@ export class ArticleController {
    * @param categories 게시글에 연결할 카테고리
    * @param weeklyprice 주간 가격 (선택 사항)
    * @param monthlyprice 월간 가격 (선택 사항)
+   * @param file 업로드된 파일 (메인 이미지)
    * @returns 생성된 게시글 정보를 반환
    */
   @Post('write')
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
   async createArticle(
     @Request() req,
     @Body('title') title: string,
@@ -77,7 +83,9 @@ export class ArticleController {
     @Body('categories') categories: CategoryEntity[],
     @Body('weeklyprice') weeklyprice?: number,
     @Body('monthlyprice') monthlyprice?: number,
+    @UploadedFile() file?: Express.Multer.File,
   ): Promise<ArticleEntity> {
+    const mainImage = file ? file.filename : null; // 파일명이 저장될 mainImage
     return await this.articleService.createArticle(
       req.user.id,
       title,
@@ -88,6 +96,7 @@ export class ArticleController {
       categories,
       weeklyprice,
       monthlyprice,
+      mainImage,
     );
   }
 
@@ -120,14 +129,29 @@ export class ArticleController {
    * article 업데이트
    * @param articleId 게시글 ID
    * @param body 업데이트할 게시글 정보
+   * @param file 업로드된 파일 (메인 이미지)
    * @returns 업데이트된 게시글 정보를 반환
    */
   @Patch('edit/:articleId')
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
   async updateArticle(
     @Param('articleId') articleId: number,
     @Body() body,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<ArticleDetail> {
-    return await this.articleService.updateArticle(articleId, body);
+    const mainImage = file ? file.filename : null; // 파일명이 저장될 mainImage
+    return await this.articleService.updateArticle(articleId, body, mainImage);
+  }
+
+  /**
+   * 게시글 메인 이미지 삭제
+   * @param articleId 게시글 ID
+   * @returns 업데이트된 게시글 엔티티
+   */
+  @Delete(':articleId/main-image')
+  @UseGuards(JwtAuthGuard)
+  async deleteMainImage(@Param('articleId') articleId: number) {
+    return await this.articleService.deleteMainImage(articleId);
   }
 }

@@ -10,7 +10,7 @@ import {
 } from 'src/models/article.entity';
 import { CategoryEntity } from 'src/models/category.entity';
 import { UserEntity } from 'src/models/user.entity';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class ArticleRepository {
@@ -358,6 +358,7 @@ export class ArticleRepository {
     categories: CategoryEntity[],
     weeklyprice?: number,
     monthlyprice?: number,
+    mainImage?: string,
   ): Promise<ArticleEntity> {
     const article = this.repository.create({
       title,
@@ -369,6 +370,7 @@ export class ArticleRepository {
       categories,
       weeklyprice,
       monthlyprice,
+      mainImage, // mainImage 필드를 추가합니다.
     });
     return await this.repository.save(article);
   }
@@ -540,6 +542,32 @@ export class ArticleRepository {
       .update(ArticleEntity)
       .set({ avgnumofstars: newAvg })
       .where('id = :id', { id: articleId })
+      .execute();
+  }
+
+  async updateMainImage(
+    article: ArticleEntity,
+    mainImageUrl: string,
+  ): Promise<UpdateResult> {
+    return await this.repository
+      .createQueryBuilder()
+      .update(article)
+      .set({ mainImage: mainImageUrl })
+      .where('id = :id', { id: article.id })
+      .execute();
+  }
+
+  /**
+   * 게시글 메인 이미지 삭제
+   * @param article 게시글
+   * @returns 업데이트된 게시글 엔티티
+   */
+  async deleteMainImage(article: ArticleEntity): Promise<UpdateResult> {
+    return await this.repository
+      .createQueryBuilder()
+      .update(ArticleEntity)
+      .set({ mainImage: null })
+      .where('id = :id', { id: article.id })
       .execute();
   }
 }

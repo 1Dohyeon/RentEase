@@ -75,17 +75,11 @@ export class ArticleEntity extends CommonEntity {
   })
   avgnumofstars: number;
 
-  // 프로필 이미지 추가
+  // 메인 이미지 추가
   @IsOptional()
   @IsString()
   @Column({ type: 'varchar', nullable: true })
   mainImage?: string;
-
-  // 프로필 이미지 추가
-  @IsOptional()
-  @IsString()
-  @Column({ type: 'varchar', nullable: true })
-  subImages?: string;
 
   @ManyToOne(() => UserEntity, (user) => user.articles)
   @JoinColumn({ name: 'authorid' })

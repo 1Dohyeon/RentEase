@@ -104,7 +104,7 @@ export class ProfileRepository {
   ): Promise<UpdateResult> {
     return await this.repository
       .createQueryBuilder()
-      .update(user)
+      .update(UserEntity)
       .set({ profileimage: profileImageUrl })
       .where('id = :id', { id: user.id })
       .execute();
@@ -112,14 +112,13 @@ export class ProfileRepository {
 
   /**
    * 사용자 프로필 이미지 삭제
-   * @param userId 사용자 ID
+   * @param user 사용자
    * @returns 업데이트된 사용자 엔티티
-   * @throws HttpException 사용자를 찾을 수 없는 경우
    */
   async deleteProfileImage(user: UserProfile): Promise<UpdateResult> {
     return await this.repository
       .createQueryBuilder()
-      .update(user)
+      .update(UserEntity)
       .set({ profileimage: null })
       .where('id = :id', { id: user.id })
       .execute();
