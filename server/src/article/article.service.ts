@@ -201,7 +201,6 @@ export class ArticleService {
     categories: CategoryEntity[],
     weeklyprice?: number,
     monthlyprice?: number,
-    mainImage?: string,
   ): Promise<ArticleEntity> {
     const author = await this.userService.getUserById(userId);
 
@@ -234,7 +233,6 @@ export class ArticleService {
       categories,
       weeklyprice,
       monthlyprice,
-      mainImage,
     );
 
     return await this.getArticleById(newArticle.id);
@@ -322,7 +320,6 @@ export class ArticleService {
   async updateArticle(
     articleId: number,
     updateStatus: Partial<ArticleEntity>,
-    mainImageUrl?: string,
   ): Promise<ArticleDetail> {
     // 변경할 필드와 값 준비
     const updateFields: { [key: string]: any } = {};
@@ -342,10 +339,6 @@ export class ArticleService {
 
     await this.articleRepository.updateArticleInfo(articleId, updateFields);
 
-    if (mainImageUrl) {
-      await this.articleRepository.updateMainImage(article, mainImageUrl);
-    }
-
     if (updateStatus.categories) {
       await this.articleRepository.updateArticleCategory(
         article,
@@ -363,6 +356,14 @@ export class ArticleService {
     }
 
     return await this.getArticleDetailById(articleId);
+  }
+
+  async addMainImage(
+    articleId: number,
+    mainImageUrl: string,
+  ): Promise<ArticleEntity> {
+    await this.articleRepository.updateMainImage(articleId, mainImageUrl);
+    return await this.getArticleById(articleId);
   }
 
   /**

@@ -358,7 +358,6 @@ export class ArticleRepository {
     categories: CategoryEntity[],
     weeklyprice?: number,
     monthlyprice?: number,
-    mainImage?: string,
   ): Promise<ArticleEntity> {
     const article = this.repository.create({
       title,
@@ -370,7 +369,6 @@ export class ArticleRepository {
       categories,
       weeklyprice,
       monthlyprice,
-      mainImage, // mainImage 필드를 추가합니다.
     });
     return await this.repository.save(article);
   }
@@ -547,14 +545,14 @@ export class ArticleRepository {
   }
 
   async updateMainImage(
-    article: ArticleEntity,
+    articleId: number,
     mainImageUrl: string,
   ): Promise<UpdateResult> {
     return await this.repository
       .createQueryBuilder()
-      .update(article)
+      .update(ArticleEntity)
       .set({ mainImage: mainImageUrl })
-      .where('id = :id', { id: article.id })
+      .where('id = :id', { id: articleId })
       .execute();
   }
 

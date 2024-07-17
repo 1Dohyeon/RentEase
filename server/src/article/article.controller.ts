@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -83,9 +85,7 @@ export class ArticleController {
     @Body('categories') categories: CategoryEntity[],
     @Body('weeklyprice') weeklyprice?: number,
     @Body('monthlyprice') monthlyprice?: number,
-    @UploadedFile() file?: Express.Multer.File,
   ): Promise<ArticleEntity> {
-    const mainImage = file ? file.filename : null; // 파일명이 저장될 mainImage
     return await this.articleService.createArticle(
       req.user.id,
       title,
@@ -96,7 +96,6 @@ export class ArticleController {
       categories,
       weeklyprice,
       monthlyprice,
-      mainImage,
     );
   }
 
@@ -138,12 +137,26 @@ export class ArticleController {
   async updateArticle(
     @Param('articleId') articleId: number,
     @Body() body,
-    @UploadedFile() file: Express.Multer.File,
   ): Promise<ArticleDetail> {
-    const mainImage = file ? file.filename : null; // 파일명이 저장될 mainImage
-    return await this.articleService.updateArticle(articleId, body, mainImage);
+    return await this.articleService.updateArticle(articleId, body);
   }
 
+  @Patch(':articleId/main-image')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async addMainImage(
+    @Param('articleId') articleId: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new HttpException(
+        '프로필 이미지가 업로드되지 않았습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const mainImageUrl = file.path;
+    return await this.articleService.addMainImage(articleId, mainImageUrl);
+  }
   /**
    * 게시글 메인 이미지 삭제
    * @param articleId 게시글 ID
