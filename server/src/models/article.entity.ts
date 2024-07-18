@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -80,6 +81,11 @@ export class ArticleEntity extends CommonEntity {
   @IsString()
   @Column({ type: 'varchar', nullable: true })
   mainImage?: string;
+
+  // true=공개, false=비공개
+  @IsBoolean()
+  @Column({ type: 'boolean', nullable: true, default: false })
+  status: boolean;
 
   @ManyToOne(() => UserEntity, (user) => user.articles)
   @JoinColumn({ name: 'authorid' })

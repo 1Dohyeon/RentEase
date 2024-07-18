@@ -363,6 +363,7 @@ export class ArticleService {
     mainImageUrl: string,
   ): Promise<ArticleEntity> {
     await this.articleRepository.updateMainImage(articleId, mainImageUrl);
+    await this.articleRepository.ArticleSetStatuseTrue(articleId);
     return await this.getArticleById(articleId);
   }
 
