@@ -115,6 +115,20 @@ export class UserService {
     return user;
   }
 
+  async getArticlesAllByUserId(
+    userId: number,
+  ): Promise<UserEntity | undefined> {
+    const user = await this.userRepository.getArticlesAllByUserId(userId);
+
+    if (!user) {
+      throw new NotFoundException(
+        '해당하는 사용자와 게시글을 찾을 수 없습니다.',
+      );
+    }
+
+    return user;
+  }
+
   /**
    * 사용자가 작성한 리뷰 조회 서비스 로직
    * @param userId 사용자 ID

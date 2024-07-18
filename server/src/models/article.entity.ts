@@ -138,6 +138,7 @@ export interface ArticleDetail {
   currency: Currency;
   createdTimeSince: string;
   author: UserEntity;
+  status: boolean;
   addresses: AddressEntity[];
   categories: CategoryEntity[];
   reviews: ReviewEntity[];

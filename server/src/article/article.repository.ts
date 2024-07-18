@@ -433,6 +433,57 @@ export class ArticleRepository {
       .leftJoinAndSelect('review.writer', 'writer')
       .where('article.id = :id', { id: articleId })
       .andWhere('article.isDeleted = false')
+      .andWhere('author.isDeleted = false')
+      .select([
+        'article.id',
+        'article.title',
+        'article.content',
+        'article.dailyprice',
+        'article.weeklyprice',
+        'article.monthlyprice',
+        'article.currency',
+        'article.createdTimeSince',
+        'article.avgnumofstars',
+        'article.mainImage',
+        'article.status',
+        'address.id',
+        'address.city',
+        'address.district',
+        'category.id',
+        'category.title',
+        'author.id',
+        'author.nickname',
+        'review.id',
+        'review.content',
+        'review.numofstars',
+        'writer.id',
+        'writer.nickname',
+      ])
+      .getOne();
+
+    return {
+      ...article,
+      createdTimeSince: timeSince(article.createdTimeSince),
+    };
+  }
+
+  /**
+   * id를 통해 article detail(createdAt 포맷) 정보 불러옴
+   * @param articleId 게시글 ID
+   * @returns 해당 게시글의 상세 정보를 반환
+   */
+  async getArticleDetailByIdStatusPublic(
+    articleId: number,
+  ): Promise<ArticleDetail | undefined> {
+    const article = await this.repository
+      .createQueryBuilder('article')
+      .leftJoinAndSelect('article.addresses', 'address')
+      .leftJoinAndSelect('article.categories', 'category')
+      .leftJoinAndSelect('article.author', 'author')
+      .leftJoinAndSelect('article.reviews', 'review')
+      .leftJoinAndSelect('review.writer', 'writer')
+      .where('article.id = :id', { id: articleId })
+      .andWhere('article.isDeleted = false')
       .andWhere('article.status = true')
       .andWhere('author.isDeleted = false')
       .select([

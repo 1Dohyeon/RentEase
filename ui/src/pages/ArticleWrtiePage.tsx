@@ -1,14 +1,12 @@
-import React, { useContext } from "react";
+import React from "react";
 import Header from "../components/Header";
 import WriteArticleFormComponent from "../components/WrtieArticleFormComponent";
-import { AuthContext } from "../contexts/AuthContext";
 
 const ArticleWritePage: React.FC = () => {
-  const { userId, isLoggedIn } = useContext(AuthContext);
   return (
     <div>
       <Header />
-      <div style={{ width: "100%", height: "70px" }}></div>
+      <div style={{ width: "100%", height: "100px" }}></div>
       <div style={{ width: "600px", margin: "0 auto" }}>
         <WriteArticleFormComponent />
       </div>

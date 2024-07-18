@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext";
 import "../styles/WriteArticleFormComponent.css";
 import apiClient from "../utils/apiClient";
 
@@ -14,32 +15,92 @@ interface Address {
   district: string;
 }
 
-const WriteArticleFormComponent: React.FC = () => {
+interface Article {
+  id: number;
+  title: string;
+  content: string;
+  dailyprice: string;
+  weeklyprice: string;
+  monthlyprice: string;
+  currency: string;
+  mainImage?: string;
+  categories: Category[];
+  addresses: Address[];
+}
+
+const EditArticleFormComponent: React.FC = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-
-  const initialState = location.state?.article || {
-    title: "",
-    content: "",
-    dailyprice: "",
-    weeklyprice: "",
-    monthlyprice: "",
-    currency: "KRW",
-    categories: [],
-    addresses: [],
-  };
-
-  const [title, setTitle] = useState(initialState.title);
-  const [content, setContent] = useState(initialState.content);
-  const [dailyPrice, setDailyPrice] = useState(initialState.dailyprice);
-  const [monthlyPrice, setMonthlyPrice] = useState(initialState.monthlyprice);
-  const [weeklyPrice, setWeeklyPrice] = useState(initialState.weeklyprice);
-  const [currency, setCurrency] = useState(initialState.currency);
+  const existingArticle = (location.state as { article: Article } | undefined)
+    ?.article;
+  const [title, setTitle] = useState(
+    existingArticle ? existingArticle.title : ""
+  );
+  const [content, setContent] = useState(
+    existingArticle ? existingArticle.content : ""
+  );
+  const [dailyPrice, setDailyPrice] = useState(
+    existingArticle ? existingArticle.dailyprice : ""
+  );
+  const [monthlyPrice, setMonthlyPrice] = useState(
+    existingArticle ? existingArticle.monthlyprice : ""
+  );
+  const [weeklyPrice, setWeeklyPrice] = useState(
+    existingArticle ? existingArticle.weeklyprice : ""
+  );
+  const [currency, setCurrency] = useState(
+    existingArticle ? existingArticle.currency : "KRW"
+  );
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>(
+    existingArticle
+      ? existingArticle.categories.map((cat: Category) => cat.id)
+      : []
+  );
   const [addresses, setAddresses] = useState<Address[]>([]);
-  const [selectedAddresses, setSelectedAddresses] = useState<number[]>([]);
-  const [noAddressPrompt, setNoAddressPrompt] = useState(false);
+  const [selectedAddresses, setSelectedAddresses] = useState<number[]>(
+    existingArticle
+      ? existingArticle.addresses.map((addr: Address) => addr.id)
+      : []
+  );
+  const [mainImage, setMainImage] = useState<File | null>(
+    existingArticle && existingArticle.mainImage ? null : null
+  ); // 이미지 파일 상태 추가
+  const { articleId } = useParams<{ articleId: string }>();
+  const { isLoggedIn, userId } = useContext(AuthContext);
+  const [userArticles, setUserArticles] = useState<number[]>([]); // 사용자가 작성한 articleId 목록
+
+  const navigate = useNavigate(); // useNavigate 훅 사용
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/error");
+    }
+
+    const fetchUserArticles = async () => {
+      try {
+        const response = await apiClient.get(`/users/${userId}/articles`);
+        const userArticleIds = response.data.articles.map(
+          (article: any) => article.id
+        );
+        setUserArticles(userArticleIds);
+
+        // 현재 페이지의 articleId가 사용자가 작성한 articleId 목록에 포함되어 있는지 확인
+        const numArticleId = articleId ? parseInt(articleId) : null;
+        const isUserArticle = numArticleId
+          ? userArticleIds.includes(numArticleId)
+          : false;
+
+        // 사용자가 작성한 게시글이 아닌 경우 404 페이지로 리디렉션
+        if (!isUserArticle) {
+          navigate("/error");
+        }
+      } catch (error) {
+        console.error("사용자 게시글 데이터 로딩 오류:", error);
+      }
+    };
+
+    fetchUserArticles();
+  }, [userId]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -56,10 +117,23 @@ const WriteArticleFormComponent: React.FC = () => {
         const response = await apiClient.get("/settings/profile/address");
         const fetchedAddresses = response.data;
 
-        setAddresses(fetchedAddresses);
+        // 기존 글의 주소가 있다면 사용자 주소 목록에 추가
+        if (existingArticle && existingArticle.addresses) {
+          const existingArticleAddresses = existingArticle.addresses.filter(
+            (existingAddr) =>
+              !fetchedAddresses.some((addr: any) => addr.id === existingAddr.id)
+          );
+          setAddresses([...fetchedAddresses, ...existingArticleAddresses]);
+        } else {
+          setAddresses(fetchedAddresses);
+        }
 
-        if (!fetchedAddresses.length) {
-          setNoAddressPrompt(true);
+        // 사용자 주소가 설정되어 있지 않으면 설정 페이지로 이동
+        if (
+          !fetchedAddresses.length &&
+          (!existingArticle || !existingArticle.addresses.length)
+        ) {
+          setNoAddressPrompt(true); // 사용자 주소 없음을 나타내는 상태 업데이트
         }
       } catch (error) {
         console.error("주소 데이터 로딩 오류:", error);
@@ -69,6 +143,8 @@ const WriteArticleFormComponent: React.FC = () => {
     fetchCategories();
     fetchAddresses();
   }, []);
+
+  const [noAddressPrompt, setNoAddressPrompt] = useState(false);
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const categoryId = parseInt(event.target.value, 10);
@@ -113,13 +189,27 @@ const WriteArticleFormComponent: React.FC = () => {
     };
 
     try {
-      const response = await apiClient.post("/articles/write", articleData);
-      const newArticleId = response.data.id;
+      let response;
+      if (existingArticle) {
+        response = await apiClient.patch(
+          `/articles/edit/${existingArticle.id}`,
+          articleData
+        );
 
-      // 이전 페이지로 article 데이터 전달
-      navigate(`/articles/write/${newArticleId}/main-image`, {
-        state: { article: articleData },
-      });
+        // 여기서 mainImage 데이터도 함께 전달하도록 설정
+        navigate(`/articles/edit/${existingArticle.id}/main-image`, {
+          state: {
+            article: articleData,
+            mainImage: mainImage, // mainImage 데이터 추가
+          },
+        });
+      } else {
+        navigate(`/articles`); // 메인 페이지로 이동
+      }
+
+      if (!response) {
+        throw new Error("게시글 작성에 실패했습니다.");
+      }
     } catch (error: any) {
       console.error("게시글 작성 오류:", error);
       let errorMessage = "게시글 작성 중 오류가 발생했습니다.";
@@ -135,7 +225,7 @@ const WriteArticleFormComponent: React.FC = () => {
 
   return (
     <div>
-      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>게시글 작성</h2>
+      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>게시글 수정</h2>
       <form className="article-form" onSubmit={(e) => e.preventDefault()}>
         <div>
           <input
@@ -210,6 +300,7 @@ const WriteArticleFormComponent: React.FC = () => {
 
         <h3 style={{ marginTop: "20px" }}>주소 설정</h3>
         <div className="address-selection">
+          {/* 주소 설정 섹션 */}
           {noAddressPrompt ? (
             <div>
               {addresses.map((address) => (
@@ -296,4 +387,4 @@ const WriteArticleFormComponent: React.FC = () => {
   );
 };
 
-export default WriteArticleFormComponent;
+export default EditArticleFormComponent;

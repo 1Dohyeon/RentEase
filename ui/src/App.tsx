@@ -3,7 +3,9 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import AccountSettingsPage from "./pages/AccountSettingsPage";
 import AddressSettingsPage from "./pages/AddressSettingsPage";
 import ArticleDetailPage from "./pages/ArticleDetailPage";
+import ArticleEditImageSettingPage from "./pages/ArticleEditImageSettingPage";
 import ArticleEditPage from "./pages/ArticleEditPage";
+import ArticleImageSettingPage from "./pages/ArticleImageSettingPage";
 import ArticleWritePage from "./pages/ArticleWrtiePage";
 import ArticlesPage from "./pages/ArticlesPage";
 import CategoryArticlesPage from "./pages/CategoryArticlePage";
@@ -21,7 +23,15 @@ const App: React.FC = () => {
       <Route path="/articles" element={<ArticlesPage />} />
       <Route path="/articles/:id" element={<ArticleDetailPage />} />
       <Route path="/articles/write" element={<ArticleWritePage />} />
-      <Route path="/articles/edit/:id" element={<ArticleEditPage />} />
+      <Route
+        path="/articles/write/:articleId/main-image"
+        element={<ArticleImageSettingPage />}
+      />
+      <Route path="/articles/edit/:articleId" element={<ArticleEditPage />} />
+      <Route
+        path="/articles/edit/:articleId/main-image"
+        element={<ArticleEditImageSettingPage />}
+      />
       <Route path="/auth/login" element={<Login />} />
       <Route path="/auth/register" element={<Register />} />
       <Route path="/users/:userId" element={<MyPage />} />

@@ -269,7 +269,7 @@ export class ArticleService {
     const article =
       await this.articleRepository.getArticleDetailById(articleId);
 
-    if (!article) {
+    if (!article || article.status === false) {
       throw new HttpException(
         '게시글을 찾을 수 없습니다.',
         HttpStatus.BAD_REQUEST,

@@ -119,6 +119,35 @@ export class UserRepository {
       .where('user.id = :userId', { userId })
       .andWhere('user.isDeleted = false')
       .andWhere('article.isDeleted = false')
+      .andWhere('article.status = true')
+      .select([
+        'user.id',
+        'user.nickname',
+        'address.id',
+        'address.city',
+        'address.district',
+        'article.id',
+        'article.title',
+        'article.dailyprice',
+        'article.currency',
+        'article-address.id',
+        'article-address.city',
+        'article-address.district',
+      ])
+      .getOne();
+  }
+
+  async getArticlesAllByUserId(
+    userId: number,
+  ): Promise<UserEntity | undefined> {
+    return await this.repository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.addresses', 'address')
+      .leftJoinAndSelect('user.articles', 'article')
+      .leftJoinAndSelect('article.addresses', 'article-address')
+      .where('user.id = :userId', { userId })
+      .andWhere('user.isDeleted = false')
+      .andWhere('article.isDeleted = false')
       .select([
         'user.id',
         'user.nickname',
