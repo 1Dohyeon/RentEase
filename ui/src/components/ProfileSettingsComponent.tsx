@@ -182,12 +182,11 @@ const ProfileSettingsComponent: React.FC = () => {
               width: "200px",
               height: "200px",
               backgroundColor: "#d2d2d2",
-              marginTop: "20px",
-              textAlign: "center",
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
+              overflow: "hidden",
+              borderRadius: "50%",
             }}
           >
             {profileImagePreview ? (

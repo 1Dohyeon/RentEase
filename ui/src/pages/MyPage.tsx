@@ -77,13 +77,15 @@ const MyPage: React.FC = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              overflow: "hidden",
+              borderRadius: "50%",
             }}
           >
             {user.profileimage ? (
               <img
                 src={`${apiBaseUrl}/${user.profileimage}`}
                 alt="Profile"
-                style={{ maxWidth: "100%", maxHeight: "100%" }}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }} // 추가: 이미지가 100% 크기를 가지며, 부모 요소에 맞게 잘립니다.
               />
             ) : (
               "No Image"

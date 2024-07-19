@@ -332,7 +332,8 @@ const ArticleDetailPage: React.FC = () => {
               height: "40px",
               backgroundColor: "#d2d2d2",
               marginRight: "5px",
-              borderRadius: "20px",
+              overflow: "hidden",
+              borderRadius: "50%",
             }}
           >
             {article.author.profileimage && (

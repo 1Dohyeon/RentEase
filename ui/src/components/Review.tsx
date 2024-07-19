@@ -136,7 +136,8 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
               height: "30px",
               backgroundColor: "#d2d2d2",
               marginRight: "5px",
-              borderRadius: "15px",
+              overflow: "hidden",
+              borderRadius: "50%",
             }}
           >
             {" "}
