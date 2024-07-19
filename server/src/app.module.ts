@@ -1,6 +1,8 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 import { AccountModule } from './account/account.module';
 import { AddressModule } from './address/address.module';
 import { AppController } from './app.controller';
@@ -22,6 +24,10 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads', // 클라이언트가 접근할 경로
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),

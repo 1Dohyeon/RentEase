@@ -12,6 +12,7 @@ interface User {
   updatedAt: string;
   deletedAt: string | null;
   nickname: string;
+  profileimage?: string;
   addresses: { city: string; district: string }[];
 }
 
@@ -38,7 +39,7 @@ const MyPage: React.FC = () => {
     };
 
     fetchUserData();
-  }, [userId]);
+  }, [userId, apiBaseUrl]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -75,22 +76,28 @@ const MyPage: React.FC = () => {
               backgroundColor: "#d2d2d2",
               display: "flex",
               alignItems: "center",
+              justifyContent: "center",
             }}
-          ></div>
+          >
+            {user.profileimage ? (
+              <img
+                src={`${apiBaseUrl}/${user.profileimage}`}
+                alt="Profile"
+                style={{ maxWidth: "100%", maxHeight: "100%" }}
+              />
+            ) : (
+              "No Image"
+            )}
+          </div>
           <div
             style={{
               height: "160px",
+              marginLeft: "10px",
             }}
           >
-            <h3
-              style={{
-                marginLeft: "10px",
-              }}
-            >
-              {user.nickname}
-            </h3>
+            <h3>{user.nickname}</h3>
             {user.addresses.length > 0 && (
-              <div style={{ marginLeft: "10px" }}>
+              <div>
                 {user.addresses.map((address, index) => (
                   <span key={index}>
                     {address.city} {address.district}
@@ -106,17 +113,15 @@ const MyPage: React.FC = () => {
       <div
         style={{
           maxWidth: "840px",
-          height: "250px",
           margin: "0 auto",
         }}
       >
         <div
           style={{
-            maxWidth: "840px",
-            height: "50px",
             display: "flex",
             justifyContent: "space-between",
             padding: "0 20px",
+            height: "50px",
           }}
         >
           <div

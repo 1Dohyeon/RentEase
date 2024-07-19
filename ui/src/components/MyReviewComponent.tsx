@@ -20,7 +20,7 @@ interface ReviewProps {
   };
 }
 
-const Review: React.FC<ReviewProps> = ({ review }) => {
+const MyReviewComponent: React.FC<ReviewProps> = ({ review }) => {
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
   const { userId, isLoggedIn } = useContext(AuthContext);
@@ -126,35 +126,7 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
           marginBottom: "5px",
         }}
       >
-        <div
-          onClick={handleNicknameClick}
-          style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
-        >
-          <div
-            style={{
-              width: "30px",
-              height: "30px",
-              backgroundColor: "#d2d2d2",
-              marginRight: "5px",
-              borderRadius: "15px",
-            }}
-          >
-            {" "}
-            {review.writer?.profileimage && (
-              <img
-                src={`${apiBaseUrl}/${review.writer?.profileimage}`}
-                alt="게시글 작성자"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  borderRadius: "10px",
-                }}
-              />
-            )}
-          </div>
-          <div>{review.writer?.nickname}</div>
-        </div>
+        <StarRating rating={review.numofstars} />
         <div style={{ display: "flex", alignItems: "center" }}>
           <div style={{ fontSize: "12px", color: "#888", marginRight: "10px" }}>
             {review.createdTimeSince}
@@ -214,7 +186,7 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
           )}
         </div>
       </div>
-      <StarRating rating={review.numofstars} />
+
       <p style={{ marginTop: "15px" }}>{review.content}</p>
 
       {isEditModalOpen && (
@@ -264,4 +236,4 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
   );
 };
 
-export default Review;
+export default MyReviewComponent;

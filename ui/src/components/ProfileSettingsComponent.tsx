@@ -16,19 +16,21 @@ interface Profile {
   createdAt: string;
   updatedAt: string;
   addresses: Address[];
-  profileimage: string; // profileimage 필드 추가
+  profileimage: string;
 }
 
 const ProfileSettingsComponent: React.FC = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [nickname, setNickname] = useState("");
   const [username, setUsername] = useState("");
-  const [profileImage, setProfileImage] = useState<File | null>(null); // 프로필 이미지 파일 상태 추가
+  const [profileImage, setProfileImage] = useState<File | null>(null);
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
-    profile ? profile.profileimage : null
-  ); // 이미지 미리 보기 상태 추가
+    null
+  );
   const [addresses, setAddresses] = useState<Address[]>([]);
   const navigate = useNavigate();
+
+  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -38,13 +40,14 @@ const ProfileSettingsComponent: React.FC = () => {
         setNickname(response.data.nickname);
         setUsername(response.data.username);
         setAddresses(response.data.addresses);
+        setProfileImagePreview(`${apiBaseUrl}/${response.data.profileimage}`);
       } catch (error) {
         console.error("프로필 데이터 로딩 오류:", error);
       }
     };
 
     fetchProfile();
-  }, []);
+  }, [apiBaseUrl]);
 
   const handleSubmit = async () => {
     const updatedProfileData = {
@@ -116,6 +119,7 @@ const ProfileSettingsComponent: React.FC = () => {
 
       alert("프로필 이미지가 업데이트되었습니다.");
       setProfile(response.data);
+      setProfileImagePreview(`${apiBaseUrl}/${response.data.profileimage}`);
     } catch (error: any) {
       console.error("프로필 이미지 업데이트 오류:", error);
       let errorMessage = "프로필 이미지 업데이트 중 오류가 발생했습니다.";
@@ -136,8 +140,9 @@ const ProfileSettingsComponent: React.FC = () => {
       alert("프로필 이미지가 삭제되었습니다.");
       setProfile((prevProfile) => ({
         ...prevProfile!,
-        profileimage: "", // 이미지 URL 초기화
+        profileimage: "",
       }));
+      setProfileImagePreview(null); // 이미지 미리 보기 상태 초기화
     } catch (error: any) {
       console.error("프로필 이미지 삭제 오류:", error);
       let errorMessage = "프로필 이미지 삭제 중 오류가 발생했습니다.";
@@ -182,27 +187,20 @@ const ProfileSettingsComponent: React.FC = () => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            {/* 프로필 이미지 */}
-            {profileImagePreview && (
+            {profileImagePreview ? (
               <img
                 src={profileImagePreview}
                 alt="프로필 이미지"
                 style={{ maxWidth: "100%", maxHeight: "100%" }}
               />
-            )}
-            {!profileImagePreview && profile.profileimage && (
-              <img
-                src={profile.profileimage}
-                alt="프로필 이미지"
-                style={{ maxWidth: "100%", maxHeight: "100%" }}
-              />
+            ) : (
+              "이미지 없음"
             )}
           </div>
-          {/* 이미지 선택 및 설정 버튼 */}
           <div style={{ textAlign: "center" }}>
-            {/* 이미지 삭제 버튼 */}
             {profile.profileimage && (
               <button
                 type="button"

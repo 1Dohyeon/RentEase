@@ -129,6 +129,7 @@ export interface ArticleBanner {
   addresses: AddressEntity[];
   categories: CategoryEntity[];
   reviews: ReviewEntity[];
+  mainImage?: string;
 }
 
 export interface ArticleDetail {
@@ -144,4 +145,5 @@ export interface ArticleDetail {
   reviews: ReviewEntity[];
   weeklyprice?: number;
   monthlyprice?: number;
+  mainImage?: string;
 }

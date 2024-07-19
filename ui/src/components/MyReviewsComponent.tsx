@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiClient from "../utils/apiClient";
+import MyReviewComponent from "./MyReviewComponent";
 import "./MyReviewsComponent.css"; // CSS 파일 import
-import Review from "./Review";
 
 interface ReviewWriter {
   id: number;
   nickname: string;
+  profileimage?: string;
 }
 
 interface ArticleData {
@@ -86,7 +87,7 @@ const MyReviewsComponent: React.FC<MyReviewsComponentProps> = ({ userId }) => {
               게시글로 이동 &gt;
             </Link>
           </div>
-          <Review review={review} />
+          <MyReviewComponent review={review} />
         </div>
       ))}
     </div>

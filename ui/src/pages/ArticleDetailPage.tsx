@@ -20,6 +20,7 @@ interface Category {
 interface Author {
   id: number;
   nickname: string;
+  profileimage?: string;
 }
 
 interface Article {
@@ -35,6 +36,7 @@ interface Article {
   addresses: Address[];
   categories: Category[];
   author: Author;
+  mainImage?: string;
 }
 
 const ArticleDetailPage: React.FC = () => {
@@ -194,7 +196,21 @@ const ArticleDetailPage: React.FC = () => {
                 right: 0,
                 bottom: 0,
               }}
-            ></div>
+            >
+              {/* mainImage 표시 */}
+              {article.mainImage && (
+                <img
+                  src={`${apiBaseUrl}/${article.mainImage}`}
+                  alt="Article main"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    borderRadius: "10px",
+                  }}
+                />
+              )}
+            </div>
           </div>
           <div
             style={{
@@ -318,7 +334,20 @@ const ArticleDetailPage: React.FC = () => {
               marginRight: "5px",
               borderRadius: "20px",
             }}
-          ></div>
+          >
+            {article.author.profileimage && (
+              <img
+                src={`${apiBaseUrl}/${article.author.profileimage}`}
+                alt="게시글 작성자"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "10px",
+                }}
+              />
+            )}
+          </div>
           <p>{article.author.nickname}</p>
         </div>
         {/* 가격 */}
