@@ -1,5 +1,6 @@
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 import apiClient from "../utils/apiClient";
 
@@ -9,6 +10,7 @@ interface Message {
   sender: {
     nickname: string;
     id: number;
+    profileimage: string;
   };
   message: string;
 }
@@ -21,7 +23,8 @@ interface ChatRoomProps {
 const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null); // Reference to the end of messages container
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     socket.emit("joinRoom", { roomId });
@@ -33,7 +36,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
       });
     };
 
-    fetchMessages(); // Initial fetch
+    fetchMessages();
 
     socket.on("receiveMessage", (newMessage: Message) => {
       console.log("Received new message:", newMessage);
@@ -50,7 +53,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
   }, [roomId]);
 
   useEffect(() => {
-    // Scroll to bottom whenever messages change
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -58,17 +60,13 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
 
   const sendMessage = () => {
     if (message.trim()) {
-      // Emit the message to the socket
       socket.emit("sendMessage", { roomId, senderId: userId, message });
 
-      // Save the message to the server
       apiClient
         .post(`/chat/rooms/${roomId}/messages`, { senderId: userId, message })
         .then(() => {
-          // Clear the input field
           setMessage("");
 
-          // Refresh messages to ensure the latest message is displayed
           apiClient.get(`/chat/rooms/${roomId}/messages`).then((response) => {
             setMessages(response.data);
             console.log("Messages refreshed:", response.data);
@@ -78,6 +76,10 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
           console.error("Error saving message:", error);
         });
     }
+  };
+
+  const handleProfileClick = (userId: number) => {
+    navigate(`/users/${userId}`);
   };
 
   return (
@@ -110,27 +112,56 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
             key={index}
             style={{
               display: "flex",
-              justifyContent:
-                msg.sender.id === userId ? "flex-end" : "flex-start",
+              flexDirection: msg.sender.id === userId ? "row-reverse" : "row",
               marginBottom: "10px",
+              alignItems: "flex-end",
             }}
           >
-            <div
-              style={{
-                maxWidth: "70%",
-                padding: "8px 12px",
-                borderRadius: "10px",
-                backgroundColor:
-                  msg.sender.id === userId ? "#d1ffd6" : "#f1f1f1",
-                textAlign: "left",
-                wordBreak: "break-word",
-              }}
-            >
-              <strong>{msg.sender.nickname}</strong>: {msg.message}
-            </div>
+            {msg.sender.id !== userId && (
+              <>
+                <img
+                  src={`${apiClient.defaults.baseURL}/${msg.sender.profileimage}`}
+                  alt="Profile"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "50%",
+                    marginRight: "10px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleProfileClick(msg.sender.id)}
+                />
+                <div
+                  style={{
+                    maxWidth: "70%",
+                    padding: "8px 12px",
+                    borderRadius: "10px",
+                    backgroundColor: "#f1f1f1",
+                    textAlign: "left",
+                    wordBreak: "break-word",
+                  }}
+                >
+                  <div>{msg.message}</div>
+                </div>
+              </>
+            )}
+            {msg.sender.id === userId && (
+              <div
+                style={{
+                  maxWidth: "70%",
+                  padding: "8px 12px",
+                  borderRadius: "10px",
+                  backgroundColor: "#d1ffd6",
+                  textAlign: "left",
+                  wordBreak: "break-word",
+                }}
+              >
+                {msg.message}
+              </div>
+            )}
           </div>
         ))}
-        {/* This div is used to scroll to the bottom */}
+
         <div ref={messagesEndRef} />
       </div>
       <div
@@ -153,8 +184,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
             height: "40px",
             padding: "5px",
             marginRight: "10px",
-            backgroundColor: "transparent", // Remove background color
-            color: "black", // Set icon color to black
+            backgroundColor: "transparent",
+            color: "black",
             border: "none",
             borderRadius: "5px",
             cursor: "pointer",
