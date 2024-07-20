@@ -1,0 +1,81 @@
+.profile-section {
+  max-width: 840px;
+  margin: 0 auto;
+  width: 100%;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  padding-top: 70px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.profile-image-container {
+  width: 160px;
+  height: 160px;
+  background-color: #d2d2d2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-info {
+  height: 160px;
+  margin-left: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.address-list {
+  margin: 10px 0;
+}
+
+.chat-link {
+  align-self: flex-end;
+  margin-top: auto;
+}
+
+.tab-section {
+  max-width: 840px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 50px;
+}
+
+.tab-item {
+  max-width: 840px;
+  margin: 0 auto;
+  width: 33%;
+  text-align: center;
+  padding: 10px 0;
+  font-weight: 600;
+  color: #aaaaaa;
+  cursor: pointer;
+}
+
+.tab-item.active {
+  color: #7db26b;
+  border-bottom: 2px solid #7db26b;
+}
+
+.tab-contents {
+  max-width: 840px;
+  margin: 0 auto;
+}
+
+.loading,
+.not-found {
+  text-align: center;
+  margin-top: 20px;
+}

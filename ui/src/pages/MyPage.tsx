@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import MyArticlesComponent from "../components/MyArticlesComponent";
 import MyBookmarkComponent from "../components/MyBookmarkComponenet";
 import MyReviewsComponent from "../components/MyReviewsComponent";
+import "./MyPage.css"; // CSS 파일을 import
 
 interface User {
   id: number;
@@ -42,136 +43,66 @@ const MyPage: React.FC = () => {
   }, [userId, apiBaseUrl]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="loading">Loading...</div>;
   }
 
   if (!user) {
-    return <div>User not found</div>;
+    return <div className="not-found">User not found</div>;
   }
 
   return (
-    <div>
+    <div className="mypage">
       <Header />
-      <div
-        style={{
-          width: "840px",
-          margin: "0 auto",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            height: "250px",
-            display: "flex",
-            alignItems: "center",
-            padding: "0 20px",
-            paddingTop: "70px",
-            borderBottom: "1px solid #e5e5e5",
-          }}
-        >
-          <div
-            style={{
-              width: "160px",
-              height: "160px",
-              backgroundColor: "#d2d2d2",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              overflow: "hidden",
-              borderRadius: "50%",
-            }}
-          >
-            {user.profileimage ? (
-              <img
-                src={`${apiBaseUrl}/${user.profileimage}`}
-                alt="Profile"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }} // 추가: 이미지가 100% 크기를 가지며, 부모 요소에 맞게 잘립니다.
-              />
-            ) : (
-              "No Image"
-            )}
-          </div>
-          <div
-            style={{
-              height: "160px",
-              marginLeft: "10px",
-            }}
-          >
-            <h3>{user.nickname}</h3>
-            {user.addresses.length > 0 && (
-              <div>
-                {user.addresses.map((address, index) => (
-                  <span key={index}>
-                    {address.city} {address.district}
-                    {index !== user.addresses.length - 1 && "/"}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
+      <div className="profile-section">
+        <div className="profile-image-container">
+          {user.profileimage ? (
+            <img
+              src={`${apiBaseUrl}/${user.profileimage}`}
+              alt="Profile"
+              className="profile-image"
+            />
+          ) : (
+            "프로필 이미지가 없습니다."
+          )}
+        </div>
+        <div className="profile-info">
+          <h3>{user.nickname}</h3>
+          {user.addresses.length > 0 && (
+            <div className="address-list">
+              {user.addresses.map((address, index) => (
+                <span key={index}>
+                  {address.city} {address.district}
+                  {index !== user.addresses.length - 1 && "/"}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="chat-link">채팅 {">"}</div>
         </div>
       </div>
 
-      <div
-        style={{
-          maxWidth: "840px",
-          margin: "0 auto",
-        }}
-      >
+      <div className="tab-section">
         <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "0 20px",
-            height: "50px",
-          }}
+          onClick={() => setSelectedTab("articles")}
+          className={`tab-item ${selectedTab === "articles" ? "active" : ""}`}
         >
-          <div
-            onClick={() => setSelectedTab("articles")}
-            style={{
-              width: "33%",
-              textAlign: "center",
-              padding: "10px 0",
-              fontWeight: "600",
-              color: selectedTab === "articles" ? "#7DB26B" : "#aaaaaa",
-              borderBottom:
-                selectedTab === "articles" ? "2px solid #7DB26B" : "none",
-              cursor: "pointer",
-            }}
-          >
-            게시글
-          </div>
-          <div
-            onClick={() => setSelectedTab("reviews")}
-            style={{
-              width: "33%",
-              textAlign: "center",
-              padding: "10px 0",
-              fontWeight: "600",
-              color: selectedTab === "reviews" ? "#7DB26B" : "#aaaaaa",
-              borderBottom:
-                selectedTab === "reviews" ? "2px solid #7DB26B" : "none",
-              cursor: "pointer",
-            }}
-          >
-            후기
-          </div>
-          <div
-            onClick={() => setSelectedTab("bookmarks")}
-            style={{
-              width: "33%",
-              textAlign: "center",
-              padding: "10px 0",
-              fontWeight: "600",
-              color: selectedTab === "bookmarks" ? "#7DB26B" : "#aaaaaa",
-              borderBottom:
-                selectedTab === "bookmarks" ? "2px solid #7DB26B" : "none",
-              cursor: "pointer",
-            }}
-          >
-            북마크
-          </div>
+          게시글
         </div>
+        <div
+          onClick={() => setSelectedTab("reviews")}
+          className={`tab-item ${selectedTab === "reviews" ? "active" : ""}`}
+        >
+          후기
+        </div>
+        <div
+          onClick={() => setSelectedTab("bookmarks")}
+          className={`tab-item ${selectedTab === "bookmarks" ? "active" : ""}`}
+        >
+          북마크
+        </div>
+      </div>
+      <div className="tab-contents">
+        {" "}
         {selectedTab === "articles" && <MyArticlesComponent userId={user.id} />}
         {selectedTab === "reviews" && <MyReviewsComponent userId={user.id} />}
         {selectedTab === "bookmarks" && (

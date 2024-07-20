@@ -6,6 +6,7 @@ import ReviewsContainer from "../components/ReviewsContainer";
 import StarRating from "../components/StarRating";
 import { AuthContext } from "../contexts/AuthContext";
 import apiClient from "../utils/apiClient";
+import "./ArticleDetailPage.css";
 
 interface Address {
   id: number;
@@ -137,219 +138,85 @@ const ArticleDetailPage: React.FC = () => {
   return (
     <div>
       <Header />
-      <div style={{ maxWidth: "840px", margin: "0 auto", padding: "20px" }}>
-        <div
-          style={{
-            width: "100%",
-            height: "70px",
-          }}
-        ></div>
+      <div className="content-container">
+        <div className="spacer"></div>
 
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <p
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              maxWidth: "calc(100% - 180px)",
-              fontSize: "26px",
-            }}
-          >
-            {/* 제목 둬도 됨 */}
-          </p>
+        <div className="header-actions">
+          <p className="article-title">{/* 제목 둬도 됨 */}</p>
           {isLoggedIn && userId === article.author.id && (
-            <div>
+            <div className="action-buttons">
               <button
-                style={{
-                  padding: "10px 20px",
-                  backgroundColor: "#7DB26B",
-                  color: "white",
-                  textDecoration: "none",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  marginRight: "20px",
-                }}
+                className="edit-button"
                 onClick={() =>
-                  navigate(`/articles/edit/${id}`, { state: { article } })
+                  navigate(`/articles/edit/${article.id}`, {
+                    state: { article },
+                  })
                 }
               >
                 수정
               </button>
-              <button
-                style={{
-                  padding: "10px 20px",
-                  color: "#FF6347",
-                  textDecoration: "none",
-                  backgroundColor: "#fdfdfd",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                }}
-                onClick={handleDeleteArticle}
-              >
+              <button className="delete-button" onClick={handleDeleteArticle}>
                 삭제
               </button>
             </div>
           )}
           {isLoggedIn && userId !== article.author.id && (
-            <button
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#7DB26B",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                fontWeight: "600",
-                marginTop: "20px",
-              }}
-              onClick={startChat}
-            >
+            <button className="chat-button" onClick={startChat}>
               채팅하기
             </button>
           )}
         </div>
-        {/* 이미지 섹션 추가 */}
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            marginTop: "20px",
-            marginBottom: "20px",
-          }}
-        >
-          <div
-            style={{
-              width: "50%",
-              paddingTop: "50%",
-              backgroundColor: "#d2d2d2",
-              borderRadius: "10px",
-              position: "relative",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-              }}
-            >
-              {/* mainImage 표시 */}
+
+        <div className="image-section">
+          <div className="main-image-container">
+            <div className="main-image">
+              {" "}
               {article.mainImage && (
                 <img
                   src={`${apiBaseUrl}/${article.mainImage}`}
                   alt="Article main"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    borderRadius: "10px",
-                  }}
+                  className="main-image-content"
                 />
               )}
             </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              width: "50%",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                gap: "10px",
-                marginBottom: "10px",
-              }}
-            >
+          <div className="additional-images">
+            <div className="image-row">
               {[...Array(2)].map((_, index) => (
-                <div
-                  key={index}
-                  style={{
-                    width: "50%",
-                    paddingTop: "50%",
-                    backgroundColor: "#e5e5e5",
-                    borderRadius: "10px",
-                    position: "relative",
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                    }}
-                  ></div>
-                </div>
+                <div key={index} className="additional-image"></div>
               ))}
             </div>
-            <div
-              style={{
-                display: "flex",
-                gap: "10px",
-              }}
-            >
+            <div className="image-row">
               {[...Array(2)].map((_, index) => (
-                <div
-                  key={index}
-                  style={{
-                    width: "50%",
-                    paddingTop: "50%",
-                    backgroundColor: "#e5e5e5",
-                    borderRadius: "10px",
-                    position: "relative",
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                    }}
-                  ></div>
-                </div>
+                <div key={index} className="additional-image"></div>
               ))}
             </div>
           </div>
         </div>
-        {/* 카테고리 */}
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div style={{ width: "85%" }}>
+
+        <div className="category-time">
+          <div className="categories">
             {article.categories.map((category) => (
               <span key={category.id}>#{category.title}</span>
             ))}
           </div>
           <small>{article.createdTimeSince}</small>
         </div>
-        {/* 제목 */}
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div style={{ width: "85%" }}>
-            <p style={{ fontSize: "26px" }}>{article.title}</p>
-          </div>
+
+        <div className="title-section">
+          <p className="article-title-large">{article.title}</p>
         </div>
-        {/* 위치 */}
-        <div style={{ width: "85%" }}>
+
+        <div className="address-section">
           {article.addresses.map((address, index) => (
-            <span key={index} style={{ fontSize: "16px" }}>
+            <span key={index} className="address">
               {address.city} {address.district}
               {index < article.addresses.length - 1 ? ", " : ""}
             </span>
           ))}
         </div>
-        {/* 별점 */}
-        <div
-          style={{ fontSize: "20px", display: "flex", alignItems: "center" }}
-        >
+
+        <div className="rating-section">
           <StarRating rating={article.avgnumofstars} />
           {article.avgnumofstars === 0 ? (
             <p>아직 후기가 없습니다.</p>
@@ -357,50 +224,23 @@ const ArticleDetailPage: React.FC = () => {
             <p>{article.avgnumofstars}</p>
           )}
         </div>
-        <hr style={{ margin: "30px 0px" }}></hr>
-        {/* 작성자 프로필 */}
-        <div
-          onClick={handleNicknameClick}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "10px",
-            cursor: "pointer",
-          }}
-        >
-          <div
-            style={{
-              width: "40px",
-              height: "40px",
-              backgroundColor: "#d2d2d2",
-              marginRight: "5px",
-              overflow: "hidden",
-              borderRadius: "50%",
-            }}
-          >
+
+        <hr className="separator" />
+
+        <div className="author-section" onClick={handleNicknameClick}>
+          <div className="author-profile">
             {article.author.profileimage && (
               <img
                 src={`${apiBaseUrl}/${article.author.profileimage}`}
                 alt="게시글 작성자"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  borderRadius: "10px",
-                }}
+                className="author-profile-image"
               />
             )}
           </div>
-          <p>{article.author.nickname}</p>
+          <p className="author-nickname">{article.author.nickname}</p>
         </div>
-        {/* 가격 */}
-        <div
-          style={{
-            borderBottom: "1px solid #ddd",
-            margin: "30px 0px",
-            paddingBottom: "30px",
-          }}
-        >
+
+        <div className="price-section">
           <p>
             {getCurrencySymbol(article.currency)}
             {parseInt(article.dailyprice, 10).toLocaleString()}/일
@@ -418,57 +258,18 @@ const ArticleDetailPage: React.FC = () => {
             </p>
           )}
         </div>
-        <p
-          style={{
-            borderBottom: "1px solid #ddd",
-            margin: "30px 0px",
-            paddingBottom: "30px",
-          }}
-        >
-          {article.content}
-        </p>
+
+        <p className="content">{article.content}</p>
+
         <ReviewsContainer
           articleId={article.id}
           avgnumofstars={article.avgnumofstars}
         />
-        {/* Modal for ChatRoom */}
+
         {isChatModalOpen && chatRoomId !== null && (
-          <div
-            style={{
-              position: "fixed",
-              top: "0",
-              left: "0",
-              right: "0",
-              bottom: "0",
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "10px",
-                width: "400px",
-                maxWidth: "100%",
-                position: "relative",
-              }}
-            >
-              <button
-                onClick={closeChatModal}
-                style={{
-                  position: "absolute",
-                  top: "10px",
-                  right: "10px",
-                  backgroundColor: "transparent",
-                  border: "none",
-                  fontSize: "20px",
-                  cursor: "pointer",
-                }}
-              >
+          <div className="chat-modal">
+            <div className="chat-modal-content">
+              <button onClick={closeChatModal} className="chat-modal-close">
                 &times;
               </button>
               <ChatRoom roomId={chatRoomId} userId={userId!} />
