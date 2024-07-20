@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ChatRoom from "../components/ChatRoom";
 import Header from "../components/Header";
 import apiClient from "../utils/apiClient";
@@ -26,6 +26,7 @@ interface ChatRoomData {
 
 const UserChatroomPage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
+  const navigate = useNavigate(); // useNavigate hook to handle navigation
   const [chatRooms, setChatRooms] = useState<ChatRoomData[]>([]);
   const [selectedChatRoomId, setSelectedChatRoomId] = useState<number | null>(
     null
@@ -57,6 +58,10 @@ const UserChatroomPage: React.FC = () => {
     setSelectedArticleId(articleId);
   };
 
+  const handleArticleNavigation = (articleId: number) => {
+    navigate(`/articles/${articleId}`);
+  };
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
@@ -68,27 +73,33 @@ const UserChatroomPage: React.FC = () => {
       <div className="chatroom-content">
         {chatRooms.length > 0 ? (
           chatRooms.map((room) => {
-            // Verify if article exists before accessing its properties
             const article = room.article;
             const chatPartner =
               room.user1.id.toString() === userId ? room.user2 : room.user1;
 
             return (
-              <div
-                key={room.id}
-                className="chatroom-item"
-                onClick={() => handleChatRoomClick(room.id, article?.id || 0)}
-              >
-                <img
-                  src={`${apiClient.defaults.baseURL}/${
-                    article?.mainImage || "default-image.png"
-                  }`}
-                  alt="Article Main"
-                  className="chatroom-main-image"
-                />
-                <div className="chatroom-title">
-                  {article?.title || "No Title"}
+              <div>
+                {" "}
+                <div key={room.id} className="chatroom-item">
+                  <img
+                    src={`${apiClient.defaults.baseURL}/${
+                      article?.mainImage || "default-image.png"
+                    }`}
+                    alt="Article Main"
+                    className="chatroom-main-image"
+                  />
+                  <div className="chatroom-title">
+                    {article?.title || "No Title"}
+                  </div>
                 </div>
+                <small
+                  className="go-article"
+                  onClick={() =>
+                    article?.id && handleArticleNavigation(article.id)
+                  }
+                >
+                  게시글로 이동 {">"}
+                </small>
               </div>
             );
           })
@@ -111,7 +122,7 @@ const UserChatroomPage: React.FC = () => {
             <ChatRoom
               roomId={selectedChatRoomId}
               userId={parseInt(userId!)}
-              articleId={selectedArticleId} // Pass the selectedArticleId here
+              articleId={selectedArticleId}
             />
           </div>
         </div>

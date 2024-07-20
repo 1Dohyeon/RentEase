@@ -67,3 +67,9 @@
   font-size: 24px;
   cursor: pointer;
 }
+
+.go-article {
+  cursor: pointer;
+  display: inline-block;
+  margin-bottom: 15px;
+}
