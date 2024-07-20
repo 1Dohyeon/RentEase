@@ -31,7 +31,7 @@ export class ChatController {
     return this.chatService.getChatRoomMessages(roomId);
   }
 
-  @Get('rooms/user/:userId')
+  @Get('rooms/users/:userId')
   @UseGuards(JwtAuthGuard)
   async getUserChatRooms(@Param('userId') userId: number) {
     return this.chatService.getUserChatRooms(userId);

@@ -191,10 +191,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1000;
 }
 
 .chat-modal-content {
-  background: white;
+  background: #fff;
   padding: 20px;
   border-radius: 10px;
   position: relative;

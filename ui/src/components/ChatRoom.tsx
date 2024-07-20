@@ -85,14 +85,15 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
       style={{
         bottom: 0,
         right: 0,
-        width: "400px",
-        height: "300px",
+        width: "360px",
+        height: "460px",
         backgroundColor: "#fff",
         border: "1px solid #ddd",
         boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
         zIndex: 1000,
         display: "flex",
         flexDirection: "column",
+        marginTop: "20px",
       }}
     >
       <div
@@ -152,8 +153,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
             height: "40px",
             padding: "5px",
             marginRight: "10px",
-            backgroundColor: "#007bff",
-            color: "#fff",
+            backgroundColor: "transparent", // Remove background color
+            color: "black", // Set icon color to black
             border: "none",
             borderRadius: "5px",
             cursor: "pointer",
@@ -170,11 +171,20 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="메시지를 입력하세요"
-          style={{ flex: 1, padding: "5px" }}
+          style={{ flex: 1, padding: "5px", borderRadius: "5px" }}
         />
         <button
           onClick={sendMessage}
-          style={{ width: "70px", padding: "5px", marginLeft: "10px" }}
+          style={{
+            width: "70px",
+            padding: "5px",
+            marginLeft: "10px",
+            border: "none",
+            color: "#fff",
+            fontWeight: "bold",
+            backgroundColor: "#7db26b",
+            borderRadius: "5px",
+          }}
         >
           전송
         </button>

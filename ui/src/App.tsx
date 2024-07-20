@@ -12,6 +12,7 @@ import CategoryArticlesPage from "./pages/CategoryArticlePage";
 import MyPage from "./pages/MyPage";
 import ProfileSettingsPage from "./pages/ProfileSettingsPage";
 import SettingPasswordPage from "./pages/SettingPasswordPage";
+import UserChatroomPage from "./pages/UserChatroomPage";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Settings from "./pages/settings/Settings";
@@ -35,6 +36,7 @@ const App: React.FC = () => {
       <Route path="/auth/login" element={<Login />} />
       <Route path="/auth/register" element={<Register />} />
       <Route path="/users/:userId" element={<MyPage />} />
+      <Route path="/users/:userId/chattings" element={<UserChatroomPage />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/articles/category" element={<CategoryArticlesPage />} />
       <Route path="/settings/profile" element={<ProfileSettingsPage />} />

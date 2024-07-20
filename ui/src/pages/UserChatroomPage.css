@@ -1,0 +1,69 @@
+.chatroom-content {
+  max-width: 440px;
+  margin: 0 auto;
+  border: 1px solid #d2d2d2;
+  border-radius: 20px;
+  padding: 10px;
+}
+
+.empty-box {
+  width: 100%;
+  height: 100px;
+}
+
+.chatroom-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin: 10px 0;
+}
+
+.chatroom-profile-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.chatroom-nickname {
+  margin-left: 20px;
+}
+
+.loading {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.no-chatrooms {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.chatroom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.chatroom-modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.close-chatroom-modal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}

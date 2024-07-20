@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import MyArticlesComponent from "../components/MyArticlesComponent";
 import MyBookmarkComponent from "../components/MyBookmarkComponenet";
@@ -25,6 +25,8 @@ const MyPage: React.FC = () => {
     "articles" | "reviews" | "bookmarks"
   >("articles");
 
+  const navigate = useNavigate();
+
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
@@ -41,6 +43,10 @@ const MyPage: React.FC = () => {
 
     fetchUserData();
   }, [userId, apiBaseUrl]);
+
+  const handleChatLinkClick = () => {
+    navigate(`/users/${userId}/chattings`);
+  };
 
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -77,7 +83,9 @@ const MyPage: React.FC = () => {
               ))}
             </div>
           )}
-          <div className="chat-link">채팅 {">"}</div>
+          <div className="chat-link" onClick={handleChatLinkClick}>
+            채팅 {">"}
+          </div>
         </div>
       </div>
 
