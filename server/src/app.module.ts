@@ -17,6 +17,7 @@ import { ArticleEntity } from './models/article.entity';
 import { BookmarkEntity } from './models/bookmark.entity';
 import { CategoryEntity } from './models/category.entity';
 import { ChatEntity } from './models/chat.entity';
+import { ChatRoomEntity } from './models/chatroom.entity';
 import { ReviewEntity } from './models/review.entity';
 import { UserEntity } from './models/user.entity';
 import { ProfileModule } from './profile/profile.module';
@@ -50,6 +51,7 @@ import { UserModule } from './user/user.module';
         CategoryEntity,
         BookmarkEntity,
         ChatEntity,
+        ChatRoomEntity,
       ],
       autoLoadEntities: true,
     }),

@@ -1,14 +1,14 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ChatroomEntity } from './chatroom.entity';
+import { ChatRoomEntity } from './chatroom.entity';
 import { UserEntity } from './user.entity';
 
-@Entity()
+@Entity('chats')
 export class ChatEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -16,16 +16,12 @@ export class ChatEntity {
   @Column()
   message: string;
 
-  @Column()
+  @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => UserEntity, { nullable: false })
-  @JoinColumn({ name: 'senderid' })
+  @ManyToOne(() => UserEntity)
   sender: UserEntity;
 
-  @ManyToOne(() => ChatroomEntity, (chatroom) => chatroom.chats, {
-    nullable: false,
-  })
-  @JoinColumn({ name: 'chatroomid' })
-  chatroom: ChatroomEntity;
+  @ManyToOne(() => ChatRoomEntity, (chatRoom) => chatRoom.chats)
+  chatRoom: ChatRoomEntity;
 }

@@ -1,7 +1,6 @@
 import {
-  Column,
+  CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -9,22 +8,20 @@ import {
 import { ChatEntity } from './chat.entity';
 import { UserEntity } from './user.entity';
 
-@Entity()
-export class ChatroomEntity {
+@Entity('chatrooms')
+export class ChatRoomEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => UserEntity, { nullable: false })
-  @JoinColumn({ name: 'userid1' })
-  userid1: UserEntity;
+  @ManyToOne(() => UserEntity)
+  user1: UserEntity;
 
-  @ManyToOne(() => UserEntity, { nullable: false })
-  @JoinColumn({ name: 'userid2' })
-  userid2: UserEntity;
+  @ManyToOne(() => UserEntity)
+  user2: UserEntity;
 
-  @OneToMany(() => ChatEntity, (chat) => chat.chatroom)
+  @OneToMany(() => ChatEntity, (chat) => chat.chatRoom)
   chats: ChatEntity[];
 }

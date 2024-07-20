@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import ChatRoom from "../components/ChatRoom";
 import Header from "../components/Header";
 import ReviewsContainer from "../components/ReviewsContainer";
 import StarRating from "../components/StarRating";
@@ -44,6 +45,8 @@ const ArticleDetailPage: React.FC = () => {
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const { userId, isLoggedIn } = useContext(AuthContext);
+  const [chatRoomId, setChatRoomId] = useState<number | null>(null);
+  const [isChatModalOpen, setIsChatModalOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -102,6 +105,27 @@ const ArticleDetailPage: React.FC = () => {
     navigate(`/users/${article?.author.id}`);
   };
 
+  const startChat = () => {
+    if (!isLoggedIn) {
+      alert("로그인 후 이용할 수 있습니다.");
+      return;
+    }
+
+    apiClient
+      .post("/chat/rooms", { user1Id: userId, user2Id: article?.author.id })
+      .then((response) => {
+        setChatRoomId(response.data.id);
+        setIsChatModalOpen(true); // Open the modal when chat starts
+      })
+      .catch((error) => {
+        console.error("Error starting chat:", error);
+      });
+  };
+
+  const closeChatModal = () => {
+    setIsChatModalOpen(false);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -120,6 +144,7 @@ const ArticleDetailPage: React.FC = () => {
             height: "70px",
           }}
         ></div>
+
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <p
             style={{
@@ -168,6 +193,23 @@ const ArticleDetailPage: React.FC = () => {
                 삭제
               </button>
             </div>
+          )}
+          {isLoggedIn && userId !== article.author.id && (
+            <button
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#7DB26B",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                fontWeight: "600",
+                marginTop: "20px",
+              }}
+              onClick={startChat}
+            >
+              채팅하기
+            </button>
           )}
         </div>
         {/* 이미지 섹션 추가 */}
@@ -309,7 +351,7 @@ const ArticleDetailPage: React.FC = () => {
           style={{ fontSize: "20px", display: "flex", alignItems: "center" }}
         >
           <StarRating rating={article.avgnumofstars} />
-          {article.avgnumofstars == 0 ? (
+          {article.avgnumofstars === 0 ? (
             <p>아직 후기가 없습니다.</p>
           ) : (
             <p>{article.avgnumofstars}</p>
@@ -389,6 +431,50 @@ const ArticleDetailPage: React.FC = () => {
           articleId={article.id}
           avgnumofstars={article.avgnumofstars}
         />
+        {/* Modal for ChatRoom */}
+        {isChatModalOpen && chatRoomId !== null && (
+          <div
+            style={{
+              position: "fixed",
+              top: "0",
+              left: "0",
+              right: "0",
+              bottom: "0",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1000,
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: "white",
+                padding: "20px",
+                borderRadius: "10px",
+                width: "400px",
+                maxWidth: "100%",
+                position: "relative",
+              }}
+            >
+              <button
+                onClick={closeChatModal}
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  right: "10px",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  fontSize: "20px",
+                  cursor: "pointer",
+                }}
+              >
+                &times;
+              </button>
+              <ChatRoom roomId={chatRoomId} userId={userId!} />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
