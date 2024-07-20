@@ -10,11 +10,13 @@ import { ArticleModule } from './article/article.module';
 import { AuthModule } from './auth/auth.module';
 import { BookmarkModule } from './bookmark/bookmark.module';
 import { CategoryModule } from './category/category.module';
+import { ChatModule } from './chat/chat.module';
 import { LoggerMiddleware } from './common/logger/logger.middleware';
 import { AddressEntity } from './models/address.entity';
 import { ArticleEntity } from './models/article.entity';
 import { BookmarkEntity } from './models/bookmark.entity';
 import { CategoryEntity } from './models/category.entity';
+import { ChatEntity } from './models/chat.entity';
 import { ReviewEntity } from './models/review.entity';
 import { UserEntity } from './models/user.entity';
 import { ProfileModule } from './profile/profile.module';
@@ -47,6 +49,7 @@ import { UserModule } from './user/user.module';
         ReviewEntity,
         CategoryEntity,
         BookmarkEntity,
+        ChatEntity,
       ],
       autoLoadEntities: true,
     }),
@@ -60,6 +63,7 @@ import { UserModule } from './user/user.module';
     ReviewModule,
     CategoryModule,
     BookmarkModule,
+    ChatModule,
   ],
   controllers: [AppController],
 })
