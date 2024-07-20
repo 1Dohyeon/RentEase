@@ -21,7 +21,7 @@ interface ChatRoomProps {
   articleId: number;
 }
 
-const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
+const UserChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -225,4 +225,4 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
   );
 };
 
-export default ChatRoom;
+export default UserChatRoom;

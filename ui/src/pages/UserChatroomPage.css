@@ -18,13 +18,13 @@
   margin: 10px 0;
 }
 
-.chatroom-profile-image {
+.chatroom-main-image {
   width: 50px;
   height: 50px;
   border-radius: 50%;
 }
 
-.chatroom-nickname {
+.chatroom-title {
   margin-left: 20px;
 }
 

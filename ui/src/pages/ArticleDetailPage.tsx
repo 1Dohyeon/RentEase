@@ -116,7 +116,7 @@ const ArticleDetailPage: React.FC = () => {
       .post("/chat/rooms", {
         user1Id: userId,
         user2Id: article?.author.id,
-        articleId: article?.id,
+        articleId: article?.id, // Pass articleId here
       })
       .then((response) => {
         setChatRoomId(response.data.id);
@@ -146,7 +146,7 @@ const ArticleDetailPage: React.FC = () => {
         <div className="spacer"></div>
 
         <div className="header-actions">
-          <p className="article-title">{/* 제목 둬도 됨 */}</p>
+          <p className="article-title">{article.title}</p>
           {isLoggedIn && userId === article.author.id && (
             <div className="action-buttons">
               <button
@@ -174,7 +174,6 @@ const ArticleDetailPage: React.FC = () => {
         <div className="image-section">
           <div className="main-image-container">
             <div className="main-image">
-              {" "}
               {article.mainImage && (
                 <img
                   src={`${apiBaseUrl}/${article.mainImage}`}
@@ -276,7 +275,11 @@ const ArticleDetailPage: React.FC = () => {
               <button onClick={closeChatModal} className="chat-modal-close">
                 &times;
               </button>
-              <ChatRoom roomId={chatRoomId} userId={userId!} />
+              <ChatRoom
+                roomId={chatRoomId}
+                userId={userId!}
+                articleId={article.id}
+              />
             </div>
           </div>
         )}

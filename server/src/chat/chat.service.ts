@@ -92,7 +92,10 @@ export class ChatService {
       .createQueryBuilder('chatRoom')
       .leftJoinAndSelect('chatRoom.user1', 'user1')
       .leftJoinAndSelect('chatRoom.user2', 'user2')
+      .leftJoinAndSelect('chatRoom.article', 'article')
       .where('user1.id = :userId OR user2.id = :userId', { userId })
+      .andWhere('article.isDeleted = false')
+      .orderBy('chatRoom.createdAt', 'DESC')
       .getMany();
   }
 }
