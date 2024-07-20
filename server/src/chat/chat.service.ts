@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ArticleEntity } from 'src/models/article.entity';
 import { Repository } from 'typeorm';
 import { ChatEntity } from '../models/chat.entity';
 import { ChatRoomEntity } from '../models/chatroom.entity';
@@ -14,16 +15,28 @@ export class ChatService {
     private readonly chatRoomRepository: Repository<ChatRoomEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(ArticleEntity)
+    private readonly articleRepository: Repository<ArticleEntity>,
   ) {}
 
   async createChatRoom(
     user1Id: number,
     user2Id: number,
+    articleId: number, // articleId is now required
   ): Promise<ChatRoomEntity> {
+    // Check if the chat room already exists
     let chatRoom = await this.chatRoomRepository.findOne({
       where: [
-        { user1: { id: user1Id }, user2: { id: user2Id } },
-        { user1: { id: user2Id }, user2: { id: user1Id } },
+        {
+          user1: { id: user1Id },
+          user2: { id: user2Id },
+          article: { id: articleId },
+        },
+        {
+          user1: { id: user2Id },
+          user2: { id: user1Id },
+          article: { id: articleId },
+        },
       ],
     });
 
@@ -34,7 +47,15 @@ export class ChatService {
       const user2 = await this.userRepository.findOne({
         where: { id: user2Id },
       });
-      chatRoom = this.chatRoomRepository.create({ user1, user2 });
+      const article = await this.articleRepository.findOne({
+        where: { id: articleId },
+      });
+
+      chatRoom = this.chatRoomRepository.create({
+        user1,
+        user2,
+        article,
+      });
       await this.chatRoomRepository.save(chatRoom);
     }
     return chatRoom;

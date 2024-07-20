@@ -11,8 +11,9 @@ export class ChatController {
   async createChatRoom(
     @Body('user1Id') user1Id: number,
     @Body('user2Id') user2Id: number,
+    @Body('articleId') articleId: number,
   ) {
-    return this.chatService.createChatRoom(user1Id, user2Id);
+    return this.chatService.createChatRoom(user1Id, user2Id, articleId);
   }
 
   @Post('rooms/:roomId/messages')

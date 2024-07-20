@@ -5,6 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ArticleEntity } from './article.entity';
 import { ChatEntity } from './chat.entity';
 import { UserEntity } from './user.entity';
 
@@ -24,4 +25,7 @@ export class ChatRoomEntity {
 
   @OneToMany(() => ChatEntity, (chat) => chat.chatRoom)
   chats: ChatEntity[];
+
+  @ManyToOne(() => ArticleEntity)
+  article: ArticleEntity;
 }

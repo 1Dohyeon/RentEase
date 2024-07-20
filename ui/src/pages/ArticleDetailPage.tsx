@@ -113,10 +113,14 @@ const ArticleDetailPage: React.FC = () => {
     }
 
     apiClient
-      .post("/chat/rooms", { user1Id: userId, user2Id: article?.author.id })
+      .post("/chat/rooms", {
+        user1Id: userId,
+        user2Id: article?.author.id,
+        articleId: article?.id,
+      })
       .then((response) => {
         setChatRoomId(response.data.id);
-        setIsChatModalOpen(true); // Open the modal when chat starts
+        setIsChatModalOpen(true);
       })
       .catch((error) => {
         console.error("Error starting chat:", error);
