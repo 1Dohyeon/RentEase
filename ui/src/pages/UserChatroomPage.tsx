@@ -78,9 +78,11 @@ const UserChatroomPage: React.FC = () => {
               room.user1.id.toString() === userId ? room.user2 : room.user1;
 
             return (
-              <div>
-                {" "}
-                <div key={room.id} className="chatroom-item">
+              <div key={room.id}>
+                <div
+                  className="chatroom-item"
+                  onClick={() => handleChatRoomClick(room.id, article?.id || 0)}
+                >
                   <img
                     src={`${apiClient.defaults.baseURL}/${
                       article?.mainImage || "default-image.png"
