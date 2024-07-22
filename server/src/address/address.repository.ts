@@ -17,6 +17,10 @@ export class AddressRepository implements OnModuleInit {
     });
   }
 
+  async getAllAddresses(): Promise<AddressEntity[]> {
+    return await this.repository.createQueryBuilder('address').getMany();
+  }
+
   // db에 주소 저장이 안되어있다면 서버 시작시 주소 정보를 추가함
   async onModuleInit() {
     const addresses = [

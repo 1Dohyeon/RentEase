@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
+import { BookmarkService } from 'src/bookmark/bookmark.service';
 import { UserDto } from 'src/user/dtos/user.dto';
 import { UserLoginDto } from 'src/user/dtos/user.login.req';
 import { UserRegisterDto } from 'src/user/dtos/user.register.req';
@@ -18,6 +19,7 @@ export class AuthService {
     private jwtService: JwtService,
     private readonly userService: UserService,
     private readonly configService: ConfigService,
+    private readonly bookmarkService: BookmarkService,
   ) {}
 
   /**
@@ -49,6 +51,8 @@ export class AuthService {
       username,
       nickname,
     });
+
+    await this.bookmarkService.createBookmark(user.id);
 
     return user;
   }

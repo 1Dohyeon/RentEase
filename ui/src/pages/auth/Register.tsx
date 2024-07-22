@@ -77,13 +77,13 @@ const Register: React.FC = () => {
         style={{
           width: "480px",
           margin: "0 auto",
-          marginTop: "10px",
         }}
       >
         <h2
           style={{
             textAlign: "center",
             padding: "10px",
+            paddingTop: "100px",
             color: "#3A3A3A",
           }}
         >

@@ -8,13 +8,18 @@ const Header: React.FC = () => {
   return (
     <header
       style={{
-        maxWidth: "100%",
+        width: "100vw",
         height: "70px",
+        position: "fixed",
+        margin: "0",
         boxShadow: "0 1px 4px rgba(0, 0, 0, 0.1)",
+        backgroundColor: "#fdfdfd",
+        zIndex: "99999",
       }}
     >
       <div
         style={{
+          width: "80%",
           maxWidth: "840px",
           height: "100%",
           margin: "0 auto",
@@ -37,7 +42,7 @@ const Header: React.FC = () => {
           {isLoggedIn ? (
             <>
               <Link
-                to={`/users/${userId}`}
+                to={`/users/${userId}`} // userId가 있을 경우 해당 사용자의 마이페이지로 링크
                 style={{
                   textDecoration: "none",
                   color: "#7DB26B",
@@ -57,7 +62,6 @@ const Header: React.FC = () => {
                   textDecoration: "none",
                   color: "#7DB26B",
                   display: "inline-block",
-
                   height: "30px",
                   textAlign: "center",
                   fontWeight: "600",

@@ -1,7 +1,11 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
+import MyArticlesComponent from "../components/MyArticlesComponent";
+import MyBookmarkComponent from "../components/MyBookmarkComponenet";
+import MyReviewsComponent from "../components/MyReviewsComponent";
+import "./MyPage.css"; // CSS 파일을 import
 
 interface User {
   id: number;
@@ -9,13 +13,19 @@ interface User {
   updatedAt: string;
   deletedAt: string | null;
   nickname: string;
-  addresses: { city: string; district: string }[]; // 주소 객체 타입 수정
+  profileimage?: string;
+  addresses: { city: string; district: string }[];
 }
 
 const MyPage: React.FC = () => {
-  const { userId } = useParams(); // userId 파라미터 가져오기
+  const { userId } = useParams<{ userId: string }>();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedTab, setSelectedTab] = useState<
+    "articles" | "reviews" | "bookmarks"
+  >("articles");
+
+  const navigate = useNavigate();
 
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -23,73 +33,89 @@ const MyPage: React.FC = () => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get<User>(`${apiBaseUrl}/users/${userId}`);
-        setUser(response.data); // 사용자 정보 설정
-        setLoading(false); // 로딩 상태 변경
+        setUser(response.data);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching user data:", error);
-        setLoading(false); // 로딩 상태 변경
+        setLoading(false);
       }
     };
 
-    fetchUserData(); // 데이터 가져오기 함수 호출
-  }, [userId]); // userId가 변경될 때마다 useEffect가 실행됨
+    fetchUserData();
+  }, [userId, apiBaseUrl]);
+
+  const handleChatLinkClick = () => {
+    navigate(`/users/${userId}/chattings`);
+  };
 
   if (loading) {
-    return <div>Loading...</div>; // 로딩 중일 때 표시할 UI
+    return <div className="loading">Loading...</div>;
   }
 
   if (!user) {
-    return <div>User not found</div>; // 사용자 정보가 없을 경우 표시할 UI
+    return <div className="not-found">User not found</div>;
   }
 
   return (
-    <div>
+    <div className="mypage">
       <Header />
-      <div
-        style={{
-          maxWidth: "840px",
-          height: "250px",
-          margin: "0 auto",
-          display: "flex",
-          alignItems: "center",
-          padding: "0 20px",
-          borderBottom: "1px solid #e5e5e5",
-          borderRadius: "10px",
-        }}
-      >
-        <div
-          style={{
-            width: "160px",
-            height: "160px",
-            backgroundColor: "#d2d2d2",
-            display: "flex",
-            alignItems: "center",
-          }}
-        ></div>
-        <div
-          style={{
-            height: "160px",
-          }}
-        >
-          <h3
-            style={{
-              marginLeft: "10px",
-            }}
-          >
-            {user.nickname}
-          </h3>
+      <div className="profile-section">
+        <div className="profile-image-container">
+          {user.profileimage ? (
+            <img
+              src={`${apiBaseUrl}/${user.profileimage}`}
+              alt="Profile"
+              className="profile-image"
+            />
+          ) : (
+            "프로필 이미지가 없습니다."
+          )}
+        </div>
+        <div className="profile-info">
+          <h3>{user.nickname}</h3>
           {user.addresses.length > 0 && (
-            <div style={{ marginLeft: "10px" }}>
+            <div className="address-list">
               {user.addresses.map((address, index) => (
                 <span key={index}>
                   {address.city} {address.district}
                   {index !== user.addresses.length - 1 && "/"}
-                  {/* 마지막 주소가 아니면 '/' 추가 */}
                 </span>
               ))}
             </div>
           )}
+          <div className="chat-link" onClick={handleChatLinkClick}>
+            채팅 {">"}
+          </div>
         </div>
+      </div>
+
+      <div className="tab-section">
+        <div
+          onClick={() => setSelectedTab("articles")}
+          className={`tab-item ${selectedTab === "articles" ? "active" : ""}`}
+        >
+          게시글
+        </div>
+        <div
+          onClick={() => setSelectedTab("reviews")}
+          className={`tab-item ${selectedTab === "reviews" ? "active" : ""}`}
+        >
+          후기
+        </div>
+        <div
+          onClick={() => setSelectedTab("bookmarks")}
+          className={`tab-item ${selectedTab === "bookmarks" ? "active" : ""}`}
+        >
+          북마크
+        </div>
+      </div>
+      <div className="tab-contents">
+        {" "}
+        {selectedTab === "articles" && <MyArticlesComponent userId={user.id} />}
+        {selectedTab === "reviews" && <MyReviewsComponent userId={user.id} />}
+        {selectedTab === "bookmarks" && (
+          <MyBookmarkComponent userId={user.id} />
+        )}
       </div>
     </div>
   );
