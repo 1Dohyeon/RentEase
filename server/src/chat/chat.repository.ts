@@ -15,6 +15,13 @@ export class ChatRepository {
     private readonly chatRoomRepository: Repository<ChatRoomEntity>,
   ) {}
 
+  /**
+   * 두 유저와 게시글에 해당하는 채팅방을 가져옴
+   * @param user1Id 첫 번째 유저 ID
+   * @param user2Id 두 번째 유저 ID
+   * @param articleId 게시글 ID
+   * @returns 채팅방 정보를 반환
+   */
   async getChatroom(
     user1Id: number,
     user2Id: number,
@@ -36,12 +43,24 @@ export class ChatRepository {
     });
   }
 
+  /**
+   * 채팅방 ID로 채팅방 정보를 가져옴
+   * @param chatRoomId 채팅방 ID
+   * @returns 채팅방 정보를 반환
+   */
   async getChatroomById(chatRoomId: number): Promise<ChatRoomEntity> {
     return await this.chatRoomRepository.findOne({
       where: { id: chatRoomId },
     });
   }
 
+  /**
+   * 새로운 채팅방을 생성
+   * @param user1 첫 번째 유저 엔티티
+   * @param user2 두 번째 유저 엔티티
+   * @param article 게시글 엔티티
+   * @returns 생성된 채팅방 정보를 반환
+   */
   async createChatroom(
     user1: UserEntity,
     user2: UserEntity,
@@ -56,6 +75,13 @@ export class ChatRepository {
     return chatRoom;
   }
 
+  /**
+   * 채팅방에 메시지를 추가
+   * @param chatRoom 채팅방 엔티티
+   * @param sender 메시지를 보낸 유저 엔티티
+   * @param message 추가할 메시지 내용
+   * @returns 추가된 메시지 정보를 반환
+   */
   async createChat(
     chatRoom: ChatRoomEntity,
     sender: UserEntity,
@@ -74,6 +100,11 @@ export class ChatRepository {
     };
   }
 
+  /**
+   * 채팅방의 모든 메시지를 불러옴
+   * @param chatRoomId 채팅방 ID
+   * @returns 채팅방의 모든 메시지 리스트를 반환
+   */
   async getChatRoomMessages(chatRoomId: number): Promise<ChatEntity[]> {
     return await this.chatRepository.find({
       where: { chatRoom: { id: chatRoomId } },
@@ -81,6 +112,11 @@ export class ChatRepository {
     });
   }
 
+  /**
+   * 특정 유저가 속한 모든 채팅방을 불러옴
+   * @param userId 유저 ID
+   * @returns 유저가 속한 채팅방 리스트를 반환
+   */
   async getUserChatRooms(userId: number): Promise<ChatRoomEntity[]> {
     return this.chatRoomRepository
       .createQueryBuilder('chatRoom')
@@ -93,6 +129,10 @@ export class ChatRepository {
       .getMany();
   }
 
+  /**
+   * 채팅방을 삭제
+   * @param chatRoomId 채팅방 ID
+   */
   async deleteChatRoom(chatRoomId: number): Promise<void> {
     await this.chatRoomRepository
       .createQueryBuilder()
