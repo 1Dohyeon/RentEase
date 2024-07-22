@@ -1,101 +1,108 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { ArticleEntity } from 'src/models/article.entity';
-import { Repository } from 'typeorm';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { ArticleService } from 'src/article/article.service';
+import { UserService } from 'src/user/user.service';
 import { ChatEntity } from '../models/chat.entity';
 import { ChatRoomEntity } from '../models/chatroom.entity';
-import { UserEntity } from '../models/user.entity';
+import { ChatRepository } from './chat.repository';
 
 @Injectable()
 export class ChatService {
   constructor(
-    @InjectRepository(ChatEntity)
-    private readonly chatRepository: Repository<ChatEntity>,
-    @InjectRepository(ChatRoomEntity)
-    private readonly chatRoomRepository: Repository<ChatRoomEntity>,
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
-    @InjectRepository(ArticleEntity)
-    private readonly articleRepository: Repository<ArticleEntity>,
+    private readonly repository: ChatRepository,
+    private readonly userService: UserService,
+    private readonly articleService: ArticleService,
   ) {}
+
+  async getChatroom(
+    user1Id: number,
+    user2Id: number,
+    articleId: number,
+  ): Promise<ChatRoomEntity> {
+    const chatRoom = await this.repository.getChatroom(
+      user1Id,
+      user2Id,
+      articleId,
+    );
+
+    if (!chatRoom) {
+      throw new BadRequestException('해당 채팅방을 찾을 수 없습니다.');
+    }
+
+    return chatRoom;
+  }
 
   async createChatRoom(
     user1Id: number,
     user2Id: number,
-    articleId: number, // articleId is now required
+    articleId: number,
   ): Promise<ChatRoomEntity> {
-    // Check if the chat room already exists
-    let chatRoom = await this.chatRoomRepository.findOne({
-      where: [
-        {
-          user1: { id: user1Id },
-          user2: { id: user2Id },
-          article: { id: articleId },
-        },
-        {
-          user1: { id: user2Id },
-          user2: { id: user1Id },
-          article: { id: articleId },
-        },
-      ],
-    });
+    const chatRoom = await this.repository.getChatroom(
+      user1Id,
+      user2Id,
+      articleId,
+    );
 
     if (!chatRoom) {
-      const user1 = await this.userRepository.findOne({
-        where: { id: user1Id },
-      });
-      const user2 = await this.userRepository.findOne({
-        where: { id: user2Id },
-      });
-      const article = await this.articleRepository.findOne({
-        where: { id: articleId },
-      });
+      const user1 = await this.userService.getUserById(user1Id);
+      const user2 = await this.userService.getUserById(user2Id);
+      const article = await this.articleService.getArticleById(articleId);
 
-      chatRoom = this.chatRoomRepository.create({
-        user1,
-        user2,
-        article,
-      });
-      await this.chatRoomRepository.save(chatRoom);
+      await this.repository.createChatroom(user1, user2, article);
+      return await this.repository.getChatroom(user1Id, user2Id, articleId);
     }
+
     return chatRoom;
   }
 
-  async addChatMessage(
-    chatRoomId: number,
-    senderId: number,
-    message: string,
-  ): Promise<ChatEntity> {
-    const chatRoom = await this.chatRoomRepository.findOne({
-      where: { id: chatRoomId },
-    });
-    const sender = await this.userRepository.findOne({
-      where: { id: senderId },
-    });
-    const chatMessage = this.chatRepository.create({
-      chatRoom,
-      sender,
-      message,
-    });
-    return this.chatRepository.save(chatMessage);
+  async getChatroomById(chatRoomId: number): Promise<ChatRoomEntity> {
+    const chatRoom = await this.repository.getChatroomById(chatRoomId);
+
+    if (!chatRoom) {
+      throw new BadRequestException('해당 채팅방을 찾을 수 없습니다.');
+    }
+
+    return chatRoom;
+  }
+
+  async addChatMessage(chatRoomId: number, senderId: number, message: string) {
+    const chatRoom = await this.repository.getChatroomById(chatRoomId);
+    const sender = await this.userService.getUserById(senderId);
+    return this.repository.createChat(chatRoom, sender, message);
   }
 
   async getChatRoomMessages(chatRoomId: number): Promise<ChatEntity[]> {
-    return this.chatRepository.find({
-      where: { chatRoom: { id: chatRoomId } },
-      relations: ['sender'],
-    });
+    const chats = await this.repository.getChatRoomMessages(chatRoomId);
+
+    if (!chats) {
+      throw new BadRequestException('채팅 내역을 찾을 수 없습니다.');
+    }
+
+    return chats;
   }
 
   async getUserChatRooms(userId: number): Promise<ChatRoomEntity[]> {
-    return this.chatRoomRepository
-      .createQueryBuilder('chatRoom')
-      .leftJoinAndSelect('chatRoom.user1', 'user1')
-      .leftJoinAndSelect('chatRoom.user2', 'user2')
-      .leftJoinAndSelect('chatRoom.article', 'article')
-      .where('user1.id = :userId OR user2.id = :userId', { userId })
-      .andWhere('article.isDeleted = false')
-      .orderBy('chatRoom.createdAt', 'DESC')
-      .getMany();
+    const chatRooms = await this.repository.getUserChatRooms(userId);
+
+    if (!chatRooms) {
+      throw new BadRequestException('채팅방 목록을 찾을 수 없습니다.');
+    }
+
+    // 채팅이 없는 채팅방 삭제
+    for (const chatRoom of chatRooms) {
+      const chats = await this.repository.getChatRoomMessages(chatRoom.id);
+      if (chats.length === 0) {
+        await this.deleteChatRoom(chatRoom.id);
+      }
+    }
+
+    // 삭제 후 다시 채팅방 목록 가져오기
+    const updatedChatRooms = await this.repository.getUserChatRooms(userId);
+
+    return updatedChatRooms;
+  }
+
+  async deleteChatRoom(chatRoomId: number) {
+    await this.getChatroomById(chatRoomId);
+    await this.repository.deleteChatRoom(chatRoomId);
   }
 }
