@@ -90,4 +90,56 @@ export class ProfileRepository {
     await this.removeAddress(user, oldAddressId);
     await this.addAddress(user, newAddressEntity);
   }
+
+  /**
+   * 사용자 프로필 이미지 추가
+   * @param userId 사용자 ID
+   * @param profileImageUrl 프로필 이미지 URL
+   * @returns 업데이트된 사용자 엔티티
+   * @throws HttpException 사용자를 찾을 수 없는 경우
+   */
+  async addProfileImage(
+    user: UserProfile,
+    profileImageUrl: string,
+  ): Promise<UpdateResult> {
+    return await this.repository
+      .createQueryBuilder()
+      .update(UserEntity)
+      .set({ profileimage: profileImageUrl })
+      .where('id = :id', { id: user.id })
+      .execute();
+  }
+
+  /**
+   * 사용자 프로필 이미지 삭제
+   * @param user 사용자
+   * @returns 업데이트된 사용자 엔티티
+   */
+  async deleteProfileImage(user: UserProfile): Promise<UpdateResult> {
+    return await this.repository
+      .createQueryBuilder()
+      .update(UserEntity)
+      .set({ profileimage: null })
+      .where('id = :id', { id: user.id })
+      .execute();
+  }
+
+  /**
+   * 사용자 프로필 이미지 교체
+   * @param userId 사용자 ID
+   * @param newProfileImageUrl 새로운 프로필 이미지 URL
+   * @returns 업데이트된 사용자 엔티티
+   * @throws HttpException 사용자를 찾을 수 없는 경우
+   */
+  async replaceProfileImage(
+    user: UserProfile,
+    newProfileImageUrl: string,
+  ): Promise<UpdateResult> {
+    return await this.repository
+      .createQueryBuilder()
+      .update(user)
+      .set({ profileimage: newProfileImageUrl })
+      .where('id = :id', { id: user.id })
+      .execute();
+  }
 }

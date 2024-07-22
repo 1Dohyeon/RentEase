@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import ChatRoom from "../components/ChatRoom";
 import Header from "../components/Header";
 import ReviewsContainer from "../components/ReviewsContainer";
 import StarRating from "../components/StarRating";
 import { AuthContext } from "../contexts/AuthContext";
 import apiClient from "../utils/apiClient";
+import "./ArticleDetailPage.css";
 
 interface Address {
   id: number;
@@ -20,6 +22,7 @@ interface Category {
 interface Author {
   id: number;
   nickname: string;
+  profileimage?: string;
 }
 
 interface Article {
@@ -35,6 +38,7 @@ interface Article {
   addresses: Address[];
   categories: Category[];
   author: Author;
+  mainImage?: string;
 }
 
 const ArticleDetailPage: React.FC = () => {
@@ -42,6 +46,8 @@ const ArticleDetailPage: React.FC = () => {
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const { userId, isLoggedIn } = useContext(AuthContext);
+  const [chatRoomId, setChatRoomId] = useState<number | null>(null);
+  const [isChatModalOpen, setIsChatModalOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
@@ -100,6 +106,31 @@ const ArticleDetailPage: React.FC = () => {
     navigate(`/users/${article?.author.id}`);
   };
 
+  const startChat = () => {
+    if (!isLoggedIn) {
+      alert("로그인 후 이용할 수 있습니다.");
+      return;
+    }
+
+    apiClient
+      .post("/chat/rooms", {
+        user1Id: userId,
+        user2Id: article?.author.id,
+        articleId: article?.id, // Pass articleId here
+      })
+      .then((response) => {
+        setChatRoomId(response.data.id);
+        setIsChatModalOpen(true);
+      })
+      .catch((error) => {
+        console.error("Error starting chat:", error);
+      });
+  };
+
+  const closeChatModal = () => {
+    setIsChatModalOpen(false);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -111,227 +142,108 @@ const ArticleDetailPage: React.FC = () => {
   return (
     <div>
       <Header />
-      <div style={{ maxWidth: "840px", margin: "0 auto", padding: "20px" }}>
-        <div
-          style={{
-            width: "100%",
-            height: "70px",
-          }}
-        ></div>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <p
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              maxWidth: "calc(100% - 180px)",
-              fontSize: "26px",
-            }}
-          >
-            {/* 제목 둬도 됨 */}
-          </p>
+      <div className="content-container">
+        <div className="spacer"></div>
+
+        <div className="header-actions">
+          <p className="article-title">{article.title}</p>
           {isLoggedIn && userId === article.author.id && (
-            <div>
+            <div className="action-buttons">
               <button
-                style={{
-                  padding: "10px 20px",
-                  backgroundColor: "#7DB26B",
-                  color: "white",
-                  textDecoration: "none",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  marginRight: "20px",
-                }}
+                className="edit-button"
                 onClick={() =>
-                  navigate(`/articles/edit/${id}`, { state: { article } })
+                  navigate(`/articles/edit/${article.id}`, {
+                    state: { article },
+                  })
                 }
               >
                 수정
               </button>
-              <button
-                style={{
-                  padding: "10px 20px",
-                  color: "#FF6347",
-                  textDecoration: "none",
-                  backgroundColor: "#fdfdfd",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                }}
-                onClick={handleDeleteArticle}
-              >
+              <button className="delete-button" onClick={handleDeleteArticle}>
                 삭제
               </button>
             </div>
           )}
+          {isLoggedIn && userId !== article.author.id && (
+            <button className="chat-button" onClick={startChat}>
+              채팅하기
+            </button>
+          )}
         </div>
-        {/* 이미지 섹션 추가 */}
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            marginTop: "20px",
-            marginBottom: "20px",
-          }}
-        >
-          <div
-            style={{
-              width: "50%",
-              paddingTop: "50%",
-              backgroundColor: "#d2d2d2",
-              borderRadius: "10px",
-              position: "relative",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-              }}
-            ></div>
+
+        <div className="image-section">
+          <div className="main-image-container">
+            <div className="main-image">
+              {article.mainImage && (
+                <img
+                  src={`${apiBaseUrl}/${article.mainImage}`}
+                  alt="Article main"
+                  className="main-image-content"
+                />
+              )}
+            </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              width: "50%",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                gap: "10px",
-                marginBottom: "10px",
-              }}
-            >
+          <div className="additional-images">
+            <div className="image-row">
               {[...Array(2)].map((_, index) => (
-                <div
-                  key={index}
-                  style={{
-                    width: "50%",
-                    paddingTop: "50%",
-                    backgroundColor: "#e5e5e5",
-                    borderRadius: "10px",
-                    position: "relative",
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                    }}
-                  ></div>
-                </div>
+                <div key={index} className="additional-image"></div>
               ))}
             </div>
-            <div
-              style={{
-                display: "flex",
-                gap: "10px",
-              }}
-            >
+            <div className="image-row">
               {[...Array(2)].map((_, index) => (
-                <div
-                  key={index}
-                  style={{
-                    width: "50%",
-                    paddingTop: "50%",
-                    backgroundColor: "#e5e5e5",
-                    borderRadius: "10px",
-                    position: "relative",
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                    }}
-                  ></div>
-                </div>
+                <div key={index} className="additional-image"></div>
               ))}
             </div>
           </div>
         </div>
-        {/* 카테고리 */}
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div style={{ width: "85%" }}>
+
+        <div className="category-time">
+          <div className="categories">
             {article.categories.map((category) => (
               <span key={category.id}>#{category.title}</span>
             ))}
           </div>
           <small>{article.createdTimeSince}</small>
         </div>
-        {/* 제목 */}
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div style={{ width: "85%" }}>
-            <p style={{ fontSize: "26px" }}>{article.title}</p>
-          </div>
+
+        <div className="title-section">
+          <p className="article-title-large">{article.title}</p>
         </div>
-        {/* 위치 */}
-        <div style={{ width: "85%" }}>
+
+        <div className="address-section">
           {article.addresses.map((address, index) => (
-            <span key={index} style={{ fontSize: "16px" }}>
+            <span key={index} className="address">
               {address.city} {address.district}
               {index < article.addresses.length - 1 ? ", " : ""}
             </span>
           ))}
-          <span style={{ fontSize: "16px" }}>
-            , 다른 지역 등등등(주소가 긴 경우를 테스트하기 위해서 놔둠)
-          </span>
         </div>
-        {/* 별점 */}
-        <div
-          style={{ fontSize: "20px", display: "flex", alignItems: "center" }}
-        >
+
+        <div className="rating-section">
           <StarRating rating={article.avgnumofstars} />
-          {article.avgnumofstars == 0 ? (
+          {article.avgnumofstars === 0 ? (
             <p>아직 후기가 없습니다.</p>
           ) : (
             <p>{article.avgnumofstars}</p>
           )}
         </div>
-        <hr style={{ margin: "30px 0px" }}></hr>
-        {/* 작성자 프로필 */}
-        <div
-          onClick={handleNicknameClick}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "10px",
-            cursor: "pointer",
-          }}
-        >
-          <div
-            style={{
-              width: "40px",
-              height: "40px",
-              backgroundColor: "#d2d2d2",
-              marginRight: "5px",
-              borderRadius: "20px",
-            }}
-          ></div>
-          <p>{article.author.nickname}</p>
+
+        <hr className="separator" />
+
+        <div className="author-section" onClick={handleNicknameClick}>
+          <div className="author-profile">
+            {article.author.profileimage && (
+              <img
+                src={`${apiBaseUrl}/${article.author.profileimage}`}
+                alt="게시글 작성자"
+                className="author-profile-image"
+              />
+            )}
+          </div>
+          <p className="author-nickname">{article.author.nickname}</p>
         </div>
-        {/* 가격 */}
-        <div
-          style={{
-            borderBottom: "1px solid #ddd",
-            margin: "30px 0px",
-            paddingBottom: "30px",
-          }}
-        >
+
+        <div className="price-section">
           <p>
             {getCurrencySymbol(article.currency)}
             {parseInt(article.dailyprice, 10).toLocaleString()}/일
@@ -349,19 +261,28 @@ const ArticleDetailPage: React.FC = () => {
             </p>
           )}
         </div>
-        <p
-          style={{
-            borderBottom: "1px solid #ddd",
-            margin: "30px 0px",
-            paddingBottom: "30px",
-          }}
-        >
-          {article.content}
-        </p>
+
+        <p className="content">{article.content}</p>
+
         <ReviewsContainer
           articleId={article.id}
           avgnumofstars={article.avgnumofstars}
         />
+
+        {isChatModalOpen && chatRoomId !== null && (
+          <div className="chat-modal">
+            <div className="chat-modal-content">
+              <button onClick={closeChatModal} className="chat-modal-close">
+                &times;
+              </button>
+              <ChatRoom
+                roomId={chatRoomId}
+                userId={userId!}
+                articleId={article.id}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

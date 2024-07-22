@@ -14,6 +14,7 @@ interface ArticleData {
   dailyprice: string;
   currency: string;
   addresses: Address[];
+  mainImage?: string;
 }
 
 interface MyArticlesComponentProps {
@@ -67,6 +68,7 @@ const MyBookmarkComponent: React.FC<MyArticlesComponentProps> = ({
           dailyprice={article.dailyprice}
           currency={article.currency}
           addresses={article.addresses}
+          mainImage={article.mainImage}
         />
       ))}
     </div>

@@ -34,6 +34,7 @@ export class ReviewRepository {
         'article.title',
         'writer.id',
         'writer.nickname',
+        'writer.profileimage',
       ])
       .getOne();
 
@@ -65,6 +66,7 @@ export class ReviewRepository {
         'article.title',
         'writer.id',
         'writer.nickname',
+        'writer.profileimage',
       ])
       .getMany();
 
@@ -96,6 +98,7 @@ export class ReviewRepository {
         'article.title',
         'writer.id',
         'writer.nickname',
+        'writer.profileimage',
       ])
       .getMany();
 

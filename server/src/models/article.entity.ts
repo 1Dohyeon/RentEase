@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -75,6 +76,17 @@ export class ArticleEntity extends CommonEntity {
   })
   avgnumofstars: number;
 
+  // 메인 이미지 추가
+  @IsOptional()
+  @IsString()
+  @Column({ type: 'varchar', nullable: true })
+  mainImage?: string;
+
+  // true=공개, false=비공개
+  @IsBoolean()
+  @Column({ type: 'boolean', nullable: true, default: false })
+  status: boolean;
+
   @ManyToOne(() => UserEntity, (user) => user.articles)
   @JoinColumn({ name: 'authorid' })
   author: UserEntity;
@@ -117,6 +129,7 @@ export interface ArticleBanner {
   addresses: AddressEntity[];
   categories: CategoryEntity[];
   reviews: ReviewEntity[];
+  mainImage?: string;
 }
 
 export interface ArticleDetail {
@@ -126,9 +139,11 @@ export interface ArticleDetail {
   currency: Currency;
   createdTimeSince: string;
   author: UserEntity;
+  status: boolean;
   addresses: AddressEntity[];
   categories: CategoryEntity[];
   reviews: ReviewEntity[];
   weeklyprice?: number;
   monthlyprice?: number;
+  mainImage?: string;
 }

@@ -3,18 +3,22 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Patch,
   Post,
   Query,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AccountService } from 'src/account/account.service';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { AddressEntity } from 'src/models/address.entity';
 import { UserAccount } from 'src/models/user.entity';
 import { ProfileService } from 'src/profile/profile.service';
-
 @Controller('settings')
 @UseGuards(JwtAuthGuard)
 export class SettingController {
@@ -61,6 +65,7 @@ export class SettingController {
    * @returns 생성된 주소 정보를 반환
    */
   @Post('/profile/address')
+  @UseGuards(JwtAuthGuard)
   async createAddress(
     @Request() req,
     @Body('address') address: string,
@@ -75,6 +80,7 @@ export class SettingController {
    * @returns 삭제된 주소 정보를 반환
    */
   @Delete('/profile/address')
+  @UseGuards(JwtAuthGuard)
   async removeAddress(
     @Query('userId') userId: number,
     @Query('addressId') addressId: number,
@@ -90,6 +96,7 @@ export class SettingController {
    * @returns 수정된 주소 정보를 반환
    */
   @Patch('/profile/address')
+  @UseGuards(JwtAuthGuard)
   async updateAddress(
     @Query('userId') userId: number,
     @Query('addressId') oldAddressId: number,
@@ -99,6 +106,66 @@ export class SettingController {
       userId,
       oldAddressId,
       newAddress,
+    );
+  }
+
+  /**
+   * 사용자 프로필 이미지 추가
+   * @param userId 사용자 ID
+   * @param updateUserProfileImageDto 프로필 이미지 URL
+   * @returns 업데이트된 사용자 엔티티
+   */
+  @Patch('/profile/profile-image')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async addProfileImage(
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new HttpException(
+        '프로필 이미지가 업로드되지 않았습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const profileImage = file.path;
+    return await this.profileService.addProfileImage(req.user.id, profileImage);
+  }
+
+  /**
+   * 사용자 프로필 이미지 삭제
+   * @param userId 사용자 ID
+   * @returns 업데이트된 사용자 엔티티
+   */
+  @Delete('/profile/profile-image')
+  @UseGuards(JwtAuthGuard)
+  async deleteProfileImage(@Request() req) {
+    return await this.profileService.deleteProfileImage(req.user.id);
+  }
+
+  /**
+   * 사용자 프로필 이미지 교체
+   * @param userId 사용자 ID
+   * @param updateUserProfileImageDto 새로운 프로필 이미지 URL
+   * @returns 업데이트된 사용자 엔티티
+   */
+  @Patch('/profile/profile-image/replace')
+  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(JwtAuthGuard)
+  async replaceProfileImage(
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new HttpException(
+        '새로운 프로필 이미지가 업로드되지 않았습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const newProfileImage = file.path;
+    return await this.profileService.replaceProfileImage(
+      req.user.id,
+      newProfileImage,
     );
   }
 

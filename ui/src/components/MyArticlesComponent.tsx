@@ -13,6 +13,7 @@ interface ArticleData {
   title: string;
   dailyprice: string;
   currency: string;
+  mainImage?: string;
   addresses: Address[];
 }
 
@@ -65,6 +66,7 @@ const MyArticlesComponent: React.FC<MyArticlesComponentProps> = ({
           id={article.id}
           title={article.title}
           dailyprice={article.dailyprice}
+          mainImage={article.mainImage}
           currency={article.currency}
           addresses={article.addresses}
         />

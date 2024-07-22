@@ -1,15 +1,22 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Patch,
   Post,
   Query,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
+import { OptionalAuthGuard } from 'src/auth/jwt/jwt.optionalAuthGuard';
 import { AddressEntity } from 'src/models/address.entity';
 import {
   ArticleBanner,
@@ -29,8 +36,10 @@ export class ArticleController {
    * @returns 모든 게시글의 배너 정보를 반환
    */
   @Get()
-  async getAllArticles(): Promise<ArticleBanner[]> {
-    return await this.articleService.getAllArticles();
+  @UseGuards(OptionalAuthGuard)
+  async getAllArticles(@Request() req): Promise<ArticleBanner[]> {
+    const userId = req.user ? req.user.id : null;
+    return await this.articleService.getAllArticles(userId);
   }
 
   /**
@@ -40,51 +49,13 @@ export class ArticleController {
    * 예: /articles/category?categoryId=1
    */
   @Get('category')
+  @UseGuards(OptionalAuthGuard)
   async getArticlesByCategory(
-    @Query('categoryId') categoryId: number,
-  ): Promise<ArticleBanner[]> {
-    return await this.articleService.getArticlesByCategory(categoryId);
-  }
-
-  /**
-   * 사용자 주소 정보와 동일한 게시글만 조회
-   * @param req 요청 객체, JWT 토큰을 통해 사용자 정보를 확인
-   * @param isLocation 사용자 위치 정보를 반영할지 여부
-   * @returns 사용자 주소 정보와 동일한 게시글의 배너 정보를 반환
-   * 예: /articles/location?location=true
-   */
-  @Get('location')
-  @UseGuards(JwtAuthGuard)
-  async getArticlesByLocation(
-    @Request() req,
-    @Query('isLocation') isLocation: boolean,
-  ): Promise<ArticleBanner[]> {
-    return await this.articleService.getArticlesByLocation(
-      req.user.id,
-      isLocation,
-    );
-  }
-
-  /**
-   * 특정 카테고리에서 사용자 주소 정보와 동일한 게시글만 조회
-   * @param req 요청 객체, JWT 토큰을 통해 사용자 정보를 확인
-   * @param categoryId 카테고리 ID
-   * @param isLocation 사용자 위치 정보를 반영할지 여부
-   * @returns 해당 카테고리와 사용자 주소 정보와 일치하는 게시글의 배너 정보를 반환
-   * 예: /articles/category-location?categoryId=1&location=true
-   */
-  @Get('category-location')
-  @UseGuards(JwtAuthGuard)
-  async getArticlesByCategoryAndLocation(
     @Request() req,
     @Query('categoryId') categoryId: number,
-    @Query('isLocation') isLocation: boolean,
   ): Promise<ArticleBanner[]> {
-    return await this.articleService.getArticlesByCategoryAndLocation(
-      req.user.id,
-      categoryId,
-      isLocation,
-    );
+    const userId = req.user ? req.user.id : null;
+    return await this.articleService.getArticlesByCategory(userId, categoryId);
   }
 
   /**
@@ -98,10 +69,12 @@ export class ArticleController {
    * @param categories 게시글에 연결할 카테고리
    * @param weeklyprice 주간 가격 (선택 사항)
    * @param monthlyprice 월간 가격 (선택 사항)
+   * @param file 업로드된 파일 (메인 이미지)
    * @returns 생성된 게시글 정보를 반환
    */
   @Post('write')
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
   async createArticle(
     @Request() req,
     @Body('title') title: string,
@@ -155,14 +128,43 @@ export class ArticleController {
    * article 업데이트
    * @param articleId 게시글 ID
    * @param body 업데이트할 게시글 정보
+   * @param file 업로드된 파일 (메인 이미지)
    * @returns 업데이트된 게시글 정보를 반환
    */
   @Patch('edit/:articleId')
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
   async updateArticle(
     @Param('articleId') articleId: number,
     @Body() body,
   ): Promise<ArticleDetail> {
     return await this.articleService.updateArticle(articleId, body);
+  }
+
+  @Patch(':articleId/main-image')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async addMainImage(
+    @Param('articleId') articleId: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new HttpException(
+        '프로필 이미지가 업로드되지 않았습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const mainImageUrl = file.path;
+    return await this.articleService.addMainImage(articleId, mainImageUrl);
+  }
+  /**
+   * 게시글 메인 이미지 삭제
+   * @param articleId 게시글 ID
+   * @returns 업데이트된 게시글 엔티티
+   */
+  @Delete(':articleId/main-image')
+  @UseGuards(JwtAuthGuard)
+  async deleteMainImage(@Param('articleId') articleId: number) {
+    return await this.articleService.deleteMainImage(articleId);
   }
 }

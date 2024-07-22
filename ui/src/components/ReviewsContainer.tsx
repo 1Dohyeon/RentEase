@@ -8,6 +8,7 @@ import StarRating from "./StarRating";
 interface ReviewWriter {
   id: number | null;
   nickname: string | null;
+  profileimage?: string;
 }
 
 interface ReviewData {

@@ -1,6 +1,8 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 import { AccountModule } from './account/account.module';
 import { AddressModule } from './address/address.module';
 import { AppController } from './app.controller';
@@ -8,11 +10,14 @@ import { ArticleModule } from './article/article.module';
 import { AuthModule } from './auth/auth.module';
 import { BookmarkModule } from './bookmark/bookmark.module';
 import { CategoryModule } from './category/category.module';
+import { ChatModule } from './chat/chat.module';
 import { LoggerMiddleware } from './common/logger/logger.middleware';
 import { AddressEntity } from './models/address.entity';
 import { ArticleEntity } from './models/article.entity';
 import { BookmarkEntity } from './models/bookmark.entity';
 import { CategoryEntity } from './models/category.entity';
+import { ChatEntity } from './models/chat.entity';
+import { ChatRoomEntity } from './models/chatroom.entity';
 import { ReviewEntity } from './models/review.entity';
 import { UserEntity } from './models/user.entity';
 import { ProfileModule } from './profile/profile.module';
@@ -22,6 +27,10 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads', // 클라이언트가 접근할 경로
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -41,6 +50,8 @@ import { UserModule } from './user/user.module';
         ReviewEntity,
         CategoryEntity,
         BookmarkEntity,
+        ChatEntity,
+        ChatRoomEntity,
       ],
       autoLoadEntities: true,
     }),
@@ -54,6 +65,7 @@ import { UserModule } from './user/user.module';
     ReviewModule,
     CategoryModule,
     BookmarkModule,
+    ChatModule,
   ],
   controllers: [AppController],
 })
