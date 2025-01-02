@@ -17,6 +17,8 @@ export class ChatRepository {
 
   /**
    * 두 유저와 게시글에 해당하는 채팅방을 가져옴
+   * 같은 사용자들끼리의 채팅방이라도 어느 상품을 통해 생성된 채팅방인지
+   * 분류하기 위해 articleId도 포함시킴
    * @param user1Id 첫 번째 유저 ID
    * @param user2Id 두 번째 유저 ID
    * @param articleId 게시글 ID

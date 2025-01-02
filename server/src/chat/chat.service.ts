@@ -41,6 +41,9 @@ export class ChatService {
 
   /**
    * 채팅방을 생성
+   * 사용자가 채팅하기를 클릭한다면 실행됨.
+   * 우선 두 사용자가 기존에 채팅방을 만들었는 지 확인 후,
+   * 만들었다면 조회를 하고, 아니라면 새로 만듦
    * @param user1Id 첫 번째 유저 ID
    * @param user2Id 두 번째 유저 ID
    * @param articleId 게시글 ID
@@ -108,21 +111,9 @@ export class ChatService {
     return chats;
   }
 
-  // /**
-  //  * 채팅방에 메시지를 추가
-  //  * @param chatRoomId 채팅방 ID
-  //  * @param senderId 보낸 사람의 유저 ID
-  //  * @param message 추가할 메시지 내용
-  //  * @returns 추가된 메시지 정보를 반환
-  //  */
-  // async addChatMessage(chatRoomId: number, senderId: number, message: string) {
-  //   const chatRoom = await this.repository.getChatroomById(chatRoomId);
-  //   const sender = await this.userService.getUserById(senderId);
-  //   return this.repository.createChat(chatRoom, sender, message);
-  // }
-
   /**
    * 특정 유저가 속한 모든 채팅방을 불러옴
+   * 채팅 내용이 없는 채팅방은 있을 필요가 없으니 지움
    * @param userId 유저 ID
    * @returns 유저가 속한 채팅방 리스트를 반환
    * @throws BadRequestException 채팅방 목록을 찾을 수 없을 때
@@ -149,7 +140,7 @@ export class ChatService {
   }
 
   /**
-   * 채팅방을 삭제
+   * 채팅방 삭제
    * @param chatRoomId 채팅방 ID
    */
   async deleteChatRoom(chatRoomId: number) {

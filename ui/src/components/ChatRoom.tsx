@@ -26,12 +26,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
-  const {
-    userId: loginUser,
-    isLoggedIn,
-    nickname,
-    profileimage,
-  } = useContext(AuthContext);
+  const { userId: loginUser, profileimage } = useContext(AuthContext);
 
   useEffect(() => {
     socket.emit("joinRoom", { chatRoomId: roomId });
@@ -41,6 +36,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
       setMessages(existingMessages);
     });
 
+    // 새로운 메시지가 들어오면 덮어씌움
     socket.on("newMessage", (newMessage: Message) => {
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
@@ -58,6 +54,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
     }
   }, [messages]);
 
+  // 메시지 전송할 때 사용
   const sendMessage = () => {
     if (message.trim()) {
       socket.emit("sendMessage", {

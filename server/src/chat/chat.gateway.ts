@@ -58,17 +58,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const { chatRoomId, sender, message } = payload;
 
     try {
-      console.log('Received message:', message);
-      console.log('Sender:', sender);
-
-      // 메시지 저장 로직 호출
+      // db에 메시지 저장
       const savedMessage = await this.chatService.saveMessage(
         chatRoomId,
         sender.id,
         message,
       );
 
-      // 새로운 메시지를 모든 클라이언트에게 브로드캐스트
+      // 새로운 메시지를 chatRoom-${chatRoomId}에 있는
+      // 모든 클라이언트에게 브로드캐스트
       this.server.to(`chatRoom-${chatRoomId}`).emit('newMessage', {
         sender: {
           id: savedMessage.sender.id, // sender.id 전송
@@ -102,9 +100,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.join(`chatRoom-${chatRoomId}`);
       // 채팅방의 기존 메시지 조회
       const messages = await this.chatService.getChatRoomMessages(chatRoomId);
+
       // 기존 메시지를 클라이언트에게 전송
-      client.emit('existingMessages', messages);
       client.emit('joinedRoom', { chatRoomId });
+      client.emit('existingMessages', messages);
       console.log(`Client ${client.id} joined chatRoom-${chatRoomId}`);
     } catch (error) {
       client.emit('error', {
@@ -127,8 +126,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     try {
       // 클라이언트를 채팅방 소켓 룸에서 제거
-      client.leave(`chatRoom-${chatRoomId}`);
       client.emit('leftRoom', { chatRoomId });
+      client.leave(`chatRoom-${chatRoomId}`);
       console.log(`Client ${client.id} left chatRoom-${chatRoomId}`);
     } catch (error) {
       client.emit('error', {
