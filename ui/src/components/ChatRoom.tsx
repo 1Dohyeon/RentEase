@@ -9,7 +9,7 @@ const socket = io(process.env.REACT_APP_SOCKET_URL as string);
 interface Message {
   sender: {
     nickname: string;
-    id: number;
+    senderId: number;
     profileimage: string;
   };
   message: string;
@@ -28,28 +28,20 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    socket.emit("joinRoom", { roomId });
+    socket.emit("joinRoom", { chatRoomId: roomId });
 
-    const fetchMessages = () => {
-      apiClient.get(`/chat/rooms/${roomId}/messages`).then((response) => {
-        setMessages(response.data);
-        console.log("Fetched messages:", response.data);
-      });
-    };
+    socket.on("existingMessages", (existingMessages: Message[]) => {
+      setMessages(existingMessages);
+    });
 
-    fetchMessages();
-
-    socket.on("receiveMessage", (newMessage: Message) => {
-      console.log("Received new message:", newMessage);
-      setMessages((prevMessages) => {
-        const updatedMessages = [...prevMessages, newMessage];
-        console.log("Updated messages:", updatedMessages);
-        return updatedMessages;
-      });
+    socket.on("newMessage", (newMessage: Message) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
 
     return () => {
-      socket.disconnect();
+      socket.emit("leaveRoom", { chatRoomId: roomId });
+      socket.off("existingMessages");
+      socket.off("newMessage");
     };
   }, [roomId]);
 
@@ -61,21 +53,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
 
   const sendMessage = () => {
     if (message.trim()) {
-      socket.emit("sendMessage", { roomId, senderId: userId, message });
-
-      apiClient
-        .post(`/chat/rooms/${roomId}/messages`, { senderId: userId, message })
-        .then(() => {
-          setMessage("");
-
-          apiClient.get(`/chat/rooms/${roomId}/messages`).then((response) => {
-            setMessages(response.data);
-            console.log("Messages refreshed:", response.data);
-          });
-        })
-        .catch((error) => {
-          console.error("Error saving message:", error);
-        });
+      socket.emit("sendMessage", {
+        chatRoomId: roomId,
+        senderId: userId,
+        message,
+      });
+      setMessage("");
     }
   };
 
@@ -104,22 +87,21 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
           flex: 1,
           overflowY: "scroll",
           padding: "10px",
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
         }}
       >
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            style={{
-              display: "flex",
-              flexDirection: msg.sender.id === userId ? "row-reverse" : "row",
-              marginBottom: "10px",
-              alignItems: "flex-end",
-            }}
-          >
-            {msg.sender.id !== userId && (
-              <>
+        {messages.map((msg, index) => {
+          const isCurrentUser = msg.sender?.senderId === userId; // 안전하게 senderId 확인
+          return (
+            <div
+              key={index}
+              style={{
+                display: "flex",
+                flexDirection: isCurrentUser ? "row-reverse" : "row",
+                marginBottom: "10px",
+                alignItems: "center",
+              }}
+            >
+              {!isCurrentUser && msg.sender && (
                 <img
                   src={`${apiClient.defaults.baseURL}/${msg.sender.profileimage}`}
                   alt="Profile"
@@ -130,38 +112,25 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
                     marginRight: "10px",
                     cursor: "pointer",
                   }}
-                  onClick={() => handleProfileClick(msg.sender.id)}
+                  onClick={() => handleProfileClick(msg.sender.senderId)}
                 />
-                <div
-                  style={{
-                    maxWidth: "70%",
-                    padding: "8px 12px",
-                    borderRadius: "10px",
-                    backgroundColor: "#f1f1f1",
-                    textAlign: "left",
-                    wordBreak: "break-word",
-                  }}
-                >
-                  <div>{msg.message}</div>
-                </div>
-              </>
-            )}
-            {msg.sender.id === userId && (
+              )}
               <div
                 style={{
                   maxWidth: "70%",
                   padding: "8px 12px",
                   borderRadius: "10px",
-                  backgroundColor: "#d1ffd6",
+                  backgroundColor: isCurrentUser ? "#d1ffd6" : "#f1f1f1",
                   textAlign: "left",
                   wordBreak: "break-word",
+                  alignSelf: "flex-start",
                 }}
               >
-                {msg.message}
+                <div>{msg.message}</div>
               </div>
-            )}
-          </div>
-        ))}
+            </div>
+          );
+        })}
 
         <div ref={messagesEndRef} />
       </div>
@@ -173,31 +142,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
           alignItems: "center",
         }}
       >
-        <button
-          onClick={() =>
-            apiClient.get(`/chat/rooms/${roomId}/messages`).then((response) => {
-              setMessages(response.data);
-              console.log("Messages refreshed:", response.data);
-            })
-          }
-          style={{
-            width: "40px",
-            height: "40px",
-            padding: "5px",
-            marginRight: "10px",
-            backgroundColor: "transparent",
-            color: "black",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "20px",
-          }}
-        >
-          <i className="fas fa-sync-alt"></i>
-        </button>
         <input
           type="text"
           value={message}
