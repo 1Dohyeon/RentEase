@@ -35,7 +35,7 @@ const Login: React.FC = () => {
         { withCredentials: true }
       );
       const { jwt, loginUser } = response.data;
-      login(loginUser.nickname, loginUser.id, jwt); // AuthProvider의 login 함수 호출
+      login(loginUser.id, loginUser.nickname, loginUser.profileImage, jwt); // AuthProvider의 login 함수 호출
 
       // 성공적으로 로그인된 경우, /articles로 이동
       navigate("/articles");

@@ -1,40 +1,53 @@
-import "@fortawesome/fontawesome-free/css/all.min.css";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
+import { AuthContext } from "../contexts/AuthContext";
 import apiClient from "../utils/apiClient";
+import "./ChatRoom.css";
 
 const socket = io(process.env.REACT_APP_SOCKET_URL as string);
 
 interface Message {
   sender: {
     nickname: string;
-    senderId: number;
+    id: number;
     profileimage: string;
   };
   message: string;
 }
 
+interface SendMessage {
+  senderId: number;
+  message: string;
+}
+
 interface ChatRoomProps {
   roomId: number;
-  userId: number;
   articleId: number;
 }
 
-const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
+const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
+  const {
+    userId: loginUser,
+    isLoggedIn,
+    nickname,
+    profileImage,
+  } = useContext(AuthContext); // 여기서 한 번만 호출
 
   useEffect(() => {
     socket.emit("joinRoom", { chatRoomId: roomId });
 
     socket.on("existingMessages", (existingMessages: Message[]) => {
+      // 기존 메시지 구조가 일치하도록 처리
       setMessages(existingMessages);
     });
 
     socket.on("newMessage", (newMessage: Message) => {
+      console.log("새로운 메시지:", newMessage);
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
 
@@ -55,93 +68,61 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
     if (message.trim()) {
       socket.emit("sendMessage", {
         chatRoomId: roomId,
-        senderId: userId,
+        sender: {
+          id: loginUser,
+          nickname: nickname,
+          profileimage: profileImage,
+        },
         message,
       });
-      setMessage("");
+      setMessage(""); // 메시지 전송 후 초기화
     }
   };
 
-  const handleProfileClick = (userId: number) => {
-    navigate(`/users/${userId}`);
+  const handleProfileClick = (senderId: number | undefined) => {
+    if (!senderId) {
+      console.error("Invalid senderId:", senderId);
+      return;
+    }
+    navigate(`/users/${senderId}`);
   };
 
   return (
-    <div
-      style={{
-        bottom: 0,
-        right: 0,
-        width: "360px",
-        height: "460px",
-        backgroundColor: "#fff",
-        border: "1px solid #ddd",
-        boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-        zIndex: 1000,
-        display: "flex",
-        flexDirection: "column",
-        marginTop: "20px",
-      }}
-    >
-      <div
-        style={{
-          flex: 1,
-          overflowY: "scroll",
-          padding: "10px",
-        }}
-      >
+    <div className="chat-room">
+      <div className="chat-room-messages">
         {messages.map((msg, index) => {
-          const isCurrentUser = msg.sender?.senderId === userId; // 안전하게 senderId 확인
+          const isCurrentUser = msg.sender?.id === loginUser;
+          console.log(
+            "로그인 사용자 ID:",
+            loginUser,
+            "메시지 보낸 사람 ID:",
+            msg.sender?.id
+          );
           return (
             <div
               key={index}
-              style={{
-                display: "flex",
-                flexDirection: isCurrentUser ? "row-reverse" : "row",
-                marginBottom: "10px",
-                alignItems: "center",
-              }}
+              className={`chat-message ${isCurrentUser ? "reverse" : ""}`}
             >
               {!isCurrentUser && msg.sender && (
                 <img
                   src={`${apiClient.defaults.baseURL}/${msg.sender.profileimage}`}
                   alt="Profile"
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "50%",
-                    marginRight: "10px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleProfileClick(msg.sender.senderId)}
+                  onClick={() => handleProfileClick(msg.sender.id)}
                 />
               )}
               <div
-                style={{
-                  maxWidth: "70%",
-                  padding: "8px 12px",
-                  borderRadius: "10px",
-                  backgroundColor: isCurrentUser ? "#d1ffd6" : "#f1f1f1",
-                  textAlign: "left",
-                  wordBreak: "break-word",
-                  alignSelf: "flex-start",
-                }}
+                className={`chat-message-box ${
+                  isCurrentUser ? "current-user" : "other-user"
+                }`}
               >
                 <div>{msg.message}</div>
               </div>
             </div>
           );
         })}
-
         <div ref={messagesEndRef} />
       </div>
-      <div
-        style={{
-          borderTop: "1px solid #ddd",
-          padding: "10px",
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
+      <div className="chat-room-input">
         <input
           type="text"
           value={message}
@@ -149,21 +130,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId, userId }) => {
           placeholder="메시지를 입력하세요"
           style={{ flex: 1, padding: "5px", borderRadius: "5px" }}
         />
-        <button
-          onClick={sendMessage}
-          style={{
-            width: "70px",
-            padding: "5px",
-            marginLeft: "10px",
-            border: "none",
-            color: "#fff",
-            fontWeight: "bold",
-            backgroundColor: "#7db26b",
-            borderRadius: "5px",
-          }}
-        >
-          전송
-        </button>
+        <button onClick={sendMessage}>전송</button>
       </div>
     </div>
   );

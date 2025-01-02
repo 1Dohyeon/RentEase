@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ChatRoom from "../components/ChatRoom";
 import Header from "../components/Header";
+import { AuthContext } from "../contexts/AuthContext";
 import apiClient from "../utils/apiClient";
 import "./UserChatroomPage.css";
 
@@ -26,7 +27,8 @@ interface ChatRoomData {
 
 const UserChatroomPage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
-  const navigate = useNavigate(); // useNavigate hook to handle navigation
+  const { userId: loginUser, isLoggedIn } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [chatRooms, setChatRooms] = useState<ChatRoomData[]>([]);
   const [selectedChatRoomId, setSelectedChatRoomId] = useState<number | null>(
     null
@@ -40,7 +42,7 @@ const UserChatroomPage: React.FC = () => {
     const fetchChatRooms = async () => {
       try {
         const response = await apiClient.get<ChatRoomData[]>(
-          `/chat/rooms/users/${userId}`
+          `/chat/rooms/users/${loginUser}`
         );
         setChatRooms(response.data);
         setLoading(false);
@@ -51,7 +53,7 @@ const UserChatroomPage: React.FC = () => {
     };
 
     fetchChatRooms();
-  }, [userId]);
+  }, [loginUser]);
 
   const handleChatRoomClick = (roomId: number, articleId: number) => {
     setSelectedChatRoomId(roomId);
@@ -123,7 +125,6 @@ const UserChatroomPage: React.FC = () => {
             </button>
             <ChatRoom
               roomId={selectedChatRoomId}
-              userId={parseInt(userId!)}
               articleId={selectedArticleId}
             />
           </div>

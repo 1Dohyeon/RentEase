@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { ReactNode, createContext, useEffect, useState } from "react";
 
 interface AuthContextType {
@@ -6,8 +5,15 @@ interface AuthContextType {
   setUserId: (userId: number | null) => void;
   nickname: string | null;
   setNickname: (nickname: string | null) => void;
+  profileImage: string | null;
+  setProfileImage: (profileImage: string | null) => void;
   isLoggedIn: boolean;
-  login: (nickname: string, userId: number, jwt: string) => void;
+  login: (
+    userId: number,
+    nickname: string,
+    profileImage: string,
+    jwt: string
+  ) => void;
   logout: () => void;
 }
 
@@ -16,13 +22,11 @@ export const AuthContext = createContext<AuthContextType>({
   setUserId: () => {},
   nickname: null,
   setNickname: () => {},
+  profileImage: null,
+  setProfileImage: () => {},
   isLoggedIn: false,
   login: () => {},
   logout: () => {},
-});
-
-const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL,
 });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
@@ -30,36 +34,45 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [nickname, setNickname] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(null); // profileImage 상태 추가
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   useEffect(() => {
     const token = sessionStorage.getItem("jwt");
-    const storedUserId = sessionStorage.getItem("userId"); // 세션 스토리지에서 userId 가져오기
+    const storedUserId = sessionStorage.getItem("userId");
+    const storedProfileImage = sessionStorage.getItem("profileImage"); // profileImage 불러오기
     if (token && storedUserId) {
-      // 토큰이 있을 경우 로그인 상태를 유지합니다.
       setIsLoggedIn(true);
-      setUserId(Number(storedUserId)); // userId를 세션 스토리지에서 가져와 설정
+      setUserId(Number(storedUserId));
+      setProfileImage(storedProfileImage); // profileImage 설정
     } else {
       setIsLoggedIn(false);
     }
   }, []);
 
-  const login = (nickname: string, userId: number, jwt: string) => {
-    // 세션 스토리지에 jwt와 userId 저장
+  const login = (
+    userId: number,
+    nickname: string,
+    profileImage: string,
+    jwt: string
+  ) => {
     sessionStorage.setItem("jwt", jwt);
     sessionStorage.setItem("userId", userId.toString());
+    sessionStorage.setItem("profileImage", profileImage); // profileImage 세션에 저장
     setNickname(nickname);
     setUserId(userId);
+    setProfileImage(profileImage); // profileImage 설정
     setIsLoggedIn(true);
   };
 
   const logout = () => {
     setNickname(null);
     setUserId(null);
+    setProfileImage(null); // 로그아웃 시 profileImage도 초기화
     setIsLoggedIn(false);
-    // 세션 스토리지에서 jwt와 userId 삭제
     sessionStorage.removeItem("jwt");
     sessionStorage.removeItem("userId");
+    sessionStorage.removeItem("profileImage"); // profileImage 세션에서 삭제
   };
 
   return (
@@ -69,6 +82,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setNickname,
         userId,
         setUserId,
+        profileImage, // profileImage 추가
+        setProfileImage,
         isLoggedIn,
         login,
         logout,

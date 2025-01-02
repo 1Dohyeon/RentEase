@@ -46,22 +46,41 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleSendMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody()
-    payload: { chatRoomId: number; senderId: number; message: string },
+    payload: {
+      chatRoomId: number;
+      sender: {
+        id: number;
+        nickname: string;
+        profileimage: string;
+      };
+      message: string;
+    },
   ) {
-    const { chatRoomId, senderId, message } = payload;
+    const { chatRoomId, sender, message } = payload;
 
     try {
       console.log('Received message:', message);
+      console.log('Sender:', sender);
+
+      // 메시지 저장 로직 호출
       const savedMessage = await this.chatService.saveMessage(
         chatRoomId,
-        senderId,
+        sender.id, // sender 객체에서 id 추출
         message,
       );
-      console.log('Saved message:', savedMessage); // 저장된 메시지 출력
 
-      this.server.to(`chatRoom-${chatRoomId}`).emit('newMessage', savedMessage);
+      // 저장된 메시지 출력
+      console.log('Saved message:', savedMessage);
+
+      // 새로운 메시지를 모든 클라이언트에게 브로드캐스트
+      this.server.to(`chatRoom-${chatRoomId}`).emit('newMessage', {
+        sender,
+        message,
+      });
     } catch (error) {
       console.error('Error saving message:', error);
+
+      // 클라이언트에게 에러 메시지 전송
       client.emit('error', {
         message: '메시지를 전송하는 중 오류가 발생했습니다.',
       });

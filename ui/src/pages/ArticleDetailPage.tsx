@@ -275,11 +275,7 @@ const ArticleDetailPage: React.FC = () => {
               <button onClick={closeChatModal} className="chat-modal-close">
                 &times;
               </button>
-              <ChatRoom
-                roomId={chatRoomId}
-                userId={userId!}
-                articleId={article.id}
-              />
+              <ChatRoom roomId={chatRoomId} articleId={article.id} />
             </div>
           </div>
         )}
