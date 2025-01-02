@@ -88,9 +88,7 @@ export class ChatService {
   // 메시지 저장
   async saveMessage(chatRoomId: number, senderId: number, message: string) {
     const chatRoom = await this.getChatroomById(chatRoomId); // 채팅방 검증
-    const sender = await this.userService.getUserById(senderId); // 유저 검증 (필요 시)
-
-    // Repository에 메시지 생성 요청
+    const sender = await this.userService.getUserById(senderId);
     return this.chatRepository.createChat(chatRoom, sender, message);
   }
 

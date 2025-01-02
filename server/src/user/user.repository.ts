@@ -95,7 +95,14 @@ export class UserRepository {
    * @returns 주어진 이메일을 가진 사용자 객체를 반환
    */
   async getUserByEmail(email: string): Promise<any | null> {
-    return await this.repository.findOne({ where: { email } });
+    return await this.repository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.addresses', 'address')
+      .leftJoinAndSelect('user.articles', 'article')
+      .where('user.email = :email', { email: email })
+      .andWhere('user.isDeleted = false')
+      .addSelect(['user.password'])
+      .getOne();
   }
 
   /**

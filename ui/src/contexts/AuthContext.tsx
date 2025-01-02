@@ -5,8 +5,8 @@ interface AuthContextType {
   setUserId: (userId: number | null) => void;
   nickname: string | null;
   setNickname: (nickname: string | null) => void;
-  profileImage: string | null;
-  setProfileImage: (profileImage: string | null) => void;
+  profileimage: string | null;
+  setProfileimage: (profileImage: string | null) => void;
   isLoggedIn: boolean;
   login: (
     userId: number,
@@ -22,8 +22,8 @@ export const AuthContext = createContext<AuthContextType>({
   setUserId: () => {},
   nickname: null,
   setNickname: () => {},
-  profileImage: null,
-  setProfileImage: () => {},
+  profileimage: null,
+  setProfileimage: () => {},
   isLoggedIn: false,
   login: () => {},
   logout: () => {},
@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [nickname, setNickname] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
-  const [profileImage, setProfileImage] = useState<string | null>(null); // profileImage 상태 추가
+  const [profileimage, setProfileimage] = useState<string | null>(null); // profileImage 상태 추가
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     if (token && storedUserId) {
       setIsLoggedIn(true);
       setUserId(Number(storedUserId));
-      setProfileImage(storedProfileImage); // profileImage 설정
+      setProfileimage(storedProfileImage); // profileImage 설정
     } else {
       setIsLoggedIn(false);
     }
@@ -61,14 +61,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     sessionStorage.setItem("profileImage", profileImage); // profileImage 세션에 저장
     setNickname(nickname);
     setUserId(userId);
-    setProfileImage(profileImage); // profileImage 설정
+    setProfileimage(profileImage); // profileImage 설정
     setIsLoggedIn(true);
   };
 
   const logout = () => {
     setNickname(null);
     setUserId(null);
-    setProfileImage(null); // 로그아웃 시 profileImage도 초기화
+    setProfileimage(null); // 로그아웃 시 profileImage도 초기화
     setIsLoggedIn(false);
     sessionStorage.removeItem("jwt");
     sessionStorage.removeItem("userId");
@@ -82,8 +82,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setNickname,
         userId,
         setUserId,
-        profileImage, // profileImage 추가
-        setProfileImage,
+        profileimage, // profileImage 추가
+        setProfileimage,
         isLoggedIn,
         login,
         logout,

@@ -50,7 +50,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       chatRoomId: number;
       sender: {
         id: number;
-        nickname: string;
         profileimage: string;
       };
       message: string;
@@ -65,7 +64,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // 메시지 저장 로직 호출
       const savedMessage = await this.chatService.saveMessage(
         chatRoomId,
-        sender.id, // sender 객체에서 id 추출
+        sender.id,
         message,
       );
 
@@ -74,7 +73,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       // 새로운 메시지를 모든 클라이언트에게 브로드캐스트
       this.server.to(`chatRoom-${chatRoomId}`).emit('newMessage', {
-        sender,
+        sender: {
+          id: savedMessage.senderId, // sender.id 전송
+          profileimage: savedMessage.senderProfileImage,
+        },
         message,
       });
     } catch (error) {

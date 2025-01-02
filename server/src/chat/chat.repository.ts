@@ -96,6 +96,7 @@ export class ChatRepository {
     return {
       message: savedChatMessage.message,
       senderId: sender.id,
+      senderProfileImage: sender.profileimage,
       createdAt: savedChatMessage.createdAt,
     };
   }

@@ -16,11 +16,6 @@ interface Message {
   message: string;
 }
 
-interface SendMessage {
-  senderId: number;
-  message: string;
-}
-
 interface ChatRoomProps {
   roomId: number;
   articleId: number;
@@ -35,8 +30,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
     userId: loginUser,
     isLoggedIn,
     nickname,
-    profileImage,
-  } = useContext(AuthContext); // 여기서 한 번만 호출
+    profileimage,
+  } = useContext(AuthContext);
 
   useEffect(() => {
     socket.emit("joinRoom", { chatRoomId: roomId });
@@ -47,7 +42,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
     });
 
     socket.on("newMessage", (newMessage: Message) => {
-      console.log("새로운 메시지:", newMessage);
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
 
@@ -70,8 +64,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
         chatRoomId: roomId,
         sender: {
           id: loginUser,
-          nickname: nickname,
-          profileimage: profileImage,
+          profileimage: profileimage,
         },
         message,
       });
@@ -95,8 +88,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ roomId }) => {
           console.log(
             "로그인 사용자 ID:",
             loginUser,
-            "메시지 보낸 사람 ID:",
-            msg.sender?.id
+            "메시지 보낸 사람:",
+            msg.sender
           );
           return (
             <div
