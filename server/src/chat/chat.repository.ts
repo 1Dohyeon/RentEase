@@ -93,12 +93,7 @@ export class ChatRepository {
       message,
     });
     const savedChatMessage = await this.chatRepository.save(chatMessage);
-    return {
-      message: savedChatMessage.message,
-      senderId: sender.id,
-      senderProfileImage: sender.profileimage,
-      createdAt: savedChatMessage.createdAt,
-    };
+    return savedChatMessage;
   }
 
   /**

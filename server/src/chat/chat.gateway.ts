@@ -68,14 +68,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         message,
       );
 
-      // 저장된 메시지 출력
-      console.log('Saved message:', savedMessage);
-
       // 새로운 메시지를 모든 클라이언트에게 브로드캐스트
       this.server.to(`chatRoom-${chatRoomId}`).emit('newMessage', {
         sender: {
-          id: savedMessage.senderId, // sender.id 전송
-          profileimage: savedMessage.senderProfileImage,
+          id: savedMessage.sender.id, // sender.id 전송
+          profileimage: savedMessage.sender.profileimage,
         },
         message,
       });
