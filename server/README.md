@@ -72,3 +72,17 @@ npm i --save-dev @types/passport-jwt
 ```
 npm i request-ip
 ```
+
+**9. socket**
+
+```
+npm install @nestjs/platform-socket.io socket.io
+npm install @types/socket.io @types/socket.io-client
+npm install @nestjs/platform-express cors
+```
+
+**10. multer**
+
+```
+npm install multer
+```
