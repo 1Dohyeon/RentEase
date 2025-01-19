@@ -5,7 +5,7 @@
 
 ### 2. 브랜치 및 커밋
 
-**브랜치**
+**branch**
 
 - main : 배포 브랜치
 - hotfix : main 브랜치 버그 수정
@@ -14,7 +14,7 @@
   - #n issue name : issue에 포함된 기능별 브랜치(ex. #1 로그인 기능 구현)
   - feature 브랜치를 나눌 때 develop 브랜치으로부터 나눌 것
 
-**커밋 규칙**
+**commit rules**
 
 - add : 새로운 개발 환경, 파일 및 새로운 기능을 추가하는 경우
 - fetch : 코드를 업데이트 했을 경우
