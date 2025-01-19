@@ -122,10 +122,11 @@ const CategoriesList: React.FC<CategoriesListProps> = ({ onCategoryClick }) => {
                 key={category.id}
                 style={{
                   width: "150px",
-                  height: "150px",
+                  height: "160px",
                   borderRadius: "50%",
-                  backgroundColor: "#c0c0c0",
+                  backgroundColor: "#fcfcfc",
                   display: "flex",
+                  fontWeight: "bold",
                   alignItems: "center",
                   justifyContent: "center",
                   cursor: "pointer",
