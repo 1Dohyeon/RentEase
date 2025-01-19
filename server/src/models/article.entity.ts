@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -16,6 +17,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
+import { BookmarkEntity } from './bookmark.entity';
 import { CategoryEntity } from './category.entity';
 import { ReviewEntity } from './review.entity';
 import { UserEntity } from './user.entity';
@@ -63,11 +65,33 @@ export class ArticleEntity extends CommonEntity {
   @Column({ type: 'enum', enum: Currency, nullable: false })
   currency: Currency;
 
+  @IsNumber()
+  @IsOptional()
+  @Column({
+    type: 'decimal',
+    precision: 3,
+    scale: 2,
+    nullable: false,
+    default: 0,
+  })
+  avgnumofstars: number;
+
+  // 메인 이미지 추가
+  @IsOptional()
+  @IsString()
+  @Column({ type: 'varchar', nullable: true })
+  mainImage?: string;
+
+  // true=공개, false=비공개
+  @IsBoolean()
+  @Column({ type: 'boolean', nullable: true, default: false })
+  status: boolean;
+
   @ManyToOne(() => UserEntity, (user) => user.articles)
   @JoinColumn({ name: 'authorid' })
   author: UserEntity;
 
-  @OneToMany(() => UserEntity, (user) => user.reviews)
+  @OneToMany(() => ReviewEntity, (review) => review.article)
   reviews: ReviewEntity[];
 
   @ManyToMany(() => AddressEntity, (address) => address.articles)
@@ -85,4 +109,41 @@ export class ArticleEntity extends CommonEntity {
     inverseJoinColumn: { name: 'categoryid', referencedColumnName: 'id' },
   })
   categories: CategoryEntity[];
+
+  @ManyToMany(() => BookmarkEntity, (bookmark) => bookmark.articles)
+  @JoinTable({
+    name: 'bookmarksarticle',
+    joinColumn: { name: 'articleid', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'bookmarkid', referencedColumnName: 'id' },
+  })
+  bookmarks: BookmarkEntity[];
+}
+
+export interface ArticleBanner {
+  id: number;
+  title: string;
+  dailyprice: number;
+  currency: Currency;
+  createdTimeSince: string;
+  author: UserEntity;
+  addresses: AddressEntity[];
+  categories: CategoryEntity[];
+  reviews: ReviewEntity[];
+  mainImage?: string;
+}
+
+export interface ArticleDetail {
+  id: number;
+  title: string;
+  dailyprice: number;
+  currency: Currency;
+  createdTimeSince: string;
+  author: UserEntity;
+  status: boolean;
+  addresses: AddressEntity[];
+  categories: CategoryEntity[];
+  reviews: ReviewEntity[];
+  weeklyprice?: number;
+  monthlyprice?: number;
+  mainImage?: string;
 }

@@ -1,0 +1,43 @@
+.address-component {
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.address-component > div {
+  margin-bottom: 10px;
+}
+
+.address-component label {
+  font-weight: bold;
+}
+
+.address-component select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 200px;
+}
+
+.address-component button {
+  padding: 8px 12px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: #fff;
+}
+
+.address-component .edit-button {
+  background-color: #7db26b;
+}
+
+.address-component .delete-button {
+  background-color: #dc3545;
+}
+
+.address-component .add-button {
+  background-color: #7db26b;
+}
