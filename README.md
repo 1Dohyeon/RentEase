@@ -2,7 +2,7 @@
 
 개인 대 개인 렌탈 플랫폼
 
-![[./imgs/intro-img.png]]
+![intro-img](https://github.com/1Dohyeon/RentEase/blob/main/imgs/intro-img.png?raw=true)
 
 #### 1. 프로젝트 개요
 
